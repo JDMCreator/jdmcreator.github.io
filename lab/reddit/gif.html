@@ -1,0 +1,133 @@
+
+<html>
+<title>GIF to CSS3 Generator for Reddit</title>
+<style>
+canvas{
+position:absolute;
+left:-9999px;
+top:-9999px;
+}
+
+@keyframes gif-MyGif {
+0% {background-position:0px -0px;}
+5% {background-position:0px -50px;}
+10% {background-position:0px -100px;}
+15% {background-position:0px -150px;}
+20% {background-position:0px -200px;}
+25% {background-position:0px -250px;}
+30% {background-position:0px -300px;}
+35% {background-position:0px -350px;}
+40% {background-position:0px -400px;}
+45% {background-position:0px -450px;}
+50% {background-position:0px -500px;}
+55% {background-position:0px -550px;}
+60% {background-position:0px -600px;}
+65% {background-position:0px -650px;}
+70% {background-position:0px -700px;}
+75% {background-position:0px -750px;}
+80% {background-position:0px -800px;}
+85% {background-position:0px -850px;}
+90% {background-position:0px -900px;}
+95%, 100% {background-position:0px -950px;}
+}
+.test{
+background:url(frames.png) no-repeat 0px 0px;
+display:inline-block;
+width:50px;
+height:50px;
+animation: gif-MyGif 2000ms infinite steps(1);
+}
+
+</style>
+<script type="text/javascript" src="libgif.js"></script>
+<script type="text/javascript">
+
+function upload(element){
+document.getElementById('loading').style.display="block";
+ var file    = element.files[0];
+  var reader  = new FileReader();
+
+  reader.onloadend = function () {
+	var url =reader.result;
+	var rub = new SuperGif({ gif: document.getElementById('img') })
+
+	rub.load_url(url, function(){
+		drawImage(rub)
+	});
+  }
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+}
+function drawImage(rub){
+var canvas = document.getElementById('canvas'),
+height = rub.get_canvas().height,
+width = rub.get_canvas().width,
+img = document.getElementById('final_img'),
+frames = rub.getFrames(),
+totalTime = 0;
+rub.get_canvas().style.cssText="position:absolute;top:-9999px;left:-9999px;";
+canvas.width = width;
+canvas.height = height*frames.length
+
+for(var i=0, l = frames.length;i<l;i++){
+var frame = frames[i];
+	canvas.getContext('2d').putImageData(frame.data, 0, height*i);
+	totalTime += frame.delay;
+}
+img.removeAttribute("width");
+img.removeAttribute("height");
+if(height*frames.length>width){
+img.height=100;
+}
+else{
+img.width=100;
+}
+img.src = canvas.toDataURL();
+info_img.innerHTML=width+"x"+(height*frames.length)+"px - "+frames.length+" frames";
+
+/*generate keyframes*/
+var text="",
+gif_name=document.getElementById('name').value,
+actualTime=0;
+text="@keyframes gif-"+gif_name+" {\n";
+for(var i=0, l = frames.length;i<l;i++){
+	var frame = frames[i];
+	if(i<frames.length-1){
+		text += "\t"+Math.round(actualTime/totalTime*100)+"% {background-position:0px -"+height*i+"px;}\n"
+	}
+	else{
+		text += "\t"+Math.round(actualTime/totalTime*100)+"%, 100% {background-position:0px -"+height*i+"px;}"
+	}
+	actualTime += frame.delay;
+}
+text+="\n}\n"
+text+="a[href=\"#gif-"+gif_name+"\"] {\n\tbackground:url(%%"+gif_name+"%%) no-repeat 0px 0px;\n\tdisplay:inline-block;\n\twidth:"+width+"px;\n\theight:"+height+"px;"
+text+="\n\tanimation: gif-"+gif_name+" "+(totalTime*10)+"ms infinite steps(1);\n\tfont-size:0px;\n}";
+document.getElementById('css').value=(text);
+document.getElementById('r_name').value = gif_name;
+document.getElementById('markdown').value = "[](#gif-"+gif_name+")";
+document.getElementById('loading').style.display="none";
+document.getElementById('show').style.display="block";
+}
+</script>
+</html>
+Select your GIF : <input type="file" accept="image/gif" id="input"><br>
+Select an ID for your GIF : <input id="name" value="MyGif"><br>
+<button onclick="upload(document.getElementById('input'))">Upload</button>
+<div id="loading" style="display:none;">Loading...</div>
+<br>
+<canvas id="canvas"></canvas><img id="img" style="position:absolute;left:-9999px;top:-9999px;">
+<div style="display:none" id="show">
+<h2>Step #1 : Save the following PNG image (<span id="info_img"></span>)</h2>
+<br>
+<img height=100 id="final_img">
+<p>Upload it on Reddit and name it <input type="text" readonly id="r_name">.</p>
+<h2>Step #2 : Copy the following CSS in your subreddit stylesheet.</h2>
+<textarea id="css" style="width:80%;height:400px;"></textarea>
+<h2>Step #3 : Use this Markdown code to insert the gif in your sidebar, in posts or in comments</h2>
+<textarea id="markdown" style="width:80%;height:100px;"></textarea>
+</div>
+<hr>
+<a href="http://jdmcreator.byethost5.com/lab/donate.html">Donate</a> | This generator use a fork of <a href="https://github.com/buzzfeed/libgif-js">libgif.js</a>
