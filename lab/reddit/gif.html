@@ -1,4 +1,4 @@
-
+<!doctype>
 <html>
 <title>GIF to CSS3 Generator for Reddit</title>
 <style>
@@ -7,43 +7,27 @@ position:absolute;
 left:-9999px;
 top:-9999px;
 }
-
-@keyframes gif-MyGif {
-0% {background-position:0px -0px;}
-5% {background-position:0px -50px;}
-10% {background-position:0px -100px;}
-15% {background-position:0px -150px;}
-20% {background-position:0px -200px;}
-25% {background-position:0px -250px;}
-30% {background-position:0px -300px;}
-35% {background-position:0px -350px;}
-40% {background-position:0px -400px;}
-45% {background-position:0px -450px;}
-50% {background-position:0px -500px;}
-55% {background-position:0px -550px;}
-60% {background-position:0px -600px;}
-65% {background-position:0px -650px;}
-70% {background-position:0px -700px;}
-75% {background-position:0px -750px;}
-80% {background-position:0px -800px;}
-85% {background-position:0px -850px;}
-90% {background-position:0px -900px;}
-95%, 100% {background-position:0px -950px;}
+.error{
+font-weight:bold;
+color:red;
+display:none;
 }
-.test{
-background:url(frames.png) no-repeat 0px 0px;
-display:inline-block;
-width:50px;
-height:50px;
-animation: gif-MyGif 2000ms infinite steps(1);
+@keyframes red{
+from{
+background:red;
 }
-
+to{
+background:rgba(255,0,0,0);
+}
+}
+.red{
+animation:red 1s;
+}
 </style>
 <script type="text/javascript" src="libgif.js"></script>
 <script type="text/javascript">
 
 function upload(element){
-document.getElementById('loading').style.display="block";
  var file    = element.files[0];
   var reader  = new FileReader();
 
@@ -57,23 +41,52 @@ document.getElementById('loading').style.display="block";
   }
 
   if (file) {
+document.getElementById('show').style.display="none";
+document.getElementById('loading').style.display="block";
     reader.readAsDataURL(file);
   }
+  else{
+document.getElementById('select_gif').className="red";
+  }
+}
+function unbeautify(css, minimify){
+css = css.replace(/;(\s*)}/g,"$1}").replace(/([^0-9])0\s*(?:px|pt|em|ex)/g,"$10");
+if(minimify){
+	css = css.replace(/[\n\t]+/g, "").replace(/\: */g, ":").replace(/ *(\}|\{)/g, "$1");
+}
+return css;
 }
 function drawImage(rub){
 var canvas = document.getElementById('canvas'),
-height = rub.get_canvas().height,
-width = rub.get_canvas().width,
+gifheight = rub.get_canvas().height,
+gifwidth = rub.get_canvas().width,
 img = document.getElementById('final_img'),
 frames = rub.getFrames(),
-totalTime = 0;
-rub.get_canvas().style.cssText="position:absolute;top:-9999px;left:-9999px;";
-canvas.width = width;
-canvas.height = height*frames.length
+totalTime = 0,
+//hframes = Math.floor(Math.pow(frames.length, 0.5)),
+//wframes = Math.ceil(frames.length/hframes);
+hframes = frames.length,
+wframes = 1;
+var height = hframes * gifheight,
+width = wframes * gifwidth;
 
+
+canvas.width = width;
+canvas.height = height;
+if(document.getElementById('backward').checked){
+	frames.reverse();
+}
+var line = 0,
+col = -1;
 for(var i=0, l = frames.length;i<l;i++){
 var frame = frames[i];
-	canvas.getContext('2d').putImageData(frame.data, 0, height*i);
+col++;
+if(col>=wframes){
+col = 0;
+line++;
+
+}
+	canvas.getContext('2d').putImageData(frame.data, col*gifwidth, gifheight*line, 0, 0, gifwidth, gifheight);
 	totalTime += frame.delay;
 }
 img.removeAttribute("width");
@@ -84,37 +97,83 @@ img.height=100;
 else{
 img.width=100;
 }
+if(document.getElementById('jpeg').checked){
+img.src = canvas.toDataURL("image/jpeg", 1);
+}
+else if(document.getElementById('jpeg_80').checked){
+img.src = canvas.toDataURL("image/jpeg", 0.8);
+}
+else{
 img.src = canvas.toDataURL();
-info_img.innerHTML=width+"x"+(height*frames.length)+"px - "+frames.length+" frames";
+}
+var newimg = document.createElement("img");
+newimg.id="img";
+document.body.appendChild(newimg);
+if(img.src.length<30){
+	document.getElementById('loading').style.display="none";
+	document.getElementById('err_too_big').style.display="block";
+	return false;
+}
+info_img.innerHTML=(width)+"x"+(height)+"px - "+frames.length+" frames - "+size(img.src);
 
 /*generate keyframes*/
 var text="",
 gif_name=document.getElementById('name').value,
 actualTime=0;
+img.setAttribute("download",gif_name);
 text="@keyframes gif-"+gif_name+" {\n";
 for(var i=0, l = frames.length;i<l;i++){
 	var frame = frames[i];
 	if(i<frames.length-1){
-		text += "\t"+Math.round(actualTime/totalTime*100)+"% {background-position:0px -"+height*i+"px;}\n"
+		text += "\t"+Math.round(actualTime/totalTime*10000)/100+"% {background-position:0px "+gifheight*-i+"px;}\n"
 	}
 	else{
-		text += "\t"+Math.round(actualTime/totalTime*100)+"%, 100% {background-position:0px -"+height*i+"px;}"
+		text += "\t"+Math.round(actualTime/totalTime*10000)/100+"%, 100% {background-position:0px -"+gifheight*i+"px;}"
 	}
 	actualTime += frame.delay;
 }
 text+="\n}\n"
-text+="a[href=\"#gif-"+gif_name+"\"] {\n\tbackground:url(%%"+gif_name+"%%) no-repeat 0px 0px;\n\tdisplay:inline-block;\n\twidth:"+width+"px;\n\theight:"+height+"px;"
-text+="\n\tanimation: gif-"+gif_name+" "+(totalTime*10)+"ms infinite steps(1);\n\tfont-size:0px;\n}";
-document.getElementById('css').value=(text);
+text+="a[href=\"#gif-"+gif_name+"\"] {\n\tbackground:url(%%"+gif_name+"%%) no-repeat 0px 0px;\n\tdisplay:inline-block;\n\twidth:"+gifwidth+"px;\n\theight:"+gifheight+"px;"
+text+="\n\tanimation: gif-"+gif_name+" "+(totalTime/100)+"s "+(document.getElementById('infinity').checked ? "infinite " : "")+"steps(1);\n\tfont-size:0px;\n\tcursor:default\n}";
+text+="\na[href=\"#gif-"+gif_name+"\"]:active {\n\tpointer-events: none;\n}";
+if(document.getElementById('pause_hover').checked){
+	text+="\na[href=\"#gif-"+gif_name+"\"]:hover {\n\tanimation-play-state: paused;\n}";
+}
+//document.getElementById('css').value=unbeautify(text, !true);
+document.getElementById('css').value=text;
 document.getElementById('r_name').value = gif_name;
 document.getElementById('markdown').value = "[](#gif-"+gif_name+")";
 document.getElementById('loading').style.display="none";
 document.getElementById('show').style.display="block";
 }
+function size(url){
+url = url.substring(url.indexOf(',')+1);
+var str = atob(url),
+size = str.length;
+if(size < 1000){
+return size+" B";
+}
+else if(size < 1000000){
+return (Math.round(size/10)/100)+" KB";
+}
+else if(size < 1000000000){
+return (Math.round(size/10000)/100)+" MB"
+}
+else{
+return (Math.round(size/10000000)/100)+" GB"
+}
+}
 </script>
 </html>
-Select your GIF : <input type="file" accept="image/gif" id="input"><br>
+<span id="select_gif" onanimationend="this.className=''">Select your GIF : <input type="file" accept="image/gif" id="input"></span><br>
 Select an ID for your GIF : <input id="name" value="MyGif"><br>
+Options:
+<blockquote>
+<input type=checkbox id="backward"> Play GIF backward<br>
+<input type=checkbox checked id="infinity"> Play infinitly<br>
+<input type=checkbox id="pause_hover"> Pause on hover<br>
+<input type=radio checked name="format" id="png"> PNG <input type=radio name="format" id="jpeg"> JPEG <input type=radio name="format" id="jpeg_80"> JPEG (80% Quality)
+</blockquote>
 <button onclick="upload(document.getElementById('input'))">Upload</button>
 <div id="loading" style="display:none;">Loading...</div>
 <br>
@@ -129,5 +188,6 @@ Select an ID for your GIF : <input id="name" value="MyGif"><br>
 <h2>Step #3 : Use this Markdown code to insert the gif in your sidebar, in posts or in comments</h2>
 <textarea id="markdown" style="width:80%;height:100px;"></textarea>
 </div>
+<div class="error" id="err_too_big">Your browser don't support treatment of spritesheet that big. Try again with another browser.</div>
 <hr>
 <a href="http://jdmcreator.byethost5.com/lab/donate.html">Donate</a> | This generator use a fork of <a href="https://github.com/buzzfeed/libgif-js">libgif.js</a>
