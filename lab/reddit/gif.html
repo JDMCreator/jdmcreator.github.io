@@ -1,4 +1,3 @@
-<!doctype>
 <html>
 <title>GIF to CSS3 Generator for Reddit</title>
 <style>
@@ -61,12 +60,15 @@ var canvas = document.getElementById('canvas'),
 gifheight = rub.get_canvas().height,
 gifwidth = rub.get_canvas().width,
 img = document.getElementById('final_img'),
+url = document.getElementById('url').value,
 frames = rub.getFrames(),
 totalTime = 0,
-//hframes = Math.floor(Math.pow(frames.length, 0.5)),
-//wframes = Math.ceil(frames.length/hframes);
 hframes = frames.length,
 wframes = 1;
+if(document.getElementById('square').checked){
+	hframes = Math.floor(Math.pow(frames.length, 0.5));
+	wframes = Math.ceil(frames.length/hframes);
+}
 var height = hframes * gifheight,
 width = wframes * gifwidth;
 
@@ -86,6 +88,8 @@ col = 0;
 line++;
 
 }
+frame.x = col * gifwidth;
+frame.y = gifheight * line;
 	canvas.getContext('2d').putImageData(frame.data, col*gifwidth, gifheight*line, 0, 0, gifwidth, gifheight);
 	totalTime += frame.delay;
 }
@@ -125,24 +129,27 @@ text="@keyframes gif-"+gif_name+" {\n";
 for(var i=0, l = frames.length;i<l;i++){
 	var frame = frames[i];
 	if(i<frames.length-1){
-		text += "\t"+Math.round(actualTime/totalTime*10000)/100+"% {background-position:0px "+gifheight*-i+"px;}\n"
+		text += "\t"+Math.round(actualTime/totalTime*10000)/100+"% {background-position:"+(-frame.x)+"px "+(-frame.y)+"px;}\n"
 	}
 	else{
-		text += "\t"+Math.round(actualTime/totalTime*10000)/100+"%, 100% {background-position:0px -"+gifheight*i+"px;}"
+		text += "\t"+Math.round(actualTime/totalTime*10000)/100+"%, 100% {background-position:"+(-frame.x)+"px "+(-frame.y)+"px;}"
 	}
 	actualTime += frame.delay;
 }
 text+="\n}\n"
-text+="a[href=\"#gif-"+gif_name+"\"] {\n\tbackground:url(%%"+gif_name+"%%) no-repeat 0px 0px;\n\tdisplay:inline-block;\n\twidth:"+gifwidth+"px;\n\theight:"+gifheight+"px;"
-text+="\n\tanimation: gif-"+gif_name+" "+(totalTime/100)+"s "+(document.getElementById('infinity').checked ? "infinite " : "")+"steps(1);\n\tfont-size:0px;\n\tcursor:default\n}";
+text+="a[href=\"#gif-"+gif_name+"\"] "+(url ? "+ a " : "") +"{\n\tbackground:url(%%"+gif_name+"%%) no-repeat 0px 0px;\n\tdisplay:inline-block;\n\twidth:"+gifwidth+"px;\n\theight:"+gifheight+"px;"
+text+="\n\tanimation: gif-"+gif_name+" "+(totalTime/100)+"s "+(document.getElementById('infinity').checked ? "infinite " : "")+"steps(1);\n\tfont-size:0px;"+(url ? "" : "\n\tcursor:default")+"\n}";
+if(url){
+text+="\na[href=\"#gif-"+gif_name+"\"] {\n\tcursor: default;\n}"
+}
 text+="\na[href=\"#gif-"+gif_name+"\"]:active {\n\tpointer-events: none;\n}";
 if(document.getElementById('pause_hover').checked){
-	text+="\na[href=\"#gif-"+gif_name+"\"]:hover {\n\tanimation-play-state: paused;\n}";
+	text+="\na[href=\"#gif-"+gif_name+"\"]"+(url ? " + a" : "") +":hover {\n\tanimation-play-state: paused;\n}";
 }
 //document.getElementById('css').value=unbeautify(text, !true);
 document.getElementById('css').value=text;
 document.getElementById('r_name').value = gif_name;
-document.getElementById('markdown').value = "[](#gif-"+gif_name+")";
+document.getElementById('markdown').value = "[](#gif-"+gif_name+")" + (url ? " []("+url+")" : "");
 document.getElementById('loading').style.display="none";
 document.getElementById('show').style.display="block";
 }
@@ -165,14 +172,17 @@ return (Math.round(size/10000000)/100)+" GB"
 }
 </script>
 </html>
+<h1>GIF to CSS3 Generator for Reddit</h1>
 <span id="select_gif" onanimationend="this.className=''">Select your GIF : <input type="file" accept="image/gif" id="input"></span><br>
 Select an ID for your GIF : <input id="name" value="MyGif"><br>
 Options:
 <blockquote>
+URL of the link (if you want the GIF to be a link) : <input id="url" placeholder="http://"><br>
 <input type=checkbox id="backward"> Play GIF backward<br>
-<input type=checkbox checked id="infinity"> Play infinitly<br>
+<input type=checkbox checked id="infinity"> Play in a loop<br>
 <input type=checkbox id="pause_hover"> Pause on hover<br>
-<input type=radio checked name="format" id="png"> PNG <input type=radio name="format" id="jpeg"> JPEG <input type=radio name="format" id="jpeg_80"> JPEG (80% Quality)
+<input type=radio checked name="format" id="png"> PNG <input type=radio name="format" id="jpeg"> JPEG <input type=radio name="format" id="jpeg_80"> JPEG (80% Quality)<br>
+Shape of spritesheet : <input type=radio checked name="shape"> Vertical <input type=radio name="shape" id="square"> Square
 </blockquote>
 <button onclick="upload(document.getElementById('input'))">Upload</button>
 <div id="loading" style="display:none;">Loading...</div>
@@ -188,6 +198,6 @@ Options:
 <h2>Step #3 : Use this Markdown code to insert the gif in your sidebar, in posts or in comments</h2>
 <textarea id="markdown" style="width:80%;height:100px;"></textarea>
 </div>
-<div class="error" id="err_too_big">Your browser don't support treatment of spritesheet that big. Try again with another browser.</div>
+<div class="error" id="err_too_big">Your browser don't support treatment of spritesheet that big. Try again with the 'Square' option or with another browser.</div>
 <hr>
 <a href="http://jdmcreator.byethost5.com/lab/donate.html">Donate</a> | This generator use a fork of <a href="https://github.com/buzzfeed/libgif-js">libgif.js</a>
