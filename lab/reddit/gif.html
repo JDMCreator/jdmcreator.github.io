@@ -1,10 +1,28 @@
 <html>
 <title>GIF to CSS3 Generator for Reddit</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style>
 canvas{
 position:absolute;
 left:-9999px;
 top:-9999px;
+}
+.help{
+cursor:help;
+}
+.help:hover ~ div {
+display:block;
+}
+.help ~ div {
+display:none;
+position:relative;
+left:20px;
+top:0;
+background:#FFF;
+border:2px solid brown;
+padding:3px;
+width:200px;
+z-index:99;
 }
 .error{
 font-weight:bold;
@@ -27,20 +45,32 @@ animation:red 1s;
 <script type="text/javascript">
 
 function upload(element){
+if(isFunctionStarted){
+return false;
+}
+ isFunctionStarted = true;
  var file    = element.files[0];
   var reader  = new FileReader();
 
   reader.onloadend = function () {
+	stepMess("Uploading Completed. Loading...");
 	var url =reader.result;
 	var rub = new SuperGif({ gif: document.getElementById('img') })
 
 	rub.load_url(url, function(){
-		drawImage(rub)
+		stepMess("Loading completed. Analyzing...")
+		generate(rub)
 	});
   }
 
   if (file) {
+	if(file.type.toLowerCase() != "image/gif"){
+		document.getElementById('select_gif').className="red";
+		return;
+	}
 document.getElementById('show').style.display="none";
+document.getElementById('err_too_big').style.display="none";
+stepMess("Uploading...");
 document.getElementById('loading').style.display="block";
     reader.readAsDataURL(file);
   }
@@ -55,7 +85,107 @@ if(minimify){
 }
 return css;
 }
-function drawImage(rub){
+var savedData = {},
+isFunctionStarted = false;
+function saveGenerated(name, data){
+	savedData[name] = data;
+	if(savedData.vt && savedData.hz && savedData.sq){
+		onreception(savedData.vt, savedData.hz, savedData.sq);
+		isFunctionStarted = false;
+		savedData = {};
+	} 
+}
+function stepMess(msg){
+document.getElementById('loading').innerHTML = msg;
+}
+function generate(rub){
+if(document.getElementById('auto').checked){
+(function(rub){
+
+setTimeout(function(){
+	stepMess("Creating a vertical spritesheet..."); 
+	saveGenerated("vt", drawImage(rub, "vertical"));
+
+	setTimeout(function(){
+		stepMess("Creating an horizontal spritesheet..."); 
+		saveGenerated("hz", drawImage(rub, "horizontal"));
+
+		setTimeout(function(){
+			stepMess("Creating a squared spritesheet..."); 
+			saveGenerated("sq", drawImage(rub, "square"));
+		}, 50)		
+	}, 50)
+}, 50);
+
+})(rub);
+}
+else if(document.getElementById('square').checked){
+interpret(drawImage(rub, "square"));
+}
+else if(document.getElementById('hz').checked){
+interpret(drawImage(rub, "horizontal"));
+}
+else{
+interpret(drawImage(rub, "vertical"));
+}
+}
+function onreception(vt, hz, sq){
+stepMess("Got all data. Analyzing..."); 
+var obj = vt;
+if(vt.error){
+	if(hz.error){
+		if(sq.error){
+			document.getElementById('err_too_big').style.display = "block";
+			document.getElementById('loading').style.display="none";
+			return;
+		}
+		obj = sq;
+	}
+	else if(!sq.error && sq.size < hz.size){
+		obj = sq;
+	}
+	else {
+		obj = hz;
+	}
+}
+else if(hz.size < vt.size){
+	if(sq.size < hz.size){
+		obj = sq;
+	}
+	obj = hz;
+}
+else if(sq.size < vt.size){
+	obj = sq;
+}
+interpret(obj);
+}
+function interpret(obj){
+var img = document.getElementById('final_img');
+img.removeAttribute("height");
+img.removeAttribute("width");
+if(obj.setImageHeight){
+	img.height = 100;
+}
+else {
+	img.width = 100;
+}
+img.src = obj.src;
+img.setAttribute("download", obj.gifName);
+
+var newimg = document.createElement("img");
+newimg.id="img";
+document.body.appendChild(newimg);
+
+document.getElementById('info_img').innerHTML=(obj.width)+"x"+(obj.height)+"px - "+obj.framesLength+" frames - "+obj.sizeText;
+
+document.getElementById('css').value= obj.css;
+document.getElementById('r_name').value = obj.gifName;
+document.getElementById('markdown').value = obj.markdown;
+document.getElementById('loading').style.display="none";
+document.getElementById('show').style.display="block";
+isFunctionStarted = false;
+}
+function drawImage(rub, type){
 var canvas = document.getElementById('canvas'),
 gifheight = rub.get_canvas().height,
 gifwidth = rub.get_canvas().width,
@@ -63,11 +193,16 @@ img = document.getElementById('final_img'),
 url = document.getElementById('url').value,
 frames = rub.getFrames(),
 totalTime = 0,
+o = {type:type},
 hframes = frames.length,
 wframes = 1;
-if(document.getElementById('square').checked){
+if(type == "square"){
 	hframes = Math.floor(Math.pow(frames.length, 0.5));
 	wframes = Math.ceil(frames.length/hframes);
+}
+else if(type == "horizontal"){
+	wframes = hframes;
+	hframes = 1;
 }
 var height = hframes * gifheight,
 width = wframes * gifwidth;
@@ -93,38 +228,36 @@ frame.y = gifheight * line;
 	canvas.getContext('2d').putImageData(frame.data, col*gifwidth, gifheight*line, 0, 0, gifwidth, gifheight);
 	totalTime += frame.delay;
 }
-img.removeAttribute("width");
-img.removeAttribute("height");
+
 if(height*frames.length>width){
-img.height=100;
-}
-else{
-img.width=100;
+o.setImageHeight = true;
 }
 if(document.getElementById('jpeg').checked){
-img.src = canvas.toDataURL("image/jpeg", 1);
-}
-else if(document.getElementById('jpeg_80').checked){
-img.src = canvas.toDataURL("image/jpeg", 0.8);
+o.src = canvas.toDataURL("image/jpeg", getQuality());
+o.format = "jpeg";
+o.quality = getQuality();
 }
 else{
-img.src = canvas.toDataURL();
+o.src = canvas.toDataURL("image/png");
+o.format = "png";
 }
-var newimg = document.createElement("img");
-newimg.id="img";
-document.body.appendChild(newimg);
-if(img.src.length<30){
-	document.getElementById('loading').style.display="none";
-	document.getElementById('err_too_big').style.display="block";
-	return false;
+
+if(o.src.length<30){
+
+	return {error:"TOO_BIG"};
 }
-info_img.innerHTML=(width)+"x"+(height)+"px - "+frames.length+" frames - "+size(img.src);
+o.width = width;
+o.height = height;
+o.size = size(o.src);
+o.framesLength = frames.length;
+o.sizeText = sizeToText(o.size);
+
+
 
 /*generate keyframes*/
 var text="",
 gif_name=document.getElementById('name').value,
 actualTime=0;
-img.setAttribute("download",gif_name);
 text="@keyframes gif-"+gif_name+" {\n";
 for(var i=0, l = frames.length;i<l;i++){
 	var frame = frames[i];
@@ -146,17 +279,17 @@ text+="\na[href=\"#gif-"+gif_name+"\"]:active {\n\tpointer-events: none;\n}";
 if(document.getElementById('pause_hover').checked){
 	text+="\na[href=\"#gif-"+gif_name+"\"]"+(url ? " + a" : "") +":hover {\n\tanimation-play-state: paused;\n}";
 }
-//document.getElementById('css').value=unbeautify(text, !true);
-document.getElementById('css').value=text;
-document.getElementById('r_name').value = gif_name;
-document.getElementById('markdown').value = "[](#gif-"+gif_name+")" + (url ? " []("+url+")" : "");
-document.getElementById('loading').style.display="none";
-document.getElementById('show').style.display="block";
+o.css = text;
+o.gifName = gif_name
+o.markdown = "[](#gif-"+gif_name+")" + (url ? " []("+url+")" : "")
+
+return o;
 }
 function size(url){
 url = url.substring(url.indexOf(',')+1);
-var str = atob(url),
-size = str.length;
+return atob(url).length;
+}
+function sizeToText(size){
 if(size < 1000){
 return size+" B";
 }
@@ -170,6 +303,27 @@ else{
 return (Math.round(size/10000000)/100)+" GB"
 }
 }
+function getSpeedFactor(){
+var speedFactorE = document.getElementById('speed');
+    speedFactor = speedFactorE.value;
+
+speedFactor = parseFloat(speedFactor.trim().replace(/,/g,"."));
+if(isNaN(speedFactor)){speedFactor = 1}
+if(speedFactor<1e-5){speedFactor = 1e-5}
+speedFactorE.value = speedFactor;
+}
+function getQuality(){
+var qualityE = document.getElementById('quality'),
+    quality = qualityE.value;
+
+quality = parseFloat(quality.trim().replace(/,/g,"."))
+if(isNaN(quality)){ quality = 100 }
+quality /= 100;
+if(quality>1){quality = 1}
+else if(quality<0){quality = 0}
+qualityE.value = quality * 100;
+return quality;
+}
 </script>
 </html>
 <h1>GIF to CSS3 Generator for Reddit</h1>
@@ -177,12 +331,24 @@ return (Math.round(size/10000000)/100)+" GB"
 Select an ID for your GIF : <input id="name" value="MyGif"><br>
 Options:
 <blockquote>
-URL of the link (if you want the GIF to be a link) : <input id="url" placeholder="http://"><br>
+URL of the link (if you want the GIF to be a link) : <input id="url" type="url" placeholder="http://"><br>
 <input type=checkbox id="backward"> Play GIF backward<br>
 <input type=checkbox checked id="infinity"> Play in a loop<br>
 <input type=checkbox id="pause_hover"> Pause on hover<br>
-<input type=radio checked name="format" id="png"> PNG <input type=radio name="format" id="jpeg"> JPEG <input type=radio name="format" id="jpeg_80"> JPEG (80% Quality)<br>
-Shape of spritesheet : <input type=radio checked name="shape"> Vertical <input type=radio name="shape" id="square"> Square
+<input type=radio checked name="format" id="png"> PNG <input type=radio name="format" id="jpeg"> JPEG (Quality : <input type="number" id="quality" value="100" max="100" min="0" size=3>%)
+
+<div style="display:inline-block;position:absolute;"><sup class="help">[?]</sup>
+<div>Don't choose JPEG if there's transparency in your GIF.</div>
+</div>
+<br>
+Shape of spritesheet : <input type=radio name="shape"> Vertical <input type=radio name="shape" id="hz"> Horizontal <input type=radio name="shape" id="square"> Square
+<div style="display:inline-block;position:absolute;"><sup class="help">[?]</sup>
+<div>A square spritesheet allows you to load bigger GIFs, but renders bigger spritesheets than vertical or horizontal ones.</div>
+</div>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type=radio name="shape" id="auto" checked> Auto 
+<div style="display:inline-block;position:absolute;"><sup class="help">[?]</sup>
+<div>This option will try every shape to find the one with the smallest filesize. It's slower, but better.</div>
+</div>
 </blockquote>
 <button onclick="upload(document.getElementById('input'))">Upload</button>
 <div id="loading" style="display:none;">Loading...</div>
