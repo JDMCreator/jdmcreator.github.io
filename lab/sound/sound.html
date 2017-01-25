@@ -1,0 +1,324 @@
+<html>
+<script>
+
+var audioContext = window.AudioContext || window.webkitAudioContext;
+audioContext = new audioContext();
+var bufferSize = 2 * audioContext.sampleRate,
+    noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
+    output = noiseBuffer.getChannelData(0);
+for (var i = 0; i < bufferSize; i++) {
+    output[i] = Math.random() * 2 - 1;
+}
+
+
+//whiteNoise.connect(audioContext.destination);
+
+function createWhiteNoise(){
+	var whiteNoise = audioContext.createBufferSource();
+		whiteNoise.buffer = noiseBuffer;
+		whiteNoise.loop = true;
+		whiteNoise.start(0);
+	return whiteNoise;
+}
+function createGaussianNoise(){
+	var whiteNoise = createWhiteNoise();
+	var scriptNode = audioContext.createScriptProcessor(0, 1, 1);
+	scriptNode.onaudioprocess = function(e){
+	
+	var inputBuffer = e.inputBuffer,
+	outputBuffer = e.outputBuffer;
+	var whiteNoise = inputBuffer.getChannelData(0),
+	outputData = outputBuffer.getChannelData(0);
+	
+	for (var sample = 0; sample < inputBuffer.length; sample++) {
+		var noise = whiteNoise[sample],
+		noise2 = Math.random() * 2 - 1;
+		outputData[sample] = (Math.sqrt(Math.abs(2*Math.log(noise)))||0)*2*Math.cos(2*Math.PI*noise2);
+		if(isNaN(outputData[sample])){
+			console.log(Math.sqrt(-2*Math.log(noise)));
+			console.log(Math.cos(2*Math.PI*noise2));
+			debugger;
+		}
+	}
+	}
+	whiteNoise.connect(scriptNode);
+	return scriptNode;
+}
+function accelerate(source, factor){
+	
+}
+function createPassFilter(LH, freq){
+var lp = audioContext.createBiquadFilter();
+lp.type = (LH ? 'low' : 'high') + 'pass';
+lp.frequency.value = freq;
+return lp
+}
+function generateRain(bpF, bpQ, LH, LHF, SN, SN2, max, HPF, volume){
+
+/*
+bpF : Bandpass frequency (50)
+bpQ : Bandpass Q value (0.4)
+LH : Highpass (0) or lowpass (1) filter
+LHF : High/lowpass filter frequency (500)
+SN : Use script processor ? 
+SN2 : Use second script processor ?
+max : Maximum value before high filter (0.35)
+HPF : Both highpasses filter frequencies (500)
+volume : Volume from 0 to 1 
+*/
+var whiteNoise = createGaussianNoise();
+var bp = audioContext.createBiquadFilter();
+bp.type = 'bandpass';
+bp.frequency.value = bpF;
+bp.Q.value = bpQ;
+
+var soundNode;
+var lp = soundNode = createPassFilter(LH, LHF);
+
+whiteNoise.connect(bp);
+bp.connect(lp);
+
+var scriptNode = audioContext.createScriptProcessor(0, 1, 1);
+	scriptNode.onaudioprocess = function(e){
+		var inputBuffer = e.inputBuffer,
+		outputBuffer = e.outputBuffer;
+		var rain = inputBuffer.getChannelData(0),
+		outputData = outputBuffer.getChannelData(0);
+		for (var sample = 0; sample < inputBuffer.length; sample++) {
+			var noise = rain[sample],
+			left = Math.cos(noise * 80 + 40 - 0.25),
+			right = noise * noise * 10;
+			outputData[sample] = left * right;
+		}
+	}
+
+if(SN){
+lp.connect(soundNode = scriptNode);
+}
+
+var scriptNode2 = audioContext.createScriptProcessor(0, 1, 1);
+	scriptNode2.onaudioprocess = function(e){
+		var inputBuffer = e.inputBuffer,
+		outputBuffer = e.outputBuffer;
+		var rain = inputBuffer.getChannelData(0),
+		outputData = outputBuffer.getChannelData(0);
+		for (var sample = 0; sample < inputBuffer.length; sample++) {
+			var noise = rain[sample];
+			outputData[sample] = Math.max(noise, max)-max*0.5;
+		}
+	}
+if(SN2){
+soundNode.connect(soundNode = scriptNode2);
+
+}
+var hp = createPassFilter(0, HPF);
+soundNode.connect(hp);
+var hp2 = createPassFilter(0,HPF);
+hp.connect(hp2);
+var LP = createPassFilter(1, 5000);
+compress(hp2, -100,0,1,0,1,1).connect(LP);
+var gainNode = audioContext.createGain();
+gainNode.gain.value = volume;
+LP.connect(gainNode);
+gainNode.connect(audioContext.destination);
+return gainNode;
+
+}
+function connectWithVolume(source, volume){
+	var gainNode = audioContext.createGain();
+	gainNode.gain.value = volume;
+	source.connect(gainNode);
+	gainNode.connect(audioContext.destination);
+	return gainNode;
+}
+function compress(source, threshold, knee, ratio, reduction, attack, release){
+	var compressor = audioContext.createDynamicsCompressor();
+	compressor.threshold.value = threshold;
+	compressor.knee.value = knee;
+	compressor.ratio.value = ratio;
+	compressor.reduction.value = reduction;
+	compressor.attack.value = attack;
+	compressor.release.value = release;
+	source.connect(compressor);
+	return compressor;
+}
+function generateRain2(f, q, t, a, hpF, volume){
+	var whiteNoise = createGaussianNoise();
+	var bp = audioContext.createBiquadFilter();
+	bp.type = 'bandpass';
+	bp.frequency.value = f;
+	bp.Q.value = q;
+	whiteNoise.connect(bp);
+	var scriptNode = audioContext.createScriptProcessor(0, 1, 1);
+	scriptNode.onaudioprocess = function(e){
+		var inputBuffer = e.inputBuffer,
+		outputBuffer = e.outputBuffer;
+		var rain = inputBuffer.getChannelData(0),
+		outputData = outputBuffer.getChannelData(0);
+		for (var sample = 0; sample < inputBuffer.length; sample++) {
+			var noise = Math.max(0, Math.min(1, rain[sample]), t)-t;
+			outputData[sample] = noise * noise * noise * noise * a;
+		}
+	}
+	bp.connect(scriptNode);
+	var hp = createPassFilter(0, hpF);
+	scriptNode.connect(hp);
+	var compressor = hp;
+	 compressor = compress(hp, -100,0,12,-20,0,1)
+	return connectWithVolume(compressor , volume);
+}
+function generateRain3(bpF, bpQ, LH, LHF, SN, SN2, max, HPF, volume){
+
+/*
+bpF : Bandpass frequency (50)
+bpQ : Bandpass Q value (0.4)
+LH : Highpass (0) or lowpass (1) filter
+LHF : High/lowpass filter frequency (500)
+SN : Use script processor ? 
+SN2 : Use second script processor ?
+max : Maximum value before high filter (0.35)
+HPF : Both highpasses filter frequencies (500)
+volume : Volume from 0 to 1 
+*/
+var whiteNoise = createGaussianNoise();
+var bp = audioContext.createBiquadFilter();
+var soundSource = audioContext.createOscillator();
+soundSource.type = "sawtooth";
+soundSource.start(0);
+
+bp.type = 'bandpass';
+bp.frequency.value = bpF;
+bp.Q.value = bpQ;
+
+var soundNode;
+var lp = soundNode = createPassFilter(LH, LHF);
+
+whiteNoise.connect(bp);
+bp.connect(lp);
+
+var scriptNode = audioContext.createScriptProcessor(0, 1, 1);
+	scriptNode.onaudioprocess = function(e){
+		var inputBuffer = e.inputBuffer,
+		outputBuffer = e.outputBuffer;
+		var rain = inputBuffer.getChannelData(0),
+		outputData = outputBuffer.getChannelData(0);
+		for (var sample = 0; sample < inputBuffer.length; sample++) {
+			var noise = rain[sample];
+
+			// Doing left things
+			var value = noise * 155 + 40;
+			soundSource.frequency.value = value;
+			// Doing right things
+			outputData[sample] = noise * noise * 10;
+		}
+	}
+
+
+lp.connect(soundNode = scriptNode);
+
+var merger = audioContext.createChannelMerger(2);
+soundSource.connect(merger, 0,0);
+scriptNode.connect(merger, 0,1);
+var scriptNode2 = audioContext.createScriptProcessor(0, 2, 1);
+	scriptNode2.onaudioprocess = function(e){
+		var inputBuffer = e.inputBuffer,
+		outputBuffer = e.outputBuffer;
+		var phasor = inputBuffer.getChannelData(0),
+		rain = inputBuffer.getChannelData(1),
+		outputData = outputBuffer.getChannelData(0);
+		for (var sample = 0; sample < inputBuffer.length; sample++) {
+			var rainnoise = rain[sample],
+			phasornoise = Math.cos(phasor[sample]-0.25),
+			noise = rainnoise * phasornoise;
+			outputData[sample] = (Math.max(noise, max)-max)*0.5;
+		}
+	}
+if(SN2){
+soundNode.connect(soundNode = scriptNode2);
+
+}
+var hp = createPassFilter(0, HPF);
+soundNode.connect(hp);
+var hp2 = createPassFilter(0,HPF);
+hp.connect(hp2);
+var hp2 = createPassFilter(0,HPF);
+var gainNode = audioContext.createGain();
+gainNode.gain.value = volume;
+hp2.connect(gainNode);
+gainNode.connect(audioContext.destination);
+return gainNode;
+
+}
+
+
+generateRain(50, 0.4, 1, 500, false, false, 0.35, 500,0.015); // brown background
+
+generateRain(50, 0.4, 0, 500, false, false, 0.35, 500, 0.01); // white noise background
+generateRain(30, 0.8, 0, 1000, true, false, 0.35, 500, 0.5); // Gentle tap
+generateRain(30, 0.8, 0, 1000, true, false, 0.35, 1000, 0.5); // Gentle high-pitched tap
+
+//generateRain(50, 0.6, 0, 500, false, true, 0.11, 1000, 0.5); // Metallic clicks
+
+generateRain2(8, 0.05, 0.08, 3, 1000, 1);
+//generateRain3(50, 0.6, 0, 200, true, true, 0.4, 500, 0.5);
+//generateRain(50, 0.6, 0, 500, false, true, 0.11, 200, 0.5);
+/*
+//lp.connect(scriptNode3);
+var gainNode = audioContext.createGain();
+gainNode.gain.value = 0.1;
+var hp = audioContext.createBiquadFilter();
+hp.type = 'highpass';
+hp.frequency.value = 500;
+//scriptNode3.connect(gainNode);
+//gainNode.connect(hp)
+whiteNoise2.connect(gainNode);
+//gainNode.connect(audioContext.destination);
+*/
+/***************************--------------------------------------------********************/
+
+var oscillator = audioContext.createOscillator();
+
+oscillator.type = 'square';
+oscillator.frequency.value = 440; // value in hertz
+//oscillator.start();
+
+var whiteNoiser = audioContext.createScriptProcessor(4096, 1, 1);
+	whiteNoiser.onaudioprocess = function(e){
+	var outputData = e.outputBuffer.getChannelData(0);
+	
+	for (var sample = 0; sample < e.inputBuffer.length; sample++) {
+		outputData[sample] = Math.random()*2-1;
+	};
+}
+var RAIN = audioContext.createScriptProcessor(4096, 1, 1);
+	RAIN.onaudioprocess = function(e){
+	var val3 = 0.016,
+	    val4 = 3,
+	    inputBuffer = e.inputBuffer,
+	    outputBuffer = e.outputBuffer,
+	    whiteNoise = inputBuffer.getChannelData(0),
+	    outputData = outputBuffer.getChannelData(0);
+	
+	for (var sample = 0; sample < inputBuffer.length; sample++) {
+		var WNS = whiteNoise[sample];
+		WNS = Math.min(1, Math.max(WNS, 0, val3))-val3;
+		WNS = WNS * WNS
+		outputData[sample] = WNS * WNS * val4;
+	};
+}
+var bp2 = audioContext.createBiquadFilter();
+bp2.type = 'bandpass';
+bp2.frequency.value = 7.7;
+bp2.Q.value = 0.0053;
+
+var gainNode2 = audioContext.createGain();
+gainNode2.gain.value = 4;
+
+oscillator.connect(whiteNoiser);
+whiteNoiser.connect(bp2);
+bp2.connect(RAIN);
+RAIN.connect(gainNode2);
+//gainNode2.connect(audioContext.destination);
+
+</script>
+</html>
