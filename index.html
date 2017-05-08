@@ -51,9 +51,25 @@ font-family:monospace;
 white-space: nowrap;
 height:300px;
 }
+nav{
+background:#2BDE73;
+border-bottom:5px solid #0F2105;
+min-height:50px;
+line-height:50px;
+}
+footer{
+background:#2BDE73;
+border-top:5px solid #0F2105;
+min-height:50px;
+line-height:50px;
+padding-left:10px;
+margin-top:50px;
+}
 </style>
 </head>
 <body>
+<nav>
+</nav>
 <section>
 <div class="container">
 <h1><img src="logo.png" alt="Logo" height=120> <span>LaTeX Complex Tables Editor</span></h1>
@@ -64,7 +80,11 @@ height:300px;
 <p>I'm a well experimented JavaScript programmer and a proud user of L<span class="a">a</span>T<span class="e">e</span>X. This project is already started. However, the support from the community will allow me to work full time on this and release it sooner. The money will be used to pay for icons, a server, my rent and food while development is on the way.</p>
 
 <p>Some packages from which features will be supported : <a href="http://ctan.org/pkg/array">array</a>, <a href="http://ctan.org/pkg/arydshln">arydshln</a>, <a href="http://ctan.org/pkg/booktabs">booktabs</a>, <a href="http://ctan.org/pkg/colortbl">colortbl</a>, <a href="http://ctan.org/pkg/ctable">ctable</a>, <a href="http://ctan.org/pkg/diagbox">diagbox</a>, <a href="http://ctan.org/pkg/dcolumn">dcolumn</a>, <a href="http://ctan.org/pkg/hhline">hhline</a>, <a href="http://ctan.org/pkg/longtable">longtable</a>, <a href="http://ctan.org/pkg/lscape">lscape</a>, <a href="http://ctan.org/pkg/makecell">makecell</a>, <a href="http://ctan.org/pkg/multirow">multirow</a>, <a href="http://ctan.org/pkg/rotating">rotating</a>, <a href="http://ctan.org/pkg/slashbox">slashbox</a>, <a href="http://ctan.org/pkg/supertabular">supertabular</a>, <a href="http://ctan.org/pkg/tabularx">tabularx</a>, <a href="http://ctan.org/pkg/xcolor">xcolor</a> and more.</p>
-<p>Thank you for your contribution and your support !</p></center>
+<p>Thank you for your contribution and your support !</p>
+
+<a class="btn btn-default" href="#" role="button">Contribute on KickStarter</a>
+
+</center>
 
 <h1><img src="logo.png" alt="Logo" height=120> <span>Features</span></h1>
 
@@ -98,15 +118,16 @@ height:300px;
 </div>
 <div class="row">
   <div class="col-md-3"><img src="double.png" alt="Merge and split cells" width=80></div>
-  <div class="col-md-3">Set cell's margins
+  <div class="col-md-3">Improved double borders via hhline package
+
 </div>
   <div class="col-md-3"><img src="margin.png" alt="Style text" width=120></div>
-  <div class="col-md-3">Import from CSV, JSON and plain text (with a tool to split columns and rows)
+  <div class="col-md-3">Set cell's margins
 </div>
 </div>
 <div class="row">
   <div class="col-md-3"><img src="import.png" alt="Merge and split cells" width=100></div>
-  <div class="col-md-3">Merge and split cells</div>
+  <div class="col-md-3">Import from CSV, JSON and plain text (with a tool to split columns and rows)</div>
   <div class="col-md-3"><img src="export.png" alt="Style text" width=100></div>
   <div class="col-md-3">Export to LaTeX, HTML, CSV, JSON and text
 </div>
@@ -275,5 +296,7 @@ Eraser & 20              & 2.50\$ \\ \bottomrule
 </textarea></div>
 </div>
 </section>
+<footer>
+</footer>
 </body>
 </html>
