@@ -1,0 +1,19 @@
+Legend
+=======
+[+] Added
+[/] Changed
+[-] Removed
+[#] Fixed
+Dates use a YYYY/MM/DD format.
+
+
+Preview 2 (2017/07/09)
+===========
+[+] Add equations in cells (with $...$ format)
+[+] Import tables from webpages, Microsoft Word, Microsoft Office, OpenDocument and others...
+[#] FIXED : Import JSON with a cell with a diagonal
+[#] FIXED : Export JSON with a cell with a diagonal
+[#] FIXED : Cells with a diagonal auto-updates like other cells
+[#] FIXED : Width of cells with a diagonal
+[#] FIXED : \textasciitilde for tilde symbol instead of \~
+[#] FIXED : Title box is okay for medium-sized screen, but not small screens
