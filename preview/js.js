@@ -21,6 +21,36 @@ function $id(id) {
 				this.element.innerHTML = "";
 				this.element.appendChild(fr);
 			};
+			this.import = function(content, format){
+				content = content || $id("import_value").value;
+				format = (format || $id("import_format").value).toLowerCase();
+				if(format == "auto"){
+					var json;
+					try{
+						json = JSON.parse(content);
+					}
+					catch(e){
+						try{
+							json = this.latex.importTable(content);
+						}
+						catch(f){
+							alert("Your file could not be loaded");
+							if(window.console){
+								console.error(e);
+								console.error(f);
+							}
+							return false;							
+						}
+					}
+					table.importFromJSON(json);
+				}
+				else if(format == "json"){
+					table.importFromJSON(JSON.parse(content));
+				}
+				else if(format == "latex"){
+					table.importFromJSON(table.latex.importTable(content));
+				}
+			}
 			this.removeAllSelection = function() {
 				this.selectedCell = null;
 				var allSelected = document.querySelectorAll("#table td[data-selected]");
@@ -504,9 +534,9 @@ function $id(id) {
 							.value = "*";
 					}
 					$id("caption")
-						.value = o.caption.caption;
+						.value = o.caption.caption || "";
 					$id("label")
-						.value = o.caption.label;
+						.value = o.caption.label || "";
 				}
 				var table = document.createDocumentFragment();
 				for (var i = 0; i < o.cells.length; i++) {

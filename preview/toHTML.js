@@ -51,6 +51,13 @@
 		otable.appendChild(orow);
 		var container = document.createElement("div");
 		container.appendChild(otable);
+		var equations = container.querySelectorAll("span.latex-equation");
+		// TODO : SPACE PROBLEMS!!!
+		for(var i=0,eq;i<equations.length;i++){
+			eq = equations[i];
+			var text = document.createTextNode("$$"+(eq.textContent || eq.innerText)+"$$");
+			eq.parentNode.replaceChild(text, eq);
+		}
 		return beautify(container.innerHTML);
 	})
 })();

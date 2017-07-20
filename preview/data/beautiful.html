@@ -1,0 +1,1026 @@
+<!doctype>
+<html>
+<head>
+<title>LaTeX Tables Editor</title>
+<style media="all" type="text/css">
+body{
+font-family:Helvetica;
+}
+  #table {
+    font-family: "Computer Modern", sans-serif;
+  }
+#table td{
+border: 1px dotted black;
+margin:0;
+padding:3pt 6pt;
+}
+em em {
+    font-style: normal;
+}
+#info_align_left{
+	display:none;
+}
+#info_align_left:checked ~ label[for="info_align_left"]{
+border:1px inset white;
+}
+body[data-border-editor] #table *{
+cursor:pointer !important;
+}
+label[for="info_align_left"]{
+font-size:0;
+border:1px solid transparent;
+background-image:url(text_align_left.png);
+display:inline-block;
+width:16px;
+height:16px;
+}
+#info_align_center{
+	display:none;
+}
+#info_align_center:checked ~ label[for="info_align_center"]{
+border:1px inset white;
+}
+label[for="info_align_center"]{
+font-size:0;
+border:1px solid transparent;
+background-image:url(text_align_center.png);
+display:inline-block;
+width:16px;
+height:16px;
+}
+#info_align_right{
+	display:none;
+}
+#info_align_right:checked ~ label[for="info_align_right"]{
+border:1px inset white;
+}
+label[for="info_align_right"]{
+font-size:0;
+border:1px solid transparent;
+background-image:url(text_align_right.png);
+display:inline-block;
+width:16px;
+height:16px;
+}
+td[data-two-diagonals]{
+position:relative;
+}
+td[data-two-diagonals]:before,td[data-two-diagonals]::before
+{
+    content: "";
+    position: absolute;
+    top:33%;left:0;right:0;bottom:0;
+    z-index: -1;
+    background:  linear-gradient(to right top, rgba(255,255,255,0) 0%,rgba(255,255,255,0) 49.9%,#000000 50%,#000000 51%,rgba(255,255,255,0) 51.1%,rgba(255,255,255,0) 100%);
+}
+td[data-two-diagonals]:after,td[data-two-diagonals]::after
+{
+    content: "";
+    position: absolute;
+    top:0;left:33%;right:0;bottom:0;
+    z-index: -1;
+    background:  linear-gradient(to right top, rgba(255,255,255,0) 0%,rgba(255,255,255,0) 49.9%,#000000 50%,#000000 51%,rgba(255,255,255,0) 51.1%,rgba(255,255,255,0) 100%);
+}
+td[data-two-diagonals] div[contenteditable]:not(:last-child)
+{
+display:inline-block;
+}
+td[data-align="l"]{
+	text-align:left;
+}
+td[data-align="c"]{
+	text-align:center;
+}
+td[data-align="r"]{
+	text-align:right;
+}
+td[data-diagonal]{
+	background: linear-gradient(to right top, rgba(255,255,255,0) 0%,rgba(255,255,255,0) 49.9%,#000000 50%,#000000 51%,rgba(255,255,255,0) 51.1%,rgba(255,255,255,0) 100%);
+}
+td[data-diagonal] div[contenteditable]{
+	margin-right:50%;
+	text-align:left;
+	word-break:keep-all;
+	white-space:nowrap;
+}
+td[data-diagonal] div[contenteditable]:first-child{
+	margin-left:50%;
+	margin-right:0;
+	text-align:right !important;
+}
+#table td[data-rotated]:not([data-selected]) div.outer{
+	display: inline-block;
+	overflow: hidden;
+}
+#left{
+position:absolute;
+top:0;
+left:0;
+right:25%;
+padding:4px;
+}
+#right{
+position:fixed;
+top:0;
+left:75%;
+right:0;
+}
+.overprop{
+margin:0;
+height:100%;
+background:lightgray;
+border-left:3px solid gray;
+padding:3px;
+border-bottom:1px solid gray;
+}
+.overprop::after{
+content:"\25BC";
+float:right;
+}
+button{
+border:1px solid black;
+background:white;
+display:inline-block;
+height:30px;
+}
+#properties{
+margin:0;
+height:100%;
+background:whitesmoke;
+border-left:3px solid gray;
+padding:3px;
+border-bottom:3px solid gray;
+}
+#properties h3{
+margin:0;
+border-bottom:1px solid gray;
+text-align:center;
+}
+#properties h6{
+margin:0;
+padding-top:2px;
+padding-bottom:2px;
+margin-top:3px;
+margin-bottom:3px;
+border-top:1px solid gray;
+border-bottom:1px solid gray;
+}
+#latex_content{
+width:100%;
+}
+#table tr[data-border-top="toprule"] td, #table td[data-border-top="toprule"]{
+padding-top:0.65ex !important;
+border-top:0.08em solid black !important;
+}
+#table tr[data-border-bottom="midrule"] td, #table td[data-border-bottom="midrule"]{
+padding-bottom:0.4ex;
+border-bottom:0.05em solid black;
+}
+#table tr[data-border-bottom="hline"] td, #table td[data-border-bottom="hline"]{
+border-bottom:0.4pt solid black;
+}
+#table tr[data-border-bottom="bottomrule"] td, #table td[data-border-bottom="bottomrule"]{
+padding-bottom:0.4ex;
+border-bottom:0.08em solid black;
+}
+#table td[data-rotated]:not([data-selected]) div[contenteditable]{
+	display: inline-block;
+	white-space: nowrap;
+	transform: translate(0,100%) rotate(-90deg);
+	transform-origin: 0 0;
+}
+#table td[data-selected][data-diagonal]{
+	background: linear-gradient(to right top, highlight 0%,highlight 49.9%,#000000 50%,#000000 51%,highlight 51.1%,highlight 100%);
+}
+#table td[data-selected][data-two-diagonals] div.outer{
+position:relative;
+}
+#table td[data-selected][data-two-diagonals] div.outer:before{
+content:"";
+position:absolute;
+background:highlight;
+z-index:-2;
+left:0;bottom:0;top:0;right:0;
+}
+#table tr, #table{
+margin:0;
+padding:0;
+}
+#table td[data-selected]:not([data-two-diagonals]):not([data-diagonal]){
+background:highlight;
+}
+.button-group-group{
+margin-bottom:20px;
+}
+.button-group{
+display:inline-block;
+border:1px solid lightgray;
+border-radius:5px;
+padding:5px;
+padding-bottom:0;
+}
+.button-group .caption{
+font-size:smaller;
+text-align:center;
+padding:2px;
+border-top:1px solid lightgray;
+margin-top:3px;
+}
+</style>
+<script type="text/javascript">
+function $id(id){
+	return document.getElementById(id);
+}
+(function(){
+"use strict"
+	var table=new (function(){
+		this.create = function(rows, cols){
+			rows = parseInt(rows, 10);
+			cols = parseInt(cols, 10);
+			var fr = document.createDocumentFragment();
+			for(var i=0;i<rows;i++){
+				fr.appendChild(this.createRow(cols));
+			}
+			this.element.innerHTML="";
+			this.element.appendChild(fr);
+		};
+		this.removeAllSelection = function(){
+			this.selectedCell = null;
+			var allSelected = document.querySelectorAll("#table td[data-selected]");
+			for(var i=0, l=allSelected.length;i<l;i++){
+				allSelected[i].removeAttribute("data-selected");
+			}
+		}
+		this.forEachSelectedCell = function(fn){
+			var allCells = document.querySelectorAll("#table td[data-selected]");
+			for(var i=0, l=allCells.length;i<l;i++){
+				if(fn(allCells[i], i) === false){break;}
+			}			
+		}
+		this.separators = function(hm){
+			if(hm==2){
+				this.twoDiagonals();
+			}
+			else if(hm==1){
+				this.diagonal();
+			}
+			else{
+				this.forEachSelectedCell(function(cell){
+					if(cell.hasAttribute("data-two-diagonals")){
+						var toDel = cell.querySelector("div[contenteditable]");
+						cell.setAttribute("data-two-diagonals-data", toDel.innerHTML);
+						toDel.parentElement.removeChild(toDel);
+					}
+					if(cell.hasAttribute("data-two-diagonals") || cell.hasAttribute("data-diagonal")){
+						var toDel = cell.querySelector("div[contenteditable]:last-child");
+						cell.setAttribute("data-diagonal-data", toDel.innerHTML);
+						toDel.parentElement.removeChild(toDel);
+					}
+					cell.removeAttribute("data-two-diagonals");
+					cell.removeAttribute("data-diagonal");
+				});
+			}
+		}
+		this.insertRowOver = function(){
+			var cell = this.selectedCell || this.element.querySelector("td");
+			if(cell){
+				var tr = this.createRowLike(cell);
+			}
+			do{
+				if(cell.tagName == "TR"){break;}
+			}while(cell = cell.parentElement);
+			
+			cell.parentElement.insertBefore(tr, cell);
+		}
+		this.insertRowUnder = function(){
+			var cell = this.selectedCell || this.element.querySelector("td:last-child");;
+			if(cell){
+				var tr = this.createRowLike(cell, true);
+			}
+			do{
+				if(cell.tagName == "TR"){break;}
+			}while(cell = cell.parentElement);
+			var td = cell.childNodes;
+			for(var i=0;i<td.length;i++){
+				var tdi = td[i];
+				if(tdi.tagName == "TD" && tdi.rowSpan > 1){
+					tdi.rowSpan = tdi.rowSpan+1;
+				}
+			}
+			cell.parentElement.insertBefore(tr, cell.nextSibling);
+		}
+		this.createRowLike = function(element, ignoreRowSpan){
+			do{
+				if(element.tagName=="TR"){
+					break;
+				}
+			}while(element = element.parentElement);
+			if(element.tagName!="TR"){
+				return null;
+			}
+			var tr = document.createElement("tr"),
+			td = element.childNodes;
+			for(var i=0;i<td.length;i++){
+				var cell = td[i];
+				if(cell.tagName == "TD"){
+					if(ignoreRowSpan && cell.rowSpan > 1){continue;}
+					cell = this.createCellLike(cell);
+					if(cell){
+						cell.removeAttribute("rowSpan");
+						cell.removeAttribute("data-diagonal");
+						cell.removeAttribute("data-two-diagonals");
+						tr.appendChild(cell);
+					}
+				}
+			}
+			return tr;
+		}
+		this.createCellLike = function(cell){
+			var td = this.createCell();
+			td.rowSpan = cell.rowSpan;
+			td.colSpan = cell.colSpan;
+			for(var i in cell.dataset){
+				td.dataset[i] = cell.dataset[i];
+			}
+			td.removeAttribute("data-selected");
+			return td;
+		}
+		this.diagonal = function(){
+			this.updateLaTeXInfoCell();
+			this.forEachSelectedCell(function(cell){
+				if(!cell.hasAttribute("data-diagonal")){
+					if(cell.hasAttribute("data-two-diagonals")){
+						var toDel = cell.querySelector("div[contenteditable]");
+						cell.setAttribute("data-two-diagonals-data", toDel.innerHTML);
+						toDel.parentElement.removeChild(toDel);
+						cell.removeAttribute("data-two-diagonals");
+					}
+					else{
+						cell.querySelector(".outer").innerHTML+="<div contenteditable>"+(cell.getAttribute("data-diagonal-data")||"[TEXT UNDER]")+"</div>";
+					}
+					cell.setAttribute("data-diagonal", "data-diagonal")
+				}
+			});
+		}
+		this.twoDiagonals = function(){
+			this.updateLaTeXInfoCell();
+			this.forEachSelectedCell(function(cell){
+				if(!cell.hasAttribute("data-two-diagonals")){
+					var div=cell.querySelector(".outer");
+					if(cell.hasAttribute("data-diagonal")){
+						cell.removeAttribute("data-diagonal");
+						div.innerHTML="<div contenteditable>"+(cell.getAttribute("data-two-diagonals-data")||"[1]")+"</div>"+div.innerHTML;
+					}
+					else{
+						div.innerHTML="<div contenteditable>"+(cell.getAttribute("data-two-diagonals-data")||"[1]")+"</div>"+div.innerHTML+"<div contenteditable>"+(cell.getAttribute("data-diagonal-data")||"[3]")+"</div>";
+					}
+					cell.setAttribute("data-two-diagonals", "data-two-diagonals");
+				}
+			});
+		}
+		this.rotate = function(){
+			this.updateLaTeXInfoCell();
+			this.forEachSelectedCell(function(cell){
+				if(!cell.hasAttribute("data-rotated")){
+					cell.setAttribute("data-rotated", "data-rotated");
+				}
+			});
+		}
+		this.selectedCell = null;
+		this.merge = function(){
+			this.mergeVertical();
+			this.mergeHorizontal()
+		}
+		this.mergeHorizontal = function(){
+			var allCells = document.querySelectorAll("#table td[data-selected]");
+			for(var i=0, l=allCells.length;i<l;i++){
+				var cell = allCells[i],
+				group = [cell],
+				height = cell.rowSpan;
+				if(!cell || cell.tagName!="TD" || !cell.parentElement || cell.parentElement.tagName!="TR"){
+					continue;
+				}
+				while(cell=cell.nextSibling){
+					if(!cell || cell.tagName!="TD" || !cell.parentElement || cell.parentElement.tagName!="TR"){
+						continue;
+					}
+					if(this.isSelected(cell) && cell.rowSpan==height){
+						group.push(cell);
+					}
+					else{break;}
+				}
+				this.mergeHorizontalCells(group);
+				
+			}
+		}
+		this.getCellPosition = function(_cell){
+			var table = this.element,
+			occupied = [],
+			rows = table.rows;
+			for(var i=0;i<rows.length;i++){
+				occupied.push([]);
+			}
+			for(var i=0;i<rows.length;i++){
+				var cols = rows[i].cells,
+				realcount = 0;
+				for(var j=0;j<cols.length;j++){
+					var cell = cols[j];
+					if(occupied[i][realcount]){
+						j--;realcount++;continue;
+					}
+					if(cell == _cell){
+						return {x:i,y:realcount}
+					}
+					for(var h=1;h<cell.rowSpan;h++){
+						for(var g=0;g<cell.colSpan;g++){
+							occupied[i+h][realcount+g]=true;
+						}
+					}
+					realcount+=cell.colSpan;
+				}
+			}
+			
+		}
+		this.getCellByPosition = function(x, y) {
+			var table = this.element,
+			occupied = [],
+			rows = table.rows;
+			if(x>=rows.length){return null;}
+			for(var i=0;i<rows.length;i++){
+				occupied.push([]);
+			}
+			for(var i=0, l=Math.min(rows.length,x+1);i<l;i++){
+				var cols = rows[i].cells,
+				realcount = 0;
+				for(var j=0;j<cols.length;j++){
+					var cell = cols[j];
+					if(occupied[i][realcount]){
+						j--;realcount++;continue;
+					}
+					if(i==x && realcount==y){
+						return cell;
+					}
+					for(var h=1;h<cell.rowSpan;h++){
+						for(var g=0;g<cell.colSpan;g++){
+							occupied[i+h][realcount+g]=true;
+						}
+					}
+					realcount+=cell.colSpan;
+				}
+			}			
+		};
+		this._getUnderCells = function(group){
+			var or = group[0],
+			length = 0,
+			cells = [];
+			if(!or || !or.parentElement || or.parentElement.tagName!="TR"){return null}
+			for(var i=0;i<group.length;i++){
+				length+=group[i].colSpan||1;
+			}
+			var pos = this.getCellPosition(or);
+			if(!pos){return null;}
+			var ncell = this.getCellByPosition(pos.x+or.rowSpan, pos.y);
+			if(!ncell){return null;}
+			var length2 = ncell.colSpan;
+			cells.push(ncell);
+			while(ncell=ncell.nextSibling){
+				if(length2>=length){
+					return cells;
+				}
+				length2+=ncell.colSpan;
+				cells.push(ncell);
+			}
+			return cells;
+		}
+		this.unselectCells = function(group){
+			for(var i=0;i<group.length;i++){
+				group.removeAttribute("data-selected");
+			}
+		}
+		this.setMargin = function(left, value){
+			this.forEachSelectedCell(function(cell){
+				if(left){
+					cell.setAttribute("data-margin-left", value);
+				}
+				else{
+					cell.setAttribute("data-margin-right", value);
+				}
+			});
+		}
+		this.setAlign = function(value){
+			if(value != "l" && value != "r" && value != "c"){value="l";}
+			this.forEachSelectedCell(function(cell){
+				cell.setAttribute("data-align", value);
+			});
+		}
+		this.mergeVertical = function(){
+			var allCells = document.querySelectorAll("#table td[data-selected]");
+			for(var i=0, l=allCells.length;i<l;i++){
+				var cell = allCells[i];
+				if(!cell){continue;}
+				var group = [cell],
+				length = cell.colSpan||1,
+				lastGroup = [cell];
+				for(;;){ // Oh
+					lastGroup = this._getUnderCells(lastGroup);
+					if(!lastGroup || lastGroup.length<1){break;}
+					// Two criterias : same length and all selected
+					var can=true,
+					length2=0;
+					for(var j=0;j<lastGroup.length;j++){
+						length2+= lastGroup[j].colSpan||1;
+						if(!this.isSelected(lastGroup[j])){
+							can = false;
+							break;
+						}
+					}
+					if(!can || length!=length2){
+						break;
+					}
+					else{
+						if(lastGroup.length>1){
+							var height = lastGroup[0].rowSpan||1;
+							for(var h=0;h<lastGroup.length;h++){
+								height = (height==lastGroup[h].rowSpan) ? height : false;
+							}
+							if(!height){break;}
+							this.mergeHorizontalCells(lastGroup);
+							lastGroup = [lastGroup[0]]
+						}
+						group.push(lastGroup[0]);
+					}
+				}
+				if(group.length>1){
+					this.mergeVerticalCells(group);
+				}
+			}
+			// Clean Up
+			var emptyrows = document.querySelectorAll("#table > tbody > tr:empty, #table > tr:empty");
+			for(var i=0,l=emptyrows.length;i<l;i++){
+				var row = emptyrows[i];
+				if(!row || !row.parentElement){continue;}
+				row.parentElement.removeChild(row);
+			}
+			var cleancells = document.querySelectorAll("#table > tbody > tr > td[rowspan]:only-of-type, #table > tr > td[rowspan]:only-of-type");
+			for(var i=0,l=cleancells.length;i<l;i++){
+				cleancells[i].removeAttribute("rowspan");
+			}
+		}
+		this.updateLaTeXInfoCell = function(cell){
+			cell = cell || this.selectedCell;
+			if(cell){
+				document.querySelector("#latex_content").value=this.generateForCell(cell);
+			}
+		}
+		this.mergeVerticalCells = function(cells){
+			var html;
+			if(cells.length < 2){return;}
+			for(var i=0;i<cells.length;i++){
+				var cell = cells[i];
+				if(!html){html = this.getHTML(cell)}
+				else {html+="<br>"+this.getHTML(cell)}
+				if(i>0){
+					cell.parentElement.removeChild(cell);
+				}
+			}
+			this.setHTML(cells[0],html);
+			cells[0].rowSpan = (cells[0].rowSpan || 1)+cells.length-1;
+		}
+		this.getHTML = function(cell){
+			return cell.querySelector("div[contenteditable]").innerHTML;
+		}
+		this.setHTML = function(cell, HTML){
+			cell.querySelector("div[contenteditable]").innerHTML = HTML;
+		}
+		this.mergeHorizontalCells = function(cells){
+			var html;
+			if(cells.length < 2){return;}
+			for(var i=0;i<cells.length;i++){
+				var cell = cells[i];
+				if(!html){html = this.getHTML(cell)}
+				else {html+=" "+this.getHTML(cell)}
+				if(i>0){
+					cell.parentElement.removeChild(cell);
+				}
+			}
+			this.setHTML(cells[0],html);
+			cells[0].colSpan = (cells[0].colSpan || 1)+cells.length-1;
+		}
+		this.cellBefore = function(cell){
+			return cell.previousSibling;
+		}
+		this.blacklistPackages = {};
+		this.colNumber = function(cell){
+			if(!cell){return null}
+			var parent = cell.parentElement;
+			if(!parent || parent.tagName !== "TR"){
+				return null;
+			}
+			var child = parent.childNodes, n=-1;
+			for(var i=0, l = child.length;i<l;i++){
+				if(child[i] === cell){return n+1}
+				if(child[i] && child[i].tagName=="TD"){
+					n+= child[i].colSpan||1;
+				}
+			}
+			return null;
+		}
+		this.cellOver = function(cell){
+			if(!cell){return null}
+			var parent = cell.parentElement;
+			if(!parent || parent.tagName !== "TR"){
+				return null;
+			}
+			var rowOver = parent.previousSibling;
+			if(!rowOver || rowOver.tagName !== "TR"){
+				return null
+			}
+			var colNumber = this.colNumber(cell);
+			if(!colNumber){return null}
+			return rowOver[colNumber]
+		}
+		this.isSelected = function(cell){
+			return cell.hasAttribute("data-selected");
+		}
+		this.selectCell = function(element, CTRL, SHIFT){
+			if(!CTRL){
+				this.removeAllSelection();
+				this.showInfo(element);
+				this.selectedCell = element;
+			}
+			if(SHIFT){
+				var actualSelected = document.querySelector("#table td[data-selected]");
+			}
+			else{
+				element.setAttribute("data-selected", "data-selected");
+			}
+		}
+		this._id=function(id){return document.getElementById(id)}
+		this.showInfo = function(element){
+			document.querySelector("#latex_content").value=this.generateForCell(element);
+			this._id("info_separators").value = element.hasAttribute("data-two-diagonals") ? 2 : element.hasAttribute("data-diagonal") ? 1 : 0;
+			this._id("info_left_margin").value = element.hasAttribute("data-margin-left") ? element.getAttribute("data-margin-left") : element.parentElement.querySelector("td:first-child")===element ? "0pt" : "3pt";
+			this._id("info_right_margin").value = element.hasAttribute("data-margin-right") ? element.getAttribute("data-margin-right") : element.parentElement.querySelector("td:last-child")===element ? "0pt" : "3pt";
+		}
+		this.createCell = function(classNames){
+			var td = document.createElement("td");
+			td.classNames = classNames || "";
+			//td.innerHTML = "<div class='outer'><div contenteditable>AA</div></div>";
+			var div1 = document.createElement("div");
+			div1.className="outer";
+			var div2 = document.createElement("div");
+			div2.contentEditable=true;
+			div2.innerHTML="AA";
+			div2.addEventListener("input", function(){
+				if(table.selectedCell === (this.parentElement||{}).parentElement){
+					table.updateLaTeXInfoCell();
+				}
+			}, false);
+			div1.appendChild(div2);
+			td.appendChild(div1);
+			td.addEventListener("click", this._clickCellManager, false);
+			return td;
+		}
+		this.createRow = function(cols, classNames){
+			var tr = document.createElement("tr");
+			for(var i=0;i<cols;i++){
+				tr.appendChild(this.createCell(classNames));
+			}
+			return tr;
+		}
+		this.selectionAllowed = true;
+		this.borderEditor = false;
+		this.toggleBorderEditor = function(){
+			if(this.borderEditor){
+				document.body.removeAttribute("data-border-editor");
+				var l = document.querySelectorAll("div[contenteditable]");
+				for(var i=0;i<l.length;i++){(l[i]||{}).contentEditable=true}
+			}
+			else{
+				document.body.setAttribute("data-border-editor", "data-border-editor");
+				var l = document.querySelectorAll("div[contenteditable]");
+				for(var i=0;i<l.length;i++){(l[i]||{}).contentEditable=false;}
+			}
+			this.selectionAllowed = !this.selectionAllowed;
+			this.borderEditor = !this.borderEditor;
+		}
+		this._clickCellManager = function(event){
+			if(table.selectionAllowed){
+				table.selectCell(this, event.ctrlKey, event.shiftKey);
+			}
+			else if(table.borderEditor){
+				table.editBorder(this, 	event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft,
+							event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop);
+			}
+		}
+		this.editBorder = function(element, x, y){
+			var pos = element.getBoundingClientRect();
+			if(y - pos.top < 4){
+				element.style.borderTop = "1px solid black";
+			}
+			else if(pos.bottom - y < 4){
+				element.style.borderBottom = "1px solid black";
+			}
+			else if(x-pos.left < 4){
+				element.style.borderLeft = "1px solid black";
+			}
+			else if(pos.right-x < 4){
+				element.style.borderRight = "1px solid black";
+			}
+		}
+		this.loaded = false;
+		this.element = null;
+		this.load = function(table){
+			this.loaded = true;
+			this.element = table; 
+			document.execCommand("styleWithCSS",false, false);
+			document.execCommand("insertBrOnReturn", false, false);
+		}
+		this.generateFromHTML = function(html, ignoreMultiline){
+			//ToDo : improve backslash
+			html = html.replace("\\","\\textbackslash ").replace(/(\$|\%|\{|\}|\~|\&|\#)/ig,"\\$1");
+			html = html.replace("&nbsp;","~").replace(/<br[/\s]*>/ig," \\\\ ");
+			html = html.replace(/<(b|(strong))((\s+[^>]*)|)>/ig,"\\textbf{").replace(/<(i|(em))[^>]*>/ig,"\\textit{").replace(/<\s*\/\s*(b|(strong)|(em)|i)[^>]*>/ig,"}");
+			html = html.replace(/(<((div)|p))/ig," \\\\ $1").replace(/(\[|\])/ig,"{$1}");
+			var div = document.createElement("div");
+			div.innerHTML = html;
+			var text = div.innerText || div.textContent;
+			text=text.replace(/[ ]{2,}/g," ").replace(/[\n\r]+/g,"");
+			if(text.indexOf("\\\\")>=0 && !ignoreMultiline){
+				text = "\\begin{tabular}[c]{@{}l@{}}"+text+"\\end{tabular}";
+			}
+			return text
+		};
+		this.createCellObject = function(before, cell, after){
+			if(arguments.length==2){
+				var content = before, o={refCell:cell};
+				if(content === false){
+					o.ignore = true;
+				}
+				else{
+					o.content = o.fullContent = content;
+				}
+				return o;
+			}
+			var o = {
+				cell : cell,
+				ignore:false,
+				before : before,
+				after : after,
+				content : this.generateForCell(cell),
+				align : cell.getAttribute("data-align") || "l"
+			}
+			o.fullContent = [before,o.content,after].join(""); // String concanation
+			return o;
+		}
+		this.generateForCell = function(cell){
+			var text="";
+			if(cell.hasAttribute("data-two-diagonals")){
+				var ce = cell.querySelectorAll("div[contenteditable]");
+				this.packages["diagbox"]=true;
+				text="\\diagbox{"+this.generateFromHTML(ce[2].innerHTML)+"}{"+this.generateFromHTML(ce[0].innerHTML)+"}{"+this.generateFromHTML(ce[1].innerHTML)+"}"
+			}
+			else if(cell.hasAttribute("data-diagonal")){
+				var ce = cell.querySelectorAll("div[contenteditable]");
+				if(this.blacklistPackages["diagbox"]){
+					this.packages["slashbox"] = true;			
+				}
+				else{
+					this.packages["diagbox"] = true;
+				}
+				text = "\\backslashbox{"+this.generateFromHTML(ce[0].innerHTML)+"}{"+this.generateFromHTML(ce[1].innerHTML)+"}";
+			}
+			else if(cell.hasAttribute("data-rotated")){
+				if(cell.rowSpan > 1){
+					if(this.blacklistPackages["makecell"]){
+						var inside = this.generateFromHTML(cell.querySelector("div[contenteditable]").innerHTML, true)
+						if(this.blacklistPackages["tabularx"]){
+							text="\\begin{sideways}\\begin{tabular}{@{}p{"+(cell.rowSpan-0.2)+"\\normalbaselineskip}@{}}"+inside+"\\end{tabular}\\end{sideways}";
+							this.packages["rotating"]=true;
+						}
+						else{
+							text="\\begin{sideways}\\begin{tabularx}{"+cell.rowSpan+"\\normalbaselineskip}{X}"+inside+"\\end{tabularx}\\end{sideways}";
+							this.packages["rotating"]=this.packages["tabularx"]=true;
+						}
+					}
+					else{
+						text="\\rotcell{"+this.generateFromHTML(cell.querySelector("div[contenteditable]").innerHTML)+"}"
+						this.packages["makecell"] = true;
+					}
+				}
+				else{
+					if(this.blacklistPackages["rotating"]){
+						text="\\rotcell{"+this.generateFromHTML(cell.querySelector("div[contenteditable]").innerHTML)+"}"
+						this.packages["makecell"] = true;
+					}
+					else{
+						text="\\begin{sideways}"+this.generateFromHTML(cell.querySelector("div[contenteditable]").innerHTML)+"\\end{sideways}"
+						this.packages["rotating"] = true;
+					}
+				}
+			}
+			else if(cell.rowSpan > 1 && !this.blacklistPackages["makecell"]){
+				text = "\\makecell{"+this.generateFromHTML(cell.querySelector("div[contenteditable]").innerHTML, true)+"}";
+				this.packages["makecell"] = true;
+			}
+			else{
+				text = this.generateFromHTML(cell.querySelector("div[contenteditable]").innerHTML);
+			}
+			return text;
+		}
+		this.packages={};
+		this.getMatrixOfCells = function(){
+
+			var table = this.element,
+			    rg = [],
+			    maxCols=0,
+			    rows = table.rows;
+			for(var i=0;i<rows.length;i++){
+				rg.push([]);
+			}
+			for(var i=0;i<rows.length;i++){
+				var row = rows[i],
+				    realCol = 0;
+				for(var j=0;j<row.cells.length;j++){
+					var cell = row.cells[j], align = cell.getAttribute("data-align") || "l";
+					if(typeof rg[i][realCol] != "object" && rg[i][realCol]!==false){
+						if(!cell.rowSpan || cell.rowSpan<2){
+							if(!cell.colSpan || cell.colSpan <2){
+								rg[i][realCol]=this.createCellObject("",cell,"");
+							}
+							else{
+								var o = rg[i][realCol]=this.createCellObject("\\multicolumn{"+cell.colSpan+"}{"+align+"}{",cell,"}");
+								for(var k=1;k<cell.colSpan;k++){
+									rg[i][realCol+k]=this.createCellObject(false, o);
+								}
+							}
+						}
+						else{
+							this.packages["multirow"]=true;
+							var o;
+							if(!cell.colSpan || cell.colSpan <2){
+								o= rg[i][realCol]=this.createCellObject("\\multirow{"+cell.rowSpan+"}{*}{",cell,"}");
+							}
+							else{
+								o = rg[i][realCol]=this.createCellObject("\\multicolumn{"+cell.colSpan+"}{"+align+"}{\\multirow{"+cell.rowSpan+"}{*}{",cell,"}}");
+							}
+							for(var k=0;k<cell.rowSpan;k++){
+								for(var l=0;l<cell.colSpan;l++){
+									// I hate four-level loops
+									if(l==0 && k!=0){
+										if(cell.colSpan>1){
+											rg[i+k][realCol]=this.createCellObject("\\multicolumn{"+cell.colSpan+"}{"+align+"}{}", o);
+										}
+										else{rg[i+k][realCol]=this.createCellObject("", o)}
+									}
+									else if(l!=0 || k!=0){
+										rg[i+k][realCol+l]=this.createCellObject(false,o);
+									}
+								}
+							}
+						}
+					}
+					else{
+						j--;
+					}
+					realCol++;
+				}
+			}
+			return rg;
+		}
+		this.generate = function(opt){
+			this.packages={}
+			var table = this.element,
+			rg = this.getMatrixOfCells();
+			console.dir(rg);
+			// Determine header
+			var header = "\\begin{tabular}{", headers = [], colHeaders = [];
+			for(var i=0;i<rg.length;i++){
+				var cells = rg[i];
+				for(var j=0;j<cells.length;j++){
+					var cell = cells[j];
+					if(cell && !cell.ignore){
+						var align = cell.align;
+						if(!headers[j]){headers[j]={}}
+						var headernow = headers[j]
+						if(!headernow[align]){headernow[align]=0}
+						headernow[align]++;
+					}
+				}
+			}
+			for(var i=0;i<headers.length;i++){
+				var max = 0, value = "", headernow=headers[i];
+				for(var j in headernow){
+					if(headernow.hasOwnProperty(j) && headernow[j]>max){
+						max = headernow[j];value = j;
+					}
+				}
+				header+=value;
+				colHeaders.push(value);
+			}
+			header+="}";
+			var str="\\begin{table}[]\n\\centering\n\\caption{My caption}\n\\label{my-label}\n" + header;
+			for(var i=0;i<rg.length;i++){
+				var cells = rg[i];
+				if(i!==0){str+=" \\\\"}
+				str+="\n"
+				for(var j=0;j<cells.length;j++){
+					var cell = cells[j];
+					if(j!==0 && cell!==false && !cell.ignore){
+						str+=" & ";
+					}
+					if(cell!==false && !cell.ignore){
+						
+						str+= cell.fullContent;
+					}
+				}
+			}
+			str+="\n\\end{tabular}\n\\end{table}";
+			var packages="";
+			for(var i in this.packages){
+				if(this.packages.hasOwnProperty(i)){
+					packages+="% \\usepackage{"+i+"}\n";
+				}
+			}
+			return packages+"\n\n"+str;
+		}
+	})()
+	window.table = table;
+})();
+</script>
+</head>
+<body>
+<div id="left">
+<div class="button-group-group">
+<div class="button-group">
+<button>New</button>
+<button>Import</button>
+<div class="caption">File</div></div>
+<div class="button-group">
+<button onclick="document.execCommand('bold',false,null)">B</button>
+<button onclick="document.execCommand('italic',false,null)">I</button>
+<button>U</button>
+<button>S</button>
+<div class="caption">Text</div></div>
+<div class="button-group">
+<button onclick="table.merge()">Merge</button>
+<button>Split</button>
+<div class="caption">Cells</div></div>
+<div class="button-group">
+<button onclick="table.insertRowOver()">RowOver</button>
+<button onclick="table.insertRowUnder()">RowUnder</button>
+<button>DeleteRow</button>
+<button>ColBefore</button> <button>ColAfter</button>  <button>DeleteCol</button>
+<div class="caption">Rows and colums</div></div>
+<div class="button-group">
+<button onclick="table.toggleBorderEditor()">BorderDraw</button>
+<div class="caption">&nbsp;</div></div>
+</div>
+
+<table id="table">
+</table><hr><center><button onclick="document.getElementById('c').value=table.generate()">Generate</button> <small><u>View options</u></small></center><hr>
+<textarea id="c" style="width:100%;height:20%;min-height:300px;">
+</textarea>
+</div>
+<div id="right">
+<div class="overprop">Packages</div>
+<div class="overprop">Borders</div>
+<div id="properties">
+<h3>Cell properties</h3>
+<input type="radio" name="align" id="info_align_left" onchange="table.setAlign('l')"><label for="info_align_left">Left</label> <input type="radio" name="align" id="info_align_center" onchange="table.setAlign('c')"><label for="info_align_center">Center</label> <input type="radio" name="align" id="info_align_right" onchange="table.setAlign('r')"><label for="info_align_right">Right</label> 
+<h6>Margins</h6>
+<table><tr><td align=right>
+Left margin :</td><td><input value="6pt" id="info_left_margin" oninput="table.setMargin(true, this.value);"></td></tr>
+<tr><td>Right margin :</td><td><input value="6pt" id="info_right_margin" oninput="table.setMargin(false, this.value);"></td></tr>
+</table>
+<h6>Effects</h6>
+Diagonal separators : <input type="number" min="0" max="2" value="0" id="info_separators" onchange="table.separators(this.value)"><br>
+<input type="checkbox" onchange="table.rotate()"> Rotated cell<br>
+<h6>LaTeX Content</h6>
+<textarea id="latex_content"></textarea>
+</div>
+¸<div id="borders">
+<h3>Border Editor</h3>
+Type of border : <select>
+<option value="normal">[\hline] Default</option>
+<option value="double">[\hline\hline] Double line</option>
+<optgroup label="Booktabs">
+<option value="toprule">[\toprule] Top rule</option>
+<option value="midrule">[\midrule] Mid rule</option>
+<option value="bottomrule">[\bottomrule] Bottom rule</option>
+</optgroup>
+<optgroup label="arydshln">
+<option value="hdashline">[\hdashline] Dash line</option>
+</optgroup>
+</select>
+</div>
+
+<input id="row"> x <input id="col"> <button onclick="table.create($id('row').value,$id('col').value)">New</button>
+</div>
+
+<script type="text/javascript">
+table.load($id('table'));
+table.create(4,4);
+</script>
+</body>
+</html>
