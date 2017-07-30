@@ -11,7 +11,6 @@ function $id(id) {
 		},
 		table = new(function() {
 			this.create = function(cols, rows) {
-				debugger;
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
 				var fr = document.createDocumentFragment();
@@ -228,6 +227,14 @@ function $id(id) {
 						cell.removeAttribute("data-rotated");
 					}
 				});
+				if(state){
+					$id("info-unrotated").classList.remove("active");
+					$id("info-rotated").classList.add("active");
+				}
+				else{
+					$id("info-unrotated").classList.add("active");
+					$id("info-rotated").classList.remove("active");
+				}
 				this.updateLaTeXInfoCell();
 			}
 			this.selectedCell = null;
@@ -419,8 +426,15 @@ function $id(id) {
 					this._id("info_align_left")
 						.classList.add("active");
 				}
-				this._id("info_rotated")
-					.checked = element.hasAttribute("data-rotated");
+				if(element.hasAttribute("data-rotated")){
+					this._id("info-rotated")
+					.classList.add("active");
+					this._id("info-unrotated").classList.remove("active")
+				}
+				else{
+					this._id("info-unrotated").classList.add("active");
+					this._id("info-rotated").classList.remove("active")
+				}
 			}
 			this.applyToCell = function(td) {
 
@@ -494,6 +508,7 @@ function $id(id) {
 								$("#border-editor-info")
 									.show(100);
 							}
+							$("#right_border").collapse('show')
 							document.body.removeAttribute("data-view-editor");
 							document.body.setAttribute("data-border-editor", "data-border-editor");
 							$id("button-mode-border")
@@ -760,7 +775,6 @@ function $id(id) {
 				}, false);
 				table.addEventListener("click", function(e) {
 					var target = e.currentTarget;
-					console.dir(target);
 					if (target.tagName == "TD" || target.tagName == "TH") {
 						_this._clickCellManager.apply(this, arguments);
 					}
@@ -814,33 +828,7 @@ function $id(id) {
 				}
 				return text
 			};
-			this.createCellObject = function(before, cell, after) {
-				if (arguments.length == 2) {
-					var content = before,
-						o = {
-							refCell: cell
-						};
-					if (content === false) {
-						o.ignore = true;
-					} else {
-						o.content = o.fullContent = content;
-					}
-					return o;
-				}
-				var o = {
-					cell: cell,
-					ignore: false,
-					before: before,
-					after: after,
-					leftBorder: cell.getAttribute("data-border-left") || "",
-					rightBorder: cell.getAttribute("data-border-right") || "",
-					content: this.generateForCell(cell),
-					header: this.getHeaderForCell(cell),
-					align: cell.getAttribute("data-align") || "l"
-				}
-				o.fullContent = before + "" + o.content + "" + after;
-				return o;
-			}
+
 			this.generateForCell = function(cell) {
 				var text = "";
 				if (cell.hasAttribute("data-two-diagonals")) {
@@ -888,7 +876,7 @@ function $id(id) {
 							this.packages["rotating"] = true;
 						}
 					}
-				} else if (cell.rowSpan > 1 && !this.blacklistPackages["makecell"]) {
+				} else if (cell.rowSpan > 1 && !this.blacklistPackages["makecell"] && !this.blacklistPackages["multirow"]) {
 					text = "\\makecell{" + this.generateFromHTML(cell.querySelector("div[contenteditable]")
 						.innerHTML, true) + "}";
 					this.packages["makecell"] = true;
@@ -952,6 +940,121 @@ function $id(id) {
 						";": ";{1pt/1pt}"
 					}[c] || ""
 				});
+			}
+			this.createCellObject = function(before, cell, after) {
+				if (arguments.length == 2) {
+					var content = before,
+						o = {
+							refCell: cell
+						};
+					if (content === false) {
+						o.ignore = true;
+					} else {
+						o.content = o.fullContent = content;
+					}
+					return o;
+				}
+				var o = {
+					cell: cell,
+					ignore: false,
+					before: before,
+					after: after,
+					leftBorder: cell.getAttribute("data-border-left") || "",
+					rightBorder: cell.getAttribute("data-border-right") || "",
+					content: this.generateForCell(cell),
+					header: this.getHeaderForCell(cell),
+					align: cell.getAttribute("data-align") || "l"
+				}
+				o.fullContent = before + "" + o.content + "" + after;
+				return o;
+			}
+			this.createCellO = function(o, row){
+				var before = row[o.x-1],
+				    after = row[o.x+1],
+				    cell = o.cell,
+				    blockMultirow = this.blacklistPackages["multirow"];
+				o.align = cell.getAttribute("data-align") || "l"
+				o.content = this.generateForCell(cell);
+				o.fullHeader = this.convertToHeader(this.getContextualHeader(before, o, after));
+				o.header = this.convertToHeader(this.getComparableHeader(before, o, after));
+				o.span = (cell.rowSpan != 1 || cell.colSpan != 1);
+				o.static = false;
+				o.leftBorder = cell.getAttribute("data-border-left") || "";
+				if(!o.leftBorder && before){
+					o.leftBorder = (before.refCell||before).cell.getAttribute("data-border-right") || ""
+				}
+				o.rightBorder = cell.getAttribute("data-border-right") || "";
+				if(!o.rightBorder && after){
+					o.rightBorder = (after.refCell||after).cell.getAttribute("data-border-left") || ""
+				}
+				o.fullContent = o.content;
+				if(o.span){
+					if(cell.rowSpan != 1){
+						this.packages["multirow"] = true;
+						if(cell.colSpan != 1){
+							if(blockMultirow){
+								o.fullContent = this.multicolumn(cell.colSpan, o.header, o.content);
+							}
+							else{
+								o.fullContent = this.multicolumn(cell.colSpan, o.header, 
+												this.multirow(cell.rowSpan, o.content)
+												);
+								o.static = true;
+							}
+						}
+						else{
+							if(blockMultirow){
+								o.fullContent = o.content;
+							}
+							else{
+								o.fullContent = this.multirow(cell.rowSpan, o.content);
+							}
+						}
+					}
+					else{
+							o.fullContent = this.multicolumn(cell.colSpan, o.header, o.content);
+							o.static = true;
+					}
+				}
+			}
+			this.multicolumn = function(span, header, content){
+				return "\\multicolumn{"+span+"}{" + header + "}{" + content + "}";
+			}
+			this.multirow = function(span, content){
+				return "\\multirow{"+span+"}{*}{"+content+"}";
+			}
+			this.matrix = function(){
+				var table = this.element,
+				    result = this.Table.matrix();
+				for(var i=0;i<result.length;i++){
+					var row = result[i];
+					for(var j=0;j<row.length;j++){
+						var cell = row[j];
+						if(!cell.refCell){
+							this.createCellO(cell, row);
+						}
+						else if(cell.refCell.x == cell.x){
+							// ROWSPAN
+							var refCell = cell.refCell;
+							cell.ignore = false;
+							cell.header = refCell.header;
+							cell.fullHeader = refCell.fullHeader;
+							if(refCell.cell.colSpan != 1){
+								cell.fullContent = "\\multicolumn{" + refCell.colSpan + "}{" + refCell.header + "}{}";
+								cell.static = true;
+							}
+							else{
+								cell.fullContent = "";
+								cell.static = false;
+							}
+						}
+						else{
+							// COLSPAN
+							cell.ignore = true;
+						}
+					}
+				}
+				return result;
 			}
 			this.getMatrixOfCells = function() {
 
@@ -1021,6 +1124,7 @@ function $id(id) {
 					}
 				}
 				this.blacklistPackages = o;
+				return o;
 			}
 			this.removeRow = function() {
 				if (this.selectedCell) {
@@ -1127,29 +1231,21 @@ function $id(id) {
 					.value = "Log (" + ((new Date())
 						.toLocaleTimeString()) + ")\n=========\n" + this.log;
 			}
-			this.generateLaTeX = function(opt) {
-				this.packages = {}
-				var table = this.element,
-					caption = this.caption(),
-					booktabs = table.hasAttribute("data-booktabs"),
-					rg = this.getMatrixOfCells(),
-					border;
-				// Determine header
-				var header = "",
-					headers = [],
-					colHeaders = [];
-				for (var i = 0; i < rg.length; i++) {
-					var cells = rg[i];
-					for (var j = 0; j < cells.length; j++) {
-						var cell = cells[j];
-						if (cell && !cell.ignore) {
-							var align = this.getContextualHeader(cells[j - 1], cell, cells[j + 1]);
+			this.headers = function(matrix){
+				matrix = matrix || this.matrix();
+				var headers = [], colHeaders = [];
+				for(var i=0;i<matrix.length;i++){
+					var row = matrix[i];
+					for(var j=0;j<row.length;j++){
+						var cell = row[j];
+						if(cell && !cell.ignore){
+							var align = (cell.refCell||cell).header;
 							if (!headers[j]) {
 								headers[j] = {}
 							}
-							var headernow = headers[j]
-							if (!headernow[align]) {
-								headernow[align] = 0
+							var headernow = headers[j];
+							if(!headernow[align]){
+								headernow[align] = 0;
 							}
 							headernow[align]++;
 						}
@@ -1165,11 +1261,24 @@ function $id(id) {
 							value = j;
 						}
 					}
-					header += value;
 					colHeaders.push(value);
 				}
-				header = this.convertToHeader(header);
-				var str = "\\begin{table}[]\n\\centering\n";
+				return colHeaders;
+			}
+			this.generateLaTeX = function(opt) {
+				this.packages = {}
+				var table = this.element,
+					caption = this.caption(),
+					booktabs = table.hasAttribute("data-booktabs"),
+					rg = this.matrix(),
+					border;
+				// Determine header
+				var colHeaders = this.headers(),
+				header = colHeaders.join("");
+				var str = "\\begin{table}[]\n";
+				if(this._id("table-opt-center").checked){
+					str += "\\centering\n"
+				}
 				if (caption.caption) {
 					str += "\\caption" + (caption.numbered ? "*" : "") + "{" + caption.caption + "}\n";
 				}
@@ -1198,13 +1307,10 @@ function $id(id) {
 							str += " & ";
 						}
 						if (cell !== false && !cell.ignore) {
-							var contextual = this.getContextualHeader(cells[j - 1], cell, cells[j + 1]),
-								comparable = this.getComparableHeader(cells[j - 1], cell, cells[j + 1])
-							if (!sameHeader(comparable, header, j) && cell.fullContent.indexOf("\\multicolumn") < 0 && cell.fullContent.length >
-								0) {
-								str += "\\multicolumn{1}{" + this.convertToHeader(comparable) + "}{" + cell.fullContent + "}";
-
-							} else {
+							if(!cell.static && cell.header != header){
+								str += this.multicolumn(1, cell.header, cell.fullContent);
+							}
+							else{
 								str += cell.fullContent;
 							}
 						}
@@ -1432,7 +1538,7 @@ function $id(id) {
 							hdashline: "\\cdashline",
 							dottedline: "\\cdashline"
 						}
-						if (!subBorder["double"] || subBorder.toprule || subBorder.midrule || subBorder.bottomrule || true) {
+						if (!subBorder["double"] || subBorder.toprule || subBorder.midrule || subBorder.bottomrule) {
 							for (var i in subBorder) {
 								if (subBorder.hasOwnProperty(i)) {
 									var bd = subBorder[i],
@@ -1462,6 +1568,48 @@ function $id(id) {
 						} else {
 							// Another rare case when there's Double subrules. We'll use hhline for this.
 							// TODO
+							var length = matrix[n].length;
+							var arrBorder = [];
+							var row = matrix[n-1] || matrix[n]
+							for(var i in subBorder){
+								if(subBorder.hasOwnProperty(i)){
+									var sb = subBorder[i];
+									for(var j=0;j<sb.length;j++){
+										arrBorder[+sb[j]] = i;
+									}
+								}
+							}
+							this.packages["hhline"] = true;
+							border = "\\hhline{";
+							for(var i=0;i<length;i++){
+								sb = arrBorder[i];
+								if(i == 0){
+									var borderLeft = (row[i].refCell||row[i]).leftBorder;
+									if(borderLeft == "normal"){
+										border += "|";
+									}
+									else if(borderLeft == "double"){
+										border += "||";
+									}
+								}
+								if(!sb){
+									border += "~";
+								}
+								else if(sb == "double"){
+									border+="="; 
+								}
+								else{
+									border += "-";
+								}
+								var borderRight = (row[i].refCell||row[i]).rightBorder;
+								if(borderRight == "normal"){
+									border += "|";
+								}
+								else if(borderRight == "double"){
+									border += "||";
+								}
+							}
+							border += "}";
 						}
 					}
 					return border;

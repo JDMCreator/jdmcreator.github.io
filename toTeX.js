@@ -49,8 +49,9 @@
 			}
 		}
 		return tex;
-	}
-	rotateMacro = "% Insert the following macro once in your document\n\\def\\rotatecell#1{\n\\setbox 0 = \\hbox{#1}\n\\newdimen\\boxwd\n\\boxwd=\\wd0\n\\newdimen\\boxht\n\\boxht=\\ht0\n\\setbox 1 = \\vtop{\\pdfsave\\pdfsetmatrix{0 1 -1 0}\\hbox{\\kern-\\boxwd\\box0}\\pdfrestore}\n\\ht1=\\boxwd\n\\kern-\\boxht\\box1\n}\n\n",
+	},
+	// The rotate macro (\rotatecell) was made by Pr. Petr Olsak and myself. Thanks a lot for his help
+	rotateMacro = "% Insert the following macro once in your document\n\\newdimen\\boxwd\n\\newdimen\\boxht\n\n\\def\\rotatecell#1{%\n\t\\setbox 0 = \\vbox{\\baselineskip=\\normalbaselineskip \\lineskiplimit=0pt\n\t\t\\halign{##\\unskip\\kern2ex\\hfil\\cr#1\\crcr}}%\n\t\\boxwd=\\wd0\n\t\\boxht=\ht0\n\t\\setbox 1 = \\hbox{\\pdfsave\\pdfsetmatrix{0 1 -1  0}\\hbox to0pt{\\box0\\hss}\\pdfrestore}%\n\t\\ht1=\\boxwd\n\t\\boxwd=\\dp1\n\t\\kern\\boxht \\box1 \\kern\\boxwd\n}\n\n",
 	generateHeaderFromMatrix = function(matrix){
 		var header = "\\strut\n\\vrule height1ex depth1ex width0px #\n",
 		    align = [],
@@ -120,7 +121,6 @@
 				header += "\\hfil";
 			}
 			header+="\\kern 3pt";
-			console.log(finalvrules[i]);
 			if(finalvrules[i] && !/^[^%]*%$/.test(finalvrules[i])){
 				header += "\\vrule"
 			}
@@ -166,7 +166,7 @@
 							"toprule" : "\\leavevmode\\leaders\\hrule height 0.8pt\\hfill\\kern 0pt",
 							"bottomrule" : "\\leavevmode\\leaders\\hrule height 0.8pt\\hfill\\kern 0pt",
 							"midrule" : "\\leavevmode\\leaders\\hrule height 0.5pt\\hfill\\kern 0pt",
-							"double" : "\\hrulefill\\kern 1pt\\hrulefill"
+							"double" : "\\hrulefill" // TODO : SUPPORT DOUBLE
 						}[borderArr[i]] || "\\hrulefill") 
 				}
 			}

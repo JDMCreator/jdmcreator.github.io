@@ -199,6 +199,12 @@
 			padding:0;
 			background:#ddd;
 			bottom:0;
+			overflow-y:hidden;
+		}
+		#right-container{
+			width:100%;
+			height:100%;
+			overflow-y:auto;
 		}
 
 		#properties,
@@ -216,7 +222,7 @@
 			text-align: center;
 		}
 
-		#properties h6,
+		#right_cell h6,
 		#borders h6 {
 			margin: 0;
 			padding-top: 2px;

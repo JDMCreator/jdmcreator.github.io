@@ -40,6 +40,7 @@
 				else if(cell.getAttribute("data-align") == "r"){
 					ocell.style.textAlign = "right";
 				}
+				ocell.style.paddingLeft = ocell.style.paddingRight = "3cm";
 				if(cell.rowSpan != 1){ocell.rowSpan=cell.rowSpan}
 				if(cell.colSpan != 1){ocell.colSpan=cell.rowSpan}
 				ocell.innerHTML = this.getHTML(cell);

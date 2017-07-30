@@ -144,14 +144,14 @@ var latex = {},
 	}
 },
 importTable = function(code){
-var tabular = /\\begin{(table|tabular[xy]?\*?)}/g.exec(code);
+var tabular = /\\begin{(tabu|table|tabular[xy]?\*?)}/g.exec(code);
 	if(!tabular){
 		return false;
 	}
 	var type = tabular[1], obj = {}, code2 = code.substring(tabular.index), initEnv = envirn(code2);
 	code = initEnv.content;
 	if(type == "table"){
-		if(/\\begin{(tabular[xy]?)}/.test(code)){
+		if(/\\begin{(tabu|tabular[xy]?)}/.test(code)){
 			var caption = code.indexOf("\\caption");
 			if(caption >=0){
 				caption = command(code.substring(caption));
@@ -159,7 +159,7 @@ var tabular = /\\begin{(table|tabular[xy]?\*?)}/g.exec(code);
 				o.caption.caption = caption.args[0];
 				o.caption.numbered = caption.asterisk;
 			}
-			tabular = /\\begin{(tabular[xy]?\*?)}/g.exec(code2);
+			tabular = /\\begin{(tabu|tabular[xy]?\*?)}/g.exec(code2);
 			if(!tabular){
 				return false; // Should not happen
 			}
@@ -168,13 +168,7 @@ var tabular = /\\begin{(table|tabular[xy]?\*?)}/g.exec(code);
 			initEnv = envirn(code2);			
 		}
 		else{
-			tabular = /\\begin{(tabular[xy]?\*?)}/g.exec(code);
-			if(!tabular){
-				return false;
-			}
-			type = tabular[1];
-			code2 = code.substring(tabular.index);
-			initEnv = envirn(code2);
+			return false;
 		}
 	}
 	code = initEnv.content;
@@ -184,6 +178,48 @@ var tabular = /\\begin{(table|tabular[xy]?\*?)}/g.exec(code);
 	}
 	else if(type == "tabular*" || type == "tabularx" || type == "tabulary"){
 		head = header(initEnv.command.args[2]);
+	}
+	else if(type == "tabu"){
+		// Because "tabu" supports "tabu to <dim>" and "tabu spread <dim>", we need to handle these special and rarely used cases
+		if(initEnv.command.args.length == 2){
+			head = header(initEnv.command.args[1]);
+		}
+		else{
+			var totalbracket = 0;
+			head = "";
+			for(var i=0,c;i<code.length;i++){
+				c = code.charAt(i);
+				if(totalbracket>0){
+					if(c == "\\"){
+						head += c + code.charAt(i+1);
+						i++;
+					}
+					else if(c == "{"){
+						head += c;
+						totalbracket++;
+					}
+					else if(c == "}"){
+						if(totalbracket <= 1){
+							code = code.substring(i+1);
+							break;
+						}
+						head += c;
+						totalbracket--;
+					}
+					else{
+						head += c;
+					}
+				}
+				else if(c == "\\"){
+					i++;
+				}
+				else if(c == "{"){
+					totalbracket++;
+				}
+			}
+			console.log(head);
+			head = header(head);
+		}
 	}
 	var count = 0, borderCSS = {
 		"normal" : "1px solid black",
@@ -232,7 +268,7 @@ var tabular = /\\begin{(table|tabular[xy]?\*?)}/g.exec(code);
 				}
 				i+=com.full.length-1;				
 			}
-			else if(name == "hrule"){
+			else if(name == "hline" || name == "firsthline" || name == "lasthline"){
 				if(actuBorder == "normal"){
 					actuBorder == "double";
 				}
@@ -245,7 +281,12 @@ var tabular = /\\begin{(table|tabular[xy]?\*?)}/g.exec(code);
 				actuBorder = name;
 				i+=com.full.length-1;
 			}
-			else if(name == "cline" || name == "cmidrule"){
+			else if(name == "cline" || name == "cmidrule" || name == "tabucline"){
+				if(name == "tabucline"){
+					// SHORT FIX TO MAKE THE FUNCTION UNDERSTAND 'TABUCLINE' LIKE CLINE
+					// TODO : Implement different styles for tabucline (ex : dotted, dashed)
+					name == "cline";
+				}
 				if(!actuBorder){
 					if(!actuBorder.push){
 						actuBorder = [];
@@ -501,53 +542,147 @@ getHTML = function(code,o){
 	}
 	return html;
 },
-header = function(head){
-	var arr = [], actu = "", inside = 0, foundfirst = false;
-	for(var i=0, char;i<head.length;i++){
-		char = head.charAt(i);
-		if(inside > 0){
-			if(char == "}"){
-				inside--;
-				actu += "}";
+getHeaderComponent = function(head, i){
+	var c = head.charAt(i),
+	    next = head.charAt(i+1),
+	    
+	    o = {char : c, opts : [], args : [], full: c}
+	if(c == "*" && next != "{"){
+		o.args.push(next);
+		o.full += next;
+		i++;
+		next = head.charAt(i+1);
+	}
+	if(next == "{" || next == "["){
+		var argsN = 0, optsN = 0, actu="",commentmode = false;
+		for(var j=i+1, d;j<head.length;j++){
+			d = head.charAt(j);
+			if(commentmode){
+				if(d == "\n" || d == "\r"){
+					commentmode = false;
+				}
+				continue;
 			}
-			else if(char == "{"){
-				inside++;
-				actu += "{";
+			else if(d == "%"){
+				commentmode = true;
+				continue;
 			}
-			else if(char == "\\"){
-				actu += "\\" + head.charAt(i+1);
-				i++;
+			if(d == "{"){
+				argsN++;
+			}
+			else if(d == "["){
+				if(argsN == 0){
+					optsN++;
+				}
+				else{
+					actu += d;
+				}
+			}
+			else if(d == "\\"){
+				actu += d + head.charAt(j+1);
+				j++
+			}
+			else if(d == "}"){
+				if(argsN <= 1 && optsN <= 0){
+					o.args.push(actu);
+					argsN = optsN = 0;
+					actu = "";
+				}
+				else{
+					argsN--;
+					actu += d;
+				}
+			}
+			else if(d == "]"){
+				if(argsN <=0 && optsN <= 1){
+					o.opts.push(actu);
+					argsN = optsN = 0;
+					actu = "";
+				}
+				else if(optsN > 0){
+					optsN--;
+					actu += d;
+				}
+				else{
+					actu += d;
+				}
+			}
+			else if(argsN <= 0 && optsN <= 0){
+				o.full += head.substring(i+1, j);
+				return o;				
 			}
 			else{
-				actu += "" + char;
+				actu += d;
+			}
+		}
+	}
+	else{
+		return o;
+	}
+	o.full += head.substring(i+1);
+	return o;
+},
+header = function(head){
+	var arr=[], actu = "", foundfirst = false, commentmode = false;
+	for(var i=0,c;i<head.length;i++){
+		c = head.charAt(i),
+		info = getHeaderComponent(head, i);
+		if(commentmode){
+			if(c == "\n" || c == "\r"){
+				commentmode = false;
 			}
 			continue;
 		}
-		if(char == "{"){
-			inside++;
-			actu += "}";
+		else if(c == "%"){
+			commentmode = true;
+			continue;
 		}
-		else if(char == "\\"){
-			actu += "\\" + head.charAt(i+1);
-			i++;
+		else if(c == "*" && info.args.length >= 2 && (+info.args[0] || 0) > 0){
+			var subpreamble = "";
+			for(var j=0;j<info.args[0];j++){
+				subpreamble += info.args[1]
+			}
+			head = head.substring(0, i) + subpreamble + head.substring(i + info.full.length);
+			console.log(head);
+			i--;
+			continue;
 		}
-		else if(/^[a-zA-Z]$/.test(char)){
-			char = char.toLowerCase();
-			char = (char == "c" || char == "r") ? char : "l";
-			if(arr.length == 0 && !foundfirst){
-				foundfirst = true;
-				actu += char
+		i += info.full.length - 1;
+		if(c == "|" || c == ":"){
+			actu += c;
+		}
+		else if(/[a-zA-Z]/.test(c)){
+			c = c.toLowerCase();
+			if(c == "x"){
+				if(info.opts.length == 1){
+					c = (/^[0-9-]/.test(info.opts[0]) ? /([cr])[\s\S]*$/i : /^[\s\S]*([cr])/i).exec(info.opts[0]);
+					c = c ? c[1] : "l";
+				}
+				else{
+					c = "l";
+				}
+			}
+			else if(c != "c" && c != "r"){
+				c = "l";
+			}
+			if(foundfirst){
+				arr.push(actu);
+				actu = c;
 			}
 			else{
-				arr.push(actu);
-				actu = char;
+				foundfirst = true;
+				actu += c;
 			}
 		}
-		else{
-			actu += char;
+		else if(c == "!" && info.args.length > 0){
+			if(info.args[0].indexOf("\\vrule") != -1){
+				actu += "|";
+			}
 		}
 	}
-	arr.push(actu);
+	if(actu){
+		arr.push(actu);
+	}
 	return arr;
 },
 treatEnv = function(code){
