@@ -6,6 +6,12 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 0.2.1 BETA
+
+CORE
+
+[#] Fixed an issue where a warning about Edge appeared on all browsers
+
 Version 0.2 BETA
 ==========
 
