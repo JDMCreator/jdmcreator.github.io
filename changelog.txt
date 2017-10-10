@@ -6,6 +6,15 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 0.5.2 BETA (2017/10/10)
+===========
+
+| Note on this release :
+|     This release fixes a bug
+
+CORE
+
+[#] Fix an issue with the "Add all borders" button
 
 Version 0.5.1 BETA (2017/10/08)
 ===========

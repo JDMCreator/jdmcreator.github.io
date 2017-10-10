@@ -10,7 +10,7 @@ function $id(id) {
 			return cellHeader == colHeader
 		},
 		table = new(function() {
-			this.version = "0.5.1";
+			this.version = "0.5.2";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -997,7 +997,6 @@ this.getHTML = (function(){
 					border = "1px dotted black";
 				}
 				this.forEachSelectedCell(function(cell) {
-					done = true;
 					var style = cell.style;
 					style.borderTop = style.borderLeft = style.borderRight = style.borderBottom = border;
 					cell.setAttribute("data-border-top", borderType);
