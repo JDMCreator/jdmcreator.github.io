@@ -1,0 +1,535 @@
+<!doctype>
+<html>
+<head>
+<title>Table.js | Documentation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="bulma.css">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script type="text/javascript" src="table.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<style>
+.container{
+width:60rem;
+}
+h2{
+padding-top:1rem;
+margin-top:0.75rem;
+border-top:1px solid lightgray;
+}
+table.example-table{
+	border-collapse:collapse;
+	margin:5px;
+}
+table.example-table td{
+	border:1px solid black;
+	padding:4px;
+}
+table.example-table .selected{
+background-color:red;
+}
+pre{
+display:none;
+}
+pre.pre-show, pre.nonlisted{
+display:block;
+}
+.definition{
+background:whitesmoke;
+padding:10px;
+margin:4px;
+}
+.definition > *:first-child::before{
+content : "Definition";
+display:block;
+font-size:1.5rem;
+font-weight:bold;
+color:black;
+}
+.definition code{
+background:#e4e4e4;
+}
+.show-hide-code{
+cursor:pointer;
+padding:2px;
+border:1px solid black;
+padding-left:6px;
+	margin:4px;
+}
+.show-hide-code strong::before{
+	content:"\25BC";
+	padding-right:3px;
+	font-size:smaller;
+}
+.show-hide-code + pre + *{
+margin-top:4px;
+}
+</style>
+</head>
+<body>
+
+  <section class="section">
+<div class="container">
+<div style="text-align:center;"><h1 class="title" style="margin-bottom:0;">Table.js 0.2</h1>
+<em>A small JavaScript library without dependencies to manipulate HTML tables</em>
+<div style="margin-top:15px;"><a class="button" href="https://github.com/JDMCreator/Table.js" target="_blank">Download on Github</a></div>
+</div>
+<h1 class="title">Documentation</h1>
+
+<ul id="tdm"></ul>
+
+<p><strong>Note : a <code>HTMLTableCellElement</code> is any <code>&lt;TD></code> or <code>&lt;TH></code> element.</strong></p>
+
+<h2 class="subtitle">Matrix</h2>
+
+A <strong>matrix</strong> is the <code>Array</code> representation of a table (vs the DOM representation of a table). It is the core of this library.
+
+<code>TableObject.matrix()</code> returns an <code>Array</code> of <code>Arrays</code> of <code>Objects</code>. Each subarray represents a row and each object a cell. Cells that span more than a row or more than a col are represented as "Ghost object" that references the original cell. A normal <code>Cell Object</code> look like this :
+
+<pre class="nonlisted"><code>
+{
+    cell : a &lt;TD> or &lt;TH> element,
+    x : column number,
+    y: row number
+}
+</pre></code>
+
+A <code>Ghost Cell Object</code> look like this :
+
+<pre class="nonlisted"><code>
+{
+    refCell : a Cell Object,
+    x : column number,
+    y: row number
+}
+</pre></code>
+
+<center>
+<table class="example-table is-centered" id="table-matrix">
+<tr><td colspan=5>A</td></tr>
+<tr><td rowspan = 4>B</td><td>C</td><td>D</td><td>E</td><td>F</td></tr>
+<tr><td>H</td><td>I</td><td>J</td><td>K</td></tr>
+<tr><td>L</td><td>M</td><td>N</td><td>O</td></tr>
+<tr><td>P</td><td>Q</td><td>R</td><td>S</td></tr>
+</table>
+<div class="buttons has-addons is-centered">
+  <span class="button" onclick="console.dir((new Table(document.getElementById('table-matrix'))).matrix())">Log matrix to console</span>
+</div>
+</center>
+
+<div class="definition"><strong>Syntax: </strong><code id="tableObjectMatrix">Matrix TableObject.matrix(Optional Boolean alwaysInterpretZeroRowSpan)</code>
+<div>Returns the matrix representation of the table. If <code>alwaysInterpretZeroRowSpan</code> is set to <code>true</code>, the matrix will interpret <code>rowspan="0"</code> (which is part of the HTML5 standard) even if the browser doesn't support it. By default, this argument is set to <code>false</code> (<code>rowspan="0"</code> will only be interpreted if it is supported by the browser).</div></div>
+
+<h2 class="subtitle">Accessing cells</h2>
+
+<div class="definition"><strong>Syntax: </strong><code id="tableObjectCell">HTMLTableCellElement TableObject.cell(Number x, Number y, Optional Matrix matrix)</code>
+<div>Returns the cell at absolute position <code>[x,y]</code>. Negative numbers start at the end (i.e. <code>[-1,-1]</code> is the last cell from the last row).</div>
+<strong>Syntax: </strong><code id="tableObjectFirst">HTMLTableCellElement TableObject.first()</code>
+<div>Returns the first cell of the table.</div>
+<strong>Syntax: </strong><code id="tableObjectLast">HTMLTableCellElement TableObject.last()</code>
+<div>Returns the last cell of the table.</div>
+<strong>Syntax: </strong><code id="tableObjectRel">HTMLTableCellElement TableObject.rel(Number x, Number y)</code>
+<div>Returns the cell at relative position <code>[x,y]</code>.</div>
+</div>
+
+You can also access to the <code>HTMLTableElement</code> with the <code>TableObject.element</code> property.
+
+
+<div class="definition"><strong>Syntax: </strong><code id="tableObjectIsAChildCell">Boolean TableObject.isAChildCell(Misc cell)</code>
+<div>Returns <code>true</code> if <code>cell</code> is a <code>HTMLTableCellElement</code> and a cell of the table.</div>
+</div>
+
+<h2 class="subtitle">Cell's position</h2>
+<center>
+<table class="example-table selectable is-centered" id="table-position" oncellselect="position(this)">
+<tr><td colspan=5>A</td></tr>
+<tr><td rowspan = 4>B</td><td class="selected">C</td><td>D</td><td>E</td><td>F</td></tr>
+<tr><td>H</td><td>I</td><td>J</td><td>K</td></tr>
+<tr><td>L</td><td>M</td><td>N</td><td>O</td></tr>
+<tr><td>P</td><td>Q</td><td>R</td><td>S</td></tr>
+</table>
+Position : (<span id="position-x">1</span>,<span id="position-y">1</span>)
+</center>
+
+<pre title="Get a cell's position"><code>
+var table = new Table(document.getElementById('table-position'));
+function position(){
+	var cell = table.element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		document.getElementById('position-x').innerHTML = position.x;
+		document.getElementById('position-y').innerHTML = position.y;
+	}
+}
+</code></pre>
+<div class="definition"><strong>Syntax: </strong><code id="tableObjectPosition">Object TableObject.position(HTMLTableCellElement cell, Optional Matrix matrix)</code>
+<div>Returns the cell real position inside the table as an <code>{x:x, y:y}</code> Object. If <code>matrix</code> is not specified, a matrix of the table will be calculated via <code>TableObject.matrix()</code> which uses a lot of ressources. If you have a lot of cells' positions to calculate, you should cache the matrix.</div></div>
+
+<h2 class="subtitle">Inserting and removing rows and columns</h2>
+<center>
+<table class="example-table selectable is-centered" id="table-row-col">
+<tr><td colspan=5>A</td></tr>
+<tr><td rowspan = 4>B</td><td class="selected">C</td><td>D</td><td>E</td><td>F</td></tr>
+<tr><td>H</td><td>I</td><td>J</td><td>K</td></tr>
+<tr><td>L</td><td>M</td><td>N</td><td>O</td></tr>
+<tr><td>P</td><td>Q</td><td>R</td><td>S</td></tr>
+</table>
+<div class="buttons has-addons is-centered">
+  <span class="button" onclick="rowBefore()">Insert row before</span>
+  <span class="button" onclick="rowAfter()">Insert row after</span>
+  <span class="button" onclick="removeRow()">Remove row</span>
+</div>
+<div class="buttons has-addons is-centered">
+  <span class="button" onclick="colBefore()">Insert column before</span>
+  <span class="button" onclick="colAfter()">Insert column after</span>
+  <span class="button" onclick="removeCol()">Remove column</span>
+</div>
+</center>
+
+<pre title="Inserting and removing rows and columns"><code>
+var table = new Table(document.getElementById('table-row-col'));
+function rowBefore(){
+	var cell = table.element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.insertRow(position.y, function(cell){
+			cell.innerHTML = "0";
+		})
+	}
+}
+function rowAfter(){
+	var cell = table.element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.insertRow(position.y+cell.rowSpan, function(cell){
+			cell.innerHTML = "0";
+		})
+	}
+}
+function removeRow(){
+	var cell = table.element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.removeRow(position.y)
+	}
+}
+function colBefore(){
+	var cell = table.element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.insertCol(position.x, function(cell){
+			cell.innerHTML = "0";
+		})
+	}
+}
+function colAfter(){
+	var cell = table.element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.insertCol(position.x+cell.colSpan, function(cell){
+			cell.innerHTML = "0";
+		})
+	}
+}
+function removeCol(){
+	var cell = table.element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.removeCol(position.x)
+	}
+}
+</code></pre>
+
+<div class="definition"><strong>Syntax: </strong><code id="tableObjectInsertRow">TableObject.insertRow(Optional Number position, Optional function callback)</code>
+<div>Insert a row at the position <code>position</code> (or at the end of the table, if not specified) and insert cells inside it like the row before it (or after it if it's the first row). If specified, the function <code>callback</code> is called for each cell inserted with the cell as the first argument.</div>
+<strong>Syntax: </strong><code id="tableObjectInsertCol">TableObject.insertCol(Optional Number position, Optional function callback)</code>
+<div>Insert a column at the position <code>position</code> (or at the end of the table, if not specified) and insert cells inside it like the column before it (or after it if it's the first column). If specified, the function <code>callback</code> is called for each cell inserted with the cell as the first argument.</div>
+<strong>Syntax: </strong><code id="tableObjectRemoveRow">TableObject.removeRow(Optional Number position)</code>
+<div>Remove the row located at position <code>position</code> and move each cell with a <code>rowspan</code> attribute other than 1 to the next row if possible. Negative position start at the end (i.e. <code>-1</code> is the last row). Default value for position is <code>-1</code>.</div>
+<strong>Syntax: </strong><code id="tableObjectRemoveCol">TableObject.removeCol(Optional Number position)</code>
+<div>Remove each cell located at position <code>position</code> for each row. Negative position start at the end (i.e. <code>-1</code> is the last cell from each row). Default value for position is <code>-1</code>.</div></div>
+
+<h2 class="subtitle">Merging and splitting cells</h2>
+<center class="container is-centered">
+
+<table class="example-table multiselectable is-centered" id="table-merge-split">
+<tr><td class="selected">1</td><td class="selected">2</td><td>3</td><td>4</td><td>5</td></tr>
+<tr><td class="selected">1</td><td class="selected">2</td><td>3</td><td>4</td><td>5</td></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+</table>
+
+<div class="buttons has-addons is-centered">
+  <span class="button" onclick = "merge()">Merge</span>
+  <span class="button" onclick = "split()">Split</span>
+</div>
+</center>
+
+<pre title="Merge cells"><code>
+var table = new Table(document.getElementById('table-merge-split'));
+function merge(){
+	var cells = table.element.querySelectorAll(".selected");
+	table.merge(cells, function(colspan, rowspan, kept, removed){
+		var content = kept.innerHTML;
+		for(var i=0;i&lt;removed.length;i++){
+			content += " " + removed[i].innerHTML;
+		}
+		kept.innerHTML = content;
+	})
+}
+</code></pre>
+<pre title="Split cells"><code>
+var table = new Table(document.getElementById('table-merge-split'));
+function split(){
+	var cells = table.element.querySelectorAll(".selected");
+	table.split(cells, function(newcell){
+		newcell.innerHTML = "New";
+		newcell.classList.add("selected");
+	})
+}
+</code></pre>
+
+<div class="definition"><strong>Syntax: </strong><code id="tableObjectMerge">TableObject.merge(NodeList||Array cells, Optional Function callback)</code>
+<div>Merge all <code>HTMLTableCellElement</code> in <code>cells</code>. Whenever cells are about to be merged, <code>callback</code> is called with four arguments : the first is the future value of the colspan attribute, the second is the future value of the rowspan attribute, the third is the cell that will be kept and the fourth is an <code>Array</code> of cells that will be removed.</div>
+<strong>Syntax: </strong><code id="tableObjectMergeHorizontal">TableObject.mergeHorizontal(NodeList||Array cells, Optional Function callback)</code>
+<div>Merge horizontally all <code>HTMLTableCellElement</code> in <code>cells</code>. Whenever cells are about to be merged, <code>callback</code> is called with four arguments : the first is the future value of the colspan attribute, the second is the future value of the rowspan attribute, the third is the cell that will be kept and the fourth is an <code>Array</code> of cells that will be removed.</div>
+<strong>Syntax: </strong><code id="tableObjectMergeVertical">TableObject.mergeVertical(NodeList||Array cells, Optional Function callback)</code>
+<div>Merge vertically all <code>HTMLTableCellElement</code> in <code>cells</code>. Whenever cells are about to be merged, <code>callback</code> is called with four arguments : the first is the future value of the colspan attribute, the second is the future value of the rowspan attribute, the third is the cell that will be kept and the fourth is an <code>Array</code> of cells that will be removed.</div>
+<strong>Syntax: </strong><code id="tableObjectSplit">TableObject.split(HTMLTableCellElement||Array||NodeList cells, Optional Function callback)</code>
+<div>Split each cell specified in the first argument and call <code>callback</code>, if specified, for each cell created with the cell as the first argument.</div></div>
+
+<p><strong>
+You should <a href="#tableObjectNormalize">normalize</a> your table after merging cells. 
+</strong></p>
+
+<h2 class="subtitle">Normalizing a table</h2>
+<strong>Normalizing</strong> a table means four things :
+<ol>
+<li> Adjusting the <code>rowspan</code> value of each cell to its minimal value;
+<li> Adjusting the <code>colspan</code> value of each cell to its minimal value;
+<li> Removing empty <code>&lt;TR></code> elements;
+<li> If there are missing cells in a row, expanding the <code>colspan</code> value of the last cell of this row.
+</ol>
+
+<div class="definition"><strong>Syntax: </strong><code id="tableObjectNormalize">Boolean TableObject.normalize()</code>
+<div>The function returns <code>true</code> if the table was modified.</div></div>
+
+<center class="container is-centered">
+<table class="example-table is-centered" id="table-normalize">
+<tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+<tr><td>1</td><td>2</td><td>3</td></tr>
+<tr></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+</table>
+
+<div class="buttons is-centered">
+  <span class="button" onclick="normalizeTable()">Normalize</span>
+</div>
+</center>
+
+<pre title="Normalize a table"><code>
+var table = new Table(document.getElementById('table-normalize'));
+function normalizeTable(){
+	table.normalize();
+}
+</code></pre>
+
+<h2 class="subtitle">
+</section>
+</div>
+<script>
+var block = document.getElementsByTagName("pre");
+for(var i=0;i<block.length;i++){
+	if(block[i].classList.contains("nonlisted")){
+		continue;
+	}
+	var d = document.createElement("div");
+	d.innerHTML = "<strong>Show/Hide Code</strong>";
+	if(block[i].hasAttribute("title")){
+		d.innerHTML+=": "+block[i].getAttribute("title");
+	}
+	d.className = "show-hide-code";
+	block[i].parentElement.insertBefore(d, block[i]);
+	d.addEventListener("click",(function(element){
+		return function(){
+			element.classList.toggle("pre-show");
+		}
+	})(block[i]), false);
+}
+var t = document.querySelectorAll("table.example-table.multiselectable");
+for(var i=0;i<t.length;i++){
+	t[i].addEventListener("click", function(event){
+		var target = event.target;
+		do{
+			if(target.tagName == "TD" || target.tagName == "TH"){
+				break;
+			}
+		}
+		while(target = target.parentElement);
+		if(target){
+			var has = target.classList.contains("selected");
+			target.classList.toggle("selected");
+		}
+	}, false);
+}
+var t = document.querySelectorAll("table.example-table.selectable");
+for(var i=0;i<t.length;i++){
+	t[i].addEventListener("click", function(event){
+		var target = event.target;
+		do{
+			if(target.tagName == "TD" || target.tagName == "TH"){
+				break;
+			}
+		}
+		while(target = target.parentElement);
+		if(target){
+			var table = target;
+			while(table = table.parentElement){
+				if(table.tagName == "TABLE"){
+					break;
+				}
+			} 
+			if(table){
+				var selected = table.getElementsByClassName("selected");
+				for(var j=0;j<selected.length;j++){
+					selected[j].classList.remove("selected");
+				}
+				target.classList.add("selected");
+				if(table.hasAttribute("oncellselect")){
+					(function() { return eval(table.getAttribute("oncellselect"));}).call(target);
+				}
+			}
+		}
+	}, false);
+}
+function merge(){
+	var element = document.getElementById('table-merge-split'),
+	cells = element.querySelectorAll(".selected"),
+	table = new Table(element);
+	table.merge(cells, function(colspan, rowspan, kept, removed){
+		var content = kept.innerHTML;
+		for(var i=0;i<removed.length;i++){
+			content += " " + removed[i].innerHTML;
+		}
+		kept.innerHTML = content;
+	})
+}
+function split(){
+	var element = document.getElementById('table-merge-split'),
+	cells = element.querySelectorAll(".selected"),
+	table = new Table(element);
+	table.split(cells, function(newcell){
+		newcell.innerHTML = "New";
+		newcell.classList.add("selected");
+	})
+}
+function normalizeTable(){
+	var element = document.getElementById('table-normalize'),
+	table = new Table(element);
+	table.normalize();
+}
+function rowBefore(){
+	var element = document.getElementById('table-row-col'),
+	table = new Table(element),
+	cell = element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.insertRow(position.y, function(cell){
+			cell.innerHTML = "0";
+		})
+	}
+}
+function rowAfter(){
+	var element = document.getElementById('table-row-col'),
+	table = new Table(element),
+	cell = element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.insertRow(position.y+cell.rowSpan, function(cell){
+			cell.innerHTML = "0";
+		})
+	}
+}
+function removeRow(){
+	var element = document.getElementById('table-row-col'),
+	table = new Table(element),
+	cell = element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.removeRow(position.y)
+	}
+}
+function colBefore(){
+	var element = document.getElementById('table-row-col'),
+	table = new Table(element),
+	cell = element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.insertCol(position.x, function(cell){
+			cell.innerHTML = "0";
+		})
+	}
+}
+function colAfter(){
+	var element = document.getElementById('table-row-col'),
+	table = new Table(element),
+	cell = element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.insertCol(position.x+cell.colSpan, function(cell){
+			cell.innerHTML = "0";
+		})
+	}
+}
+function removeCol(){
+	var element = document.getElementById('table-row-col'),
+	table = new Table(element),
+	cell = element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		table.removeCol(position.x)
+	}
+}
+function position(){
+	var element = document.getElementById('table-position'),
+	table = new Table(element),
+	cell = element.querySelector(".selected");
+	if(cell){
+		var position = table.position(cell);
+		document.getElementById('position-x').innerHTML = position.x;
+		document.getElementById('position-y').innerHTML = position.y;
+	}
+}
+var links = document.querySelectorAll('.definition code[id^="tableObject"]'),
+frag = document.createDocumentFragment();
+//debugger;
+var results=[]
+for(var i=0,link;i<links.length;i++){
+	link = links[i];
+	var title = "";
+	link.id.replace(/^tableObject([a-z]+)/i, function(full, one){
+		one = one.charAt(0).toLowerCase() + one.substring(1);
+		title = one;
+	});
+	results.push([title, link.id]);
+}
+results.sort(function(a, b) {
+    var textA = a[0].toUpperCase();
+    var textB = b[0].toUpperCase();
+    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+});
+for(var i=0;i<results.length;i++){
+	var a = document.createElement("a"), li = document.createElement("li");
+	a.href = "#"+results[i][1];
+	a.innerHTML = "." + results[i][0] + "()";
+	li.appendChild(a);
+	frag.appendChild(li);
+}
+document.getElementById('tdm').appendChild(frag);
+</script>
+</body>
+</html>
