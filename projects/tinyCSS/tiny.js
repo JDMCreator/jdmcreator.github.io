@@ -11,13 +11,11 @@
 			backdrop = document.createElement("div");
 			backdrop.className="dialog-backdrop";
 			for(var i=0;i<dialogs.length;i++){
-				var dialog = dialogs[i],
-				child = dialog.childNodes,
-				newbackdrop = backdrop.cloneNode();
+				var newbackdrop = backdrop.cloneNode();
 				newbackdrop.addEventListener("click", function(){
 					Tiny.dialog.close(this);
 				}, false);
-				dialog.insertBefore(newbackdrop, child[child.length-2]);
+				dialogs[i].appendChild(newbackdrop);
 			}
 			var closeModals = document.querySelectorAll("[data-close-dialog]:not(.tiny-ignore)");
 			for(var i=0;i<closeModals.length;i++){

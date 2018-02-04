@@ -132,7 +132,7 @@ blockquote.quote.italic{
 font-size:0.9em;
 }
 blockquote.quote::before{
-content:'“';
+content:'\201C';
 font-style:normal;
 font-size:6rem;
 font-family:"Arial";
@@ -194,11 +194,13 @@ header .h1, header .h2, header .h3, header .h4, header .h5, header .h6, header h
 	z-index:1000;
 }
 .menu{
-padding:0.25rem 0;
 	background-color:darkgray;
 z-index:1000;
+border-bottom:1px solid gray;
 }
-
+.menu-open, .menu-close{
+padding-bottom:1.8em !important;
+}
 .menu:target .menu-open{
 display:none;
 }
@@ -262,6 +264,9 @@ float:left;
 .right.on{
 float:right;
 }
+.left > *, .right > *{
+padding:0.5em 0;
+}
 .left:not(.on), .right:not(.on){
 position:absolute;
 left:-9999px;
@@ -276,7 +281,7 @@ transition:transform 0.1s;
 border-top:1px solid gray;
 }
 .left:not(.on) > *, .right:not(.on) > *{
-padding:0.15rem 1rem;
+padding:0.5em 1rem;
 }
 .left:not(.on), .right:not(.on){
 background:lightgray;
@@ -735,46 +740,32 @@ body.dialog-active{
 	bottom:0;
 	z-index:-1;
 }
-.dialog > :not(.dialog-backdrop), .dialog > footer::before{
+.dialog-content > *{
 background:white;
-width:600px;
-margin:0 auto;
-padding:10px 1rem;
-border-left:1px solid rgba(0,0,0,0.7);
-border-right:1px solid rgba(0,0,0,0.7);
-box-shadow:0 5px 15px rgba(0,0,0,0.5);
+width:100%;
+padding:0.8rem 1rem;
 box-sizing:border-box;
+}
+.dialog-content{
+box-shadow:0 5px 15px rgba(0,0,0,0.5);
+width:600px;
+margin:2rem auto;
+border:1px solid rgba(0,0,0,0.7);
+border-radius:5px;
 }
 @media screen and (max-width: 767px) {
 	.dialog > :not(.dialog-backdrop), .dialog > footer::before{
 		width:90%;
-		background:red;
 	}
 }
-.dialog > :not(.dialog-backdrop){
+.dialog-content{
 	transform:translate(0,-200px);
 	transition:transform 0.3s;
 }
-.active > :not(.dialog-backdrop), .active > footer::before{
+.dialog.active .dialog-content{
 	transform:translate(0,0);
 }
-.dialog > :first-child{
-	margin-top:30px;
-	border-top:1px solid  rgba(0,0,0,0.7);
-	border-radius:5px 5px 0 0;
-}
-.dialog > :last-child{
-	margin-bottom:30px;
-}
-.dialog > *:not(header):not(footer):not(.dialog-backdrop){
-	border-bottom:1px solid rgba(0,0,0,0.7);
-	border-radius:0 0 5px 5px;
-	padding:15px 1rem;
-}
-.dialog > header{
-	border-bottom:1px solid darkgray;
-}
-.dialog > header::after{
+.dialog-content > header::after{
 content:"";
 display:block;
 height:0;
@@ -792,21 +783,14 @@ color:darkgray;
 .dialog-close.hoverable:hover{
 	color:#333;
 }
-.dialog > footer::before{
-content:"";
-height:18px;
-padding-top:0;
-padding-bottom:0;
-display:block;
-margin-left:calc(-1rem - 1px);
-margin-top:-14px !important;
-position:relative;
-top:-12px;
-box-shadow:none;
-border-bottom:1px solid darkgray;
+.dialog-content > :not(:first-child){
+border-top:1px solid gray;
 }
-.dialog > footer{
-	border-bottom:1px solid rgba(0,0,0,0.7);
+.dialog-content > :first-child{
+border-radius:5px 5px 0 0;
+}
+.dialog-content > *:last-child{
 	border-radius:0 0 5px 5px;
 }
+
 /* ===== Tabs ===== */
