@@ -3186,12 +3186,13 @@ this.getHTML = (function(){
 					return css;
 				}
 				function backgroundInfo(cell){
-					var color = window.getComputedStyle(cell,null).getPropertyValue("background-color");
-					if(color == "transparent" || color == "white"){return ""}
+					var color = window.getComputedStyle(cell,null).getPropertyValue("background-color") || cell.style.backgroundColor;
+					if(color == "transparent" || color == "white" || !color){return ""}
 					var rgba = toRGBA(color);
 					if(rgba[3] == 0){
 						return "";
 					}
+					if(!rgba || !rgba.pop){return ""}
 					rgba.pop();
 					if(rgba.join(",") == "255,255,255"){
 						return "";
