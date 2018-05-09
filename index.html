@@ -529,6 +529,9 @@ Color of border :
       <div class="modal-body">
 		<center><em>This utility allows you to load XLS, XLSX, XLSM, CSV, OSD, SLK files and more. <strong>You can't load LaTeX files yet with this utility. Use the other utility instead.</strong></em></center>
 <div style="padding:4px;">
+<div id="worksheet-drop">
+<div>Drag a file</div>
+<div>- or -</div>
 <input type="file" id="excel-file" class="form-control-file" accept="<!--Accepted files-->
 .csv,
 .xls,
@@ -544,7 +547,9 @@ Color of border :
 .dif,
 .dbf,
 .prn,
-.eth"><button onclick="table.importExcel()" id="excel-button" style="margin:4px;" class="btn btn-primary">OK</button>
+.eth">
+</div>
+<button onclick="table.importExcel()" id="excel-button" style="margin:4px;" class="btn btn-primary">OK</button>
 </div>
 <div id="worksheet-loading-status"></div>
 <div id="worksheet-options" style="display:none;">

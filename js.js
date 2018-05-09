@@ -302,25 +302,55 @@ function $id(id) {
 				}
 				table._id("excel-button").disabled = false;
 			}
-			this.importExcel = function(){
-				var file = this._id("excel-file").files[0],
-				elem_status = this._id('worksheet-loading-status');
-				if(file){
-				this._id("excel-button").disabled = true;
-				var excelWorker = function excelWorker(data, cb, th) {
-					var worker = new Worker("js/xlsxworker.js");
+			this.importExcel = function(file){
+				file = file || this._id("excel-file").files[0]
+				var elem_status = this._id('worksheet-loading-status');
+				if(file){	
+					this._id("excel-button").disabled = true;
+					var excelWorker = function excelWorker(data, cb, th) {
+						try{
+							var worker = new Worker("js/xlsxworker.js");
+						}
+						catch(e){
+							if(/origin.+null/.test(e.message)){
+								elem_status.innerHTML = "Impossible to load worksheets locally with this browser. Use another browser or load this page in a server.";
+							}
+							else{
+								console.error(e);
+								elem_status.innerHTML = "An unknown error occured";
+							}
+							document.getElementById("excel-button").disabled = false;
+							return false;
+						}
 						worker.onmessage = function(e) {
-							switch(e.data.t) {
-								case 'ready': break;
-								case 'e': console.error(e.data.d); break;
-								case 'xlsx': cb(e.data.d);worker.terminate(); break;
+							var t = e.data.t;
+							if(t == "e"){
+								console.error(e.data.d);
+								elem_status.innerHTML = "An error occured";
+								document.getElementById("excel-button").disabled = false;
+								worker.terminate();
+							}
+							else if(t == "xlsx"){
+								cb(e.data.d);
+								worker.terminate();
 							}
 						};
+						worker.onerror = function(e){
+							elem_status.innerHTML = "An error occured";
+							document.getElementById("excel-button").disabled = false;
+							console.error(e);
+						}
 						worker.postMessage({d:data,b:'binary'});
 					};
 					var reader = new FileReader(), _this = this;
 					reader.onload = function(e){
-						elem_status.innerHTML = "Converting...";
+						elem_status.innerHTML = 'Converting... <a href="#" id="worksheet-cancel">Cancel</a>';
+						document.getElementById("worksheet-cancel").addEventListener("click", function(e){
+							e.preventDefault();
+							worker.terminate();
+							document.getElementById("excel-button").disabled = false;
+							elem_status.innerHTML = "";
+						},false);
 						excelWorker(e.target.result, _this._importExcel);
 					};
 					reader.onprogress = function(e){
@@ -331,6 +361,7 @@ function $id(id) {
 					}
 					reader.onerror = function(e){
 						elem_status.innerHTML = "An error occured";
+						document.getElementById("excel-button").disabled = false;
 					}
 					reader.readAsBinaryString(file);
 				}
@@ -1455,7 +1486,8 @@ this.getHTML = (function(){
 				this.loaded = true;
 				this.element = table;
 				var _this = this,
-				waitingforpaste = false;
+				waitingforpaste = false,
+				waitingfortab = false;
 				$id("support-us").addEventListener("animationend",function(){
 					this.classList.remove("active");
 				}, false);
@@ -1487,11 +1519,73 @@ this.getHTML = (function(){
 				}, false);
 				table.addEventListener("click", function(e) {
 					var target = e.currentTarget;
+					waitingfortab = false;
 					if (target.tagName == "TD" || target.tagName == "TH") {
 						_this._clickCellManager.apply(this, arguments);
 					}
 				}, false);
-
+				table.addEventListener("focusin", function(e) {
+					if(waitingfortab){
+						waitingfortab = false;
+						var target = e.target;
+						do{
+							if(target.tagName == "TD" || target.tagName == "TH"){
+								break;
+							}
+						}
+						while(target = target.parentElement);
+						if(target){
+							_this._clickCellManager.apply(target, arguments);
+						}
+					}
+				}, false);
+				table.addEventListener("keydown", function(e){
+					e = window.event || e;
+					if(e.keyCode && !e.ctrlKey){
+						waitingfortab = true;
+					}
+				}, false);
+				this._id("worksheet-drop").addEventListener("drop", function(e){
+					e.stopPropagation();
+					e.preventDefault();
+					this.classList.remove("dragover");
+					var file;
+					if(e.dataTransfer.items){
+						for(var i=0;i<e.dataTransfer.items.length;i++){
+							if(e.dataTransfer.items[i].kind == "file"){
+								file = e.dataTransfer.items[i].getAsFile();
+								break;
+							}
+						}
+					}
+					else{
+						file = e.dataTransfer.files[0];
+					}
+					if(file){
+						_this.importExcel(file);
+					}
+					if(e.dataTransfer.items){
+						e.dataTransfer.items.clear();
+					}
+					else{
+						e.dataTransfer.clearData();
+					}
+				}, false);
+				this._id("worksheet-drop").addEventListener("dragenter", function(e){
+					e.stopPropagation();
+					e.preventDefault();
+					this.classList.add("dragover");
+				}, false);
+				this._id("worksheet-drop").addEventListener("dragover", function(e){
+					e.stopPropagation();
+					e.preventDefault();
+					this.classList.add("dragover");
+				}, false);
+				this._id("worksheet-drop").addEventListener("dragleave", function(e){
+					e.stopPropagation();
+					e.preventDefault();
+					this.classList.remove("dragover");
+				}, false);
 
 
 				document.execCommand("styleWithCSS", false, false);
@@ -1516,9 +1610,15 @@ this.getHTML = (function(){
 				var el = div.querySelectorAll("span.latex-equation");
 				var eq = []
 				for (var i = 0; i < el.length; i++) {
-					var kbd = document.createElement("kbd");
-					eq.push("$" + (el[i].innerText || el[i].textContent) + "$");
-					el[i].parentNode.replaceChild(kbd, el[i]);
+					var equation_text = (el[i].innerText || el[i].textContent);
+					if(/\S/.test(equation_text)){
+						var kbd = document.createElement("kbd");
+						eq.push("$" + equation_text + "$");
+						el[i].parentNode.replaceChild(kbd, el[i]);
+					}
+					else{
+						el[i].parentNode.removeChild(el[i]);
+					}
 				}
 				var ul = div.querySelectorAll("ul");
 				var ULs = []
