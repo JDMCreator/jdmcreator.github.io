@@ -180,6 +180,9 @@ Table <span class="caret"></span>
 <optgroup label="Data">
 	<option value="csv">CSV</option>
 </optgroup>
+<optgroup label="Legacy formats">
+	<option value="wml">WML</option>
+</optgroup>
 	</select>
 <div><a data-target="#format-settings" data-toggle="modal" href="#">Advanced settings</a></div>
 
@@ -637,6 +640,7 @@ Color of border :
 	<option value="csv">CSV</option>
 	<option value="eplain">Eplain</option>
 	<option value="pretext">PreTeXt</option>
+	<option value="wml">PreTeXt</option>
 	</select>
 <div class="form-group" data-option-group="latex">
 							<h4>LaTeX options</h4>
@@ -747,6 +751,13 @@ Color of border :
 <select id="opt-pretext-indent" class="form-control"><option value="tab">Tab</option>
 <option value="two" selected>Two spaces</option>
 <option value="four">Four spaces</option></select>
+						</div>
+						<div class="form-group" data-option-group="wml" style="display:none;">
+							<h4>WML options</h4>
+<h5>Indentation</h5>
+<select id="opt-wml-indent" class="form-control"><option value="tab">Tab</option>
+<option value="two">Two spaces</option>
+<option value="four" selected>Four spaces</option></select>
 						</div>
       </div>
     </div>
@@ -861,6 +872,8 @@ placement: 'auto top'
 	<script type="text/javascript" src="toEplain.js">
 	</script>
 	<script type="text/javascript" src="toPreTeXt.js">
+	</script>
+	<script type="text/javascript" src="toWML.js">
 	</script>
 	<script type="text/javascript" src="latex-import.js">
 	</script>

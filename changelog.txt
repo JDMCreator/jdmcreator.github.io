@@ -6,6 +6,25 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+
+Version 1.1.2 (2018/05/10)
+===========
+
+| Note on this release :
+|     Bug fixes and WML export
+
+CORE
+
+[#] Selection with CTRL or SHIFT didn't work
+
+PLAIN TEX EXPORT
+
+[#] "<" characters disappeared
+
+WML EXPORT
+
+[+] New WML export module
+
 Version 1.1.1 (2018/05/09)
 ===========
 

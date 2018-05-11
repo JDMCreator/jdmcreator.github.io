@@ -90,7 +90,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "1.1";
+			this.version = "1.1.2";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -300,6 +300,7 @@ function $id(id) {
 				else if(results.length > 0){
 					loadWorkbook(0);
 				}
+				sendGAEvent("Code", "importFile", "file");
 				table._id("excel-button").disabled = false;
 			}
 			this.importExcel = function(file){
@@ -1541,7 +1542,7 @@ this.getHTML = (function(){
 				}, false);
 				table.addEventListener("keydown", function(e){
 					e = window.event || e;
-					if(e.keyCode && !e.ctrlKey){
+					if(e.keyCode == 9 && !e.ctrlKey){
 						waitingfortab = true;
 					}
 				}, false);
@@ -2348,6 +2349,10 @@ this.getHTML = (function(){
 				}
 				else if(format == "html"){
 					src = "<!doctype>\n<html>\n<head>\n\t<title>Minimal Working Example</title>\n</head>\n<body>\n"+src+"\n</body>\n</html>";
+				}
+				else if(format == "wml"){
+					src = '<?xml version="1.0"?>\n<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.3//EN" "http://www.wapforum.org/DTD/wml13.dtd">\n<wml>\n<card id="page" title="Minimal Working Example">\n<p>\n' + src;
+					src += '\n</p>\n</card>\n</wml>';
 				}
 				element.value = src;
 			}
