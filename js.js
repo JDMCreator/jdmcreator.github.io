@@ -90,7 +90,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "1.1.2";
+			this.version = "1.1.3";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -3486,12 +3486,7 @@ this.getHTML = (function(){
 						}
 					}
 				}
-console.dir({
-					complete: complete,
-					color : hasColor,
-					borders : border,
-					types : types
-				});
+
 				return callback.call(this, {
 					complete: complete,
 					color : hasColor,
@@ -3600,6 +3595,7 @@ console.dir({
 					if (arguments.length == 0) {
 						return ""
 					}
+					console.log(o.color);
 					var complete = o.complete,
 					hasColor = o.color,
 					borders = o.borders,
