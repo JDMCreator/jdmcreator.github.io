@@ -72,6 +72,9 @@
 				else if(inside == "&quot;"){
 					str += '"';
 				}
+				else if(inside == "&gt;"){
+					str += "$>$";
+				}
 				i += inside.length-1;
 			}
 			else if(c == "\\"){
@@ -101,6 +104,7 @@
 		}
 		str = str.replace(/[ ]{2,}/g, " ")
 			.replace(/[\n\r]+/g, "");
+
 		return str
 	},
 	nonASCII = false,
