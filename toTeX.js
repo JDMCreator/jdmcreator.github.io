@@ -242,7 +242,7 @@
 					if(!vrules[j]){vrules[j]={}}
 					if(!align[j][cell.align]){align[j][cell.align]=0}
 					align[j][cell.align]++
-					var comparable = this.getComparableHeader(cells[j-1],cell,cells[j+cell.cell.colSpan]),
+					var comparable = this.getComparableHeader(cells[j-1],cell,cells[j+((cell.cell||{}).colSpan||1)]),
 					rules="";
 					if(cells[j-1]){
 						rules=comparable.replace(/[a-z]+/ig,"");
