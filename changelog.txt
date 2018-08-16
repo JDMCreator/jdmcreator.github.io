@@ -6,6 +6,16 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 1.6.1 (2018/08/15)
+===========
+
+| Note on this release :
+|     Fixed fatal issue
+
+CORE
+
+[#] Fixed fatal issue that prevented the generator from working
+
 Version 1.6 (2018/08/14)
 ===========
 

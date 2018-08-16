@@ -112,7 +112,7 @@ function $id(id) {
 				format = (format || $id("import_format").value).toLowerCase();
 				if(format == "auto"){
 					var json;
-					if(/(\\begin{|\\halign|\\valign|\\ctable({|[))/.test(content)){
+					if(/(\\begin{|\\halign|\\valign|\\ctable({|\[))/.test(content)){
 						try{
 							this.importFromJSON(this.latex.importTable(content));
 						}
