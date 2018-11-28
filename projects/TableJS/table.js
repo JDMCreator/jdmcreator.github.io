@@ -649,6 +649,177 @@ Table = function(table){
 			}
 			return null;
 		}
+		this.group = function(cells, options){
+			options = options || {};
+			var matrix = this.matrix(),
+			table = this.element,
+			shape = options.shape == "any" ? "any" : "rectangle";
+
+			// For optimisation process, we process each cell first
+			var rowNumbers = {}
+			for(var i=0;i<cells.length;i++){
+				var cell = cells[i];
+				var parent = cell.parentElement,
+				rowN = -1;
+				isInTable: do{
+					if(parent.tagName == "TR"){
+						rowN = parent.rowIndex;
+					}
+					else if(parent.tagName == "TABLE"){
+						if(parent == table && rowN > -1){
+							if(!rowNumbers[rowN]){
+								rowNumbers[rowN] = []
+							}
+							rowNumbers[rowN].push(cell);
+						}
+						break isInTable;
+					}
+				}
+				while(parent = parent.parentElement)
+			}
+			var cells = []
+			// Then, we get their coordinates. This is an alternative version of `position()` optimized for large groups
+			for(i in rowNumbers){
+				if(rowNumbers.hasOwnProperty(i)){
+					var row = matrix[i],
+					rowNumber = rowNumbers[i],
+					cellsRow = [];
+					for(var j=0;j<rowNumber.length;j++){
+						searchingForCell : for(var h=0;h<row.length;h++){
+							if(row[h].cell == rowNumber[j]){
+								rowNumber[j] = {
+									x : row[h].x,
+									y : i,
+									cell : rowNumber[j]
+								}
+								cellsRow.push(rowNumber[j]);
+								break searchingForCell;
+							}
+						}
+					}
+					// We sort here the cells row. It is faster to do it for each row, because the row are already in order
+					// and don't need to be sorted
+					cellsRow.sort(function(a,b){
+						return a.x-b.x;
+					});
+					rowNumbers[i] = cellsRow;
+					cells.push.apply(cells, cellsRow);
+				}
+			}
+
+			// Okay, now we sort them in groups
+			var groups = [],
+			actualGroup = null,
+			rowGroups = {};
+			for(var i in rowNumbers){
+				if(rowNumbers.hasOwnProperty(i)){
+					rowGroups[i] = [];
+					var actualRowGroup = null
+					var rowNumber = rowNumbers[i],
+					lastCell = null;
+					for(var j=0;j<rowNumber.length;j++){
+						var cell = rowNumber[j];
+						if(!actualRowGroup){
+							actualRowGroup = [];
+						}
+						if(!lastCell || lastCell.x + lastCell.cell.colSpan == cell.x){
+							for(var h=0;h<cell.cell.colSpan;h++){
+								actualRowGroup.push(matrix[i][cell.x+h]);
+							}
+						}
+						else{
+							rowGroups[i].push(actualRowGroup);
+							actualRowGroup = [];
+							for(var h=0;h<cell.cell.colSpan;h++){
+								actualRowGroup.push(matrix[i][cell.x+h-1]);
+							}
+						}
+						j += cell.cell.colSpan - 1;
+						lastCell = cell;
+					}
+					rowGroups[i].push(actualRowGroup)
+				}
+			}
+			if(shape == "rectangle"){
+				for(var i in rowGroups){
+					if(rowGroups.hasOwnProperty(i)){
+						var rowGroup = rowGroups[i];
+						for(var j=0;j<rowGroup.length;j++){
+							var colGroup = rowGroup[j],
+							actualGroup = [colGroup];
+							var start = colGroup[0].x,
+							end = colGroup[colGroup.length-1].x,
+							rowN = (+i)+1;
+							searchForRow : while(rowN < matrix.length){
+								if(!rowGroups.hasOwnProperty(rowN)){
+									break searchForRow;
+								}
+								var rowGroup2 = rowGroups[rowN],
+								found = false;
+								searchInRow: for(var h=0;h<rowGroup2.length;h++){
+									var colGroup2 = rowGroup2[h];
+									var start2 = colGroup2[0].x,
+									end2 = colGroup2[colGroup2.length-1].x;
+									if(start2 > start || end2 < end){
+										continue searchInRow;
+									}
+									found = true;
+									if(start2 < start && end2 > end){
+										var startArr = [],
+										endArr = [],
+										newline = [];
+										for(var k=0;k<colGroup2.length;k++){
+											var cell2 = colGroup2[k];
+											if(cell2.x < start){
+												startArr.push(cell2);
+											}
+											else if(cell2.x > end){
+												endArr.push(cell2);
+											}
+											else{
+												newline.push(cell2);
+											}
+										}
+										rowGroup2.splice(h,1,startArr,endArr);
+										actualGroup.push(newline);
+									}
+									else if(start2 == start && end2 == end){
+										actualGroup.push(rowGroup2.splice(h,1));
+									}
+									else{
+										var newline = []
+										for(var k=0;k<colGroup2.length;k++){
+											var cell2 = colGroup2[k];
+											if(cell2.x >= start && cell2.x <= end){
+												newline.push.apply(newline,colGroup2.splice(k,1));
+												k--
+											}
+										}
+										actualGroup.push(newline);
+									}									
+								}
+								if(!found){
+									break searchForRow;
+								}
+								rowN++;
+							}
+							groups.push(actualGroup);
+						}
+					}
+				}
+			}
+			else if(shape == "any"){
+				var actualGroup = [];
+				for(var i in rowNumbers){
+					if(rowNumbers.hasOwnProperty(i)){
+						var row = rowNumbers[i];
+						for(var j=0;j<row.length;j++){
+						}
+					}
+				}
+			}
+			return groups;
+		}
 		this.matrix = function(alwaysInterpretZeroRowSpan){
 			var table = this.element,
 			    rg = [],

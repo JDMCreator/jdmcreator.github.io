@@ -4,11 +4,11 @@
 <title>Table.js | Documentation</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="bulma.css">
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<!--<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>-->
 <script type="text/javascript" src="table.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
+<!--<script>hljs.initHighlightingOnLoad();</script>-->
 <style>
 .container{
 width:60rem;
@@ -264,6 +264,7 @@ function removeCol(){
 <div class="buttons has-addons is-centered">
   <span class="button" onclick = "merge()">Merge</span>
   <span class="button" onclick = "split()">Split</span>
+  <span class="button" onclick = "group()">Group</span>
 </div>
 </center>
 
@@ -417,6 +418,12 @@ function merge(){
 		}
 		kept.innerHTML = content;
 	})
+}
+function group(){
+	var element = document.getElementById('table-merge-split'),
+	cells = element.querySelectorAll(".selected"),
+	table = new Table(element);
+	console.dir(table.group(cells));
 }
 function split(){
 	var element = document.getElementById('table-merge-split'),
