@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>SwapUnit - Unit Converter</title>
+<meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="tiny.css">
+  </head>
+<script>
+(function(window){
+var document = window.document,
+units = {};
+
+function round(x, n) {
+    return Math.round(x * Math.pow(10, n)) / Math.pow(10, n)
+}
+
+function createUnit(unit, name, opt){
+if(!units[unit]){units[unit] = {convertable:{}, conversion:{}}}
+units[unit]["name"] = name;
+units[unit]["data"] = opt || {};
+units[unit]["unit"] = unit;
+}
+function requireUnit(unit){
+if(!units[unit]){
+createUnit(unit, null);	
+}
+}
+
+function createConverter(unitA, unitB, fn, opts){
+requireUnit(unitA);requireUnit(unitB);
+var unit = units[unitA];
+unit.conversion[unitB] = fn;
+var conversionb = units[unitB].conversion;
+for(var i in conversionb){
+	if(conversionb.hasOwnProperty(i)){
+		var other = units[i];
+		if(Array.isArray(conversionb[i])){
+			var arr2 = conversionb[i].slice();
+			arr2.unshift(unitB);
+			if(!unit.conversion[i]){
+				unit.conversion[i] = arr2;
+			}
+			if(!other.conversion[unitA]){
+				var arr3 = arr2.slice();
+				arr3.reverse();
+				other.conversion[unitA] = arr3;
+			}
+		}
+		else{
+			if(!unit.conversion[i]){
+				unit.conversion[i] = [unitB];
+			}
+			if(!other.conversion[unitA]){
+				other.conversion[unitA] = [unitB];
+			}
+		}
+	}
+}
+}
+function convertUnit(value, unitA, unitB){
+if(!units[unitA] || !units[unitB]){alert('Missing unit');return false}
+
+if(!units[unitA].conversion[unitB]){alert('No conversion found');return false;}
+
+var result = convertUnitA(value, unitA, unitB);
+var unit = units[unitB];
+if(unit.data && unit.data.round !== undefined){
+	result = round(result, unit.data.round);
+}
+result = result + unitB;
+return result;
+}
+function convertUnitA(value, unitA, unitB){
+
+var conversion = units[unitA].conversion[unitB];
+var result = null;
+if(Array.isArray(conversion)){
+var actual = units[unitA];
+for(var i=0;i<conversion.length;i++){
+	result = actual.conversion[conversion[i]](result === null ? value : result)
+	actual = units[conversion[i]];
+}
+result = actual.conversion[unitB](result);
+}
+else{
+result = conversion(value);
+}
+return result;
+}
+createUnit("C", "Celsius", {round:3});
+createUnit("F", "Fahrenheit", {round:3});
+createUnit("K", "Kelvin", {round:3});
+
+createConverter("C","F",function(a){
+	return (a*9/5)+32
+});
+createConverter("F","C", function(a){
+	return (a-32)*5/9
+});
+createConverter("C", "K", function(a){
+	return a + 273.15;
+});
+createConverter("K","C", function(a){
+	return a - 273.15;
+});
+window.units = units;
+
+window.convertUnit = convertUnit;
+
+
+})(window);
+
+function splitText(text){
+if(/^\s*$/.test(text)){return false;}
+var start, end;
+text.replace(/^\s*(.+)\s+to\s+(.+)\s*$/i, function(a,b,c){
+start = b;
+end = c;
+});
+var nb="", unit;
+
+for(var i=0;i<start.length;i++){
+var sn = start.substring(0,i+1),
+c = start[i];
+if(c == "." || c == "-" || c == "e" || c == "+"){continue;}
+if(isNaN(sn*2)){
+unit = start.substring(i);
+break;
+}
+nb = sn;
+}
+alert(convertUnit(parseFloat(nb),unit,end));
+}
+
+function build(){
+	var select = document.createElement("select");
+	for(var i in units){
+		if(units.hasOwnProperty(i)){
+			var option = document.createElement("option");
+			option.value = i;
+			option.text = i + " ("+units[i].name+")";
+			select.appendChild(option);
+		}
+	}
+console.dir(select);
+	var unitSelects = document.querySelectorAll(".unitselect");
+	for(var i=0;i<unitSelects.length;i++){
+	var unitSelect = unitSelects[i];
+	var selecta = select.cloneNode(true);
+	selecta.id = unitSelect.id;
+	unitSelect.parentNode.replaceChild(selecta, unitSelect);
+	}
+}
+</script>
+  <body>
+<div class="container">
+<div class="text-container">
+  <h1>SwapUnit : Convert units easily</h1>
+<form onsubmit="splitText(search.value);return false">
+	<input id="search" placeholder="100C to F">
+</form>
+<div class="text-center">or</div>
+ <div class="text-center">
+<form onsubmit="alert(convertUnit(parseFloat(forma.value),formb.value,formc.value));return false;">
+	<ul class="group">
+		<li> <ul class="group"><li><input id="forma">
+		<li> <select class="unitselect" id="formb"></select></ul>
+		<li> <button class="button shadow" readonly>To</button>
+		<li> <ul class="group"><li><select class="unitselect" id="formc"></select></ul>
+		<li> <ul class="group"><li><button type="submit">Convert</button></ul>
+	</ul>
+</form>
+</div>
+<hr>
+<i>Support F,C,K.</i>
+</div>
+</div>
+  </body>
+<script>
+build();
+</script>
+</html>
