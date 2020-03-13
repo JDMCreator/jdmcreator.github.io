@@ -6,6 +6,21 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 1.8 (2020/03/12)
+===========
+
+| Note on this release:
+|     Improved speed for large table, improved layout for large table
+
+CORE
+
+[+] Scrollbar for large tables
+[#] Improved speed for `getHTML()` and `hasBorderType()` functions
+
+LATEX EXPORT
+
+[#] Improved speed for `generateFromHTML()`
+
 Version 1.7 (2020/01/26)
 ===========
 

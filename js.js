@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "1.7";
+			this.version = "1.8";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -845,20 +845,20 @@ this.getHTML = (function(){
 			}
 		}
 	}
-	return function(cell, n){
+	return function getHTML(cell, n){
 		var div;
 		if(cell.tagName == "TD" || cell.tagName == "TH"){
 			if(!n){
-				div = cell.querySelector("div[contenteditable]");
+				div = cell.firstElementChild.firstElementChild;
 			}
 			else{
-				div = cell.querySelectorAll("div[contenteditable]")[n]
+				div = cell.firstElementChild.children[n]
 			}
 		}
 		else{
 			div = cell;
 		}
-		if(div.innerText === "" && div.childNodes.length === 1 && div.firstChild.tagName == "BR"){
+		if(div.childNodes.length === 1 && div.firstChild.tagName == "BR" && div.innerText === ""){
 			// Fix this : https://connect.microsoft.com/IE/feedback/details/802442/ie11-rtm-implicit-br-tags-in-innerhtml-on-empty-content-editable-elements
 			return "";
 		}
@@ -1895,8 +1895,41 @@ console.dir(html);
 				td.style.height=(size.width+6)+"px";
 				td.style.width=(size.height+6)+"px";
 			}
+			this.fastGenerateFromHTML = function(html, ignoreMultiline, align){
+				return html.replace(/(?:&([^;]+);|_\\$%^_\{\}#\[`\|\xb6~])/g, function(full, inside){
+					if(inside){
+						if(inside == "nbsp"){return "~"}
+						else if(inside == "&lt;"){ return "\\textless{}"; }
+						else if(inside == "&amp;"){ return "\\&"; }
+						else if(inside == "&quot;"){ return '"'; }
+						else if(inside == "&gt;"){ return "\\textgreater{}"; }
+						else { return ""; }
+					}
+					else if(full == "|"){
+						return "\\textbar{}"
+					}
+					else if(full == "\\"){
+						return "\\textbackslash{}"
+					}
+					else if(full == "`" || full == "^"){
+						return "\\" + full + "{}";
+					}
+					else if(full == "\xb6"){
+						return "\\P{}";
+					}
+					else if(full == "~"){
+						return "\\textasciitilde{}";
+					}
+					else{
+						return "\\" + full;
+					}
+				});
+			}
 			this.generateFromHTML = function(html, ignoreMultiline, align) {
 				align = align || "l";
+				if(html.indexOf("<")<0 && html.indexOf("[")<0){
+					return this.fastGenerateFromHTML(html, ignoreMultiline, align);
+				}
 				var div = document.createElement("div"), hasMultiline;
 				div.innerHTML = html;
 				var el = div.querySelectorAll("span.latex-equation");
@@ -3144,7 +3177,27 @@ console.dir(html);
 				return !!this.element.querySelector("td[data-border-left='"+type+"'],td[data-border-right='"+type+"']")
 			}
 			this.hasBorderType = function(type){
-				return !!this.element.querySelector("td[data-border-left='"+type+"'],td[data-border-bottom='"+type+"'],td[data-border-top='"+type+"'],td[data-border-right='"+type+"']")
+				var el = this.element;
+				for(var i = 0, rows = el.rows, l = rows.length;i<rows;i++){
+					var row = rows[i];
+					for(var j=0, cells = row.cells, ll = cells.length;j<l;j++){
+						var cell = cells[j];
+						if(cell.dataset){
+							var data = cell.dataset;
+							if(data.borderLeft == type || data.borderBottom == type || data.borderTop == type || data.borderRight == type){
+								return true;
+							}
+						}
+						else if(cell.getAttribute("data-border-left") == type ||
+							   cell.getAttribute("data-border-bottom") == type ||
+							   cell.getAttribute("data-border-top") == type ||
+							   cell.getAttribute("data-border-right") == type){
+							return true;	
+						}
+					}
+				}
+				return false;
+				//return !!this.element.querySelector("td[data-border-left='"+type+"'],td[data-border-bottom='"+type+"'],td[data-border-top='"+type+"'],td[data-border-right='"+type+"']")
 			}
 			this.shrink = false;
 			this.useBooktab = function(){

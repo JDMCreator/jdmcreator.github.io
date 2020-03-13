@@ -7,6 +7,10 @@
 				white-space: nowrap !important;
 			}
 		}
+		#table-div-container{
+			width:100%;
+			overflow-x:auto;
+		}
 		#c{
 			white-space: pre;
 			overflow: auto;
