@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "1.8";
+			this.version = "1.8.1";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -1896,7 +1896,7 @@ console.dir(html);
 				td.style.width=(size.height+6)+"px";
 			}
 			this.fastGenerateFromHTML = function(html, ignoreMultiline, align){
-				return html.replace(/(?:&([^;]+);|_\\$%^_\{\}#\[`\|\xb6~])/g, function(full, inside){
+				return html.replace(/(?:&([^;]+);|[_\\$%^_\{\}#\[`\|\xb6~])/g, function(full, inside){
 					if(inside){
 						if(inside == "nbsp"){return "~"}
 						else if(inside == "&lt;"){ return "\\textless{}"; }
@@ -1947,6 +1947,7 @@ console.dir(html);
 				}
 				var ul = div.querySelectorAll("ul");
 				var ULs = []
+				if(ul.length>0){debugger;}
 				for (var i = 0; i < ul.length; i++) {
 					var uli = ul[i];
 					var ins = document.createElement("ins"),
@@ -1957,8 +1958,8 @@ console.dir(html);
 						// Let's remove weird <br> tags at the end of <li>
 						// TODO : Move this to the function that normalize HTML (getHTML)
 						while(continueWhile){
-							if(/<br\s*\/?\s*>$/i.test(liHTML)){
-								liHTML = liHTML.replace(/<br\s*\/?\s*>$/i,"");
+							if(/<\s*w?br\s*\/?\s*>$/i.test(liHTML)){
+								liHTML = liHTML.replace(/<\s*w?br\s*\/?\s*>$/i,"");
 							}
 							else{
 								continueWhile = false;

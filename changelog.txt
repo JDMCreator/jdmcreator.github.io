@@ -6,6 +6,16 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 1.8 (2020/03/22)
+===========
+
+| Note on this release:
+|     Fix for encoding of special characters in LaTeX
+
+LATEX EXPORT
+
+[#] In some cases, characters were not encoded (regression).
+
 Version 1.8 (2020/03/12)
 ===========
 
