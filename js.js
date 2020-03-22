@@ -1947,7 +1947,6 @@ console.dir(html);
 				}
 				var ul = div.querySelectorAll("ul");
 				var ULs = []
-				if(ul.length>0){debugger;}
 				for (var i = 0; i < ul.length; i++) {
 					var uli = ul[i];
 					var ins = document.createElement("ins"),
