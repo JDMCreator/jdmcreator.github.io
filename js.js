@@ -2027,7 +2027,7 @@ console.dir(html);
 							str+="\\uline{";
 						}
 						else if(tagname == "font" && useColor){
-							var color = /color\s*=\s*["']?(#?[a-f0-9]+)/i.exec(inside);
+							var color = /color\s*=\s*["']?\s*([^ "'\s]+)/i.exec(inside);
 							if(color){
 								color = color[1];
 								if(color){

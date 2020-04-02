@@ -6,6 +6,21 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 1.8.1 (2020/04/02)
+===========
+
+| Note on this release:
+|     Fixes
+
+CORE
+
+[+] New alert for 2.0 alpha 1
+[/] Cursor changed in border mode
+
+LATEX EXPORT
+
+[#] Text color didn't appear when a color name was used in HTML instead of an hex code
+
 Version 1.8 (2020/03/22)
 ===========
 

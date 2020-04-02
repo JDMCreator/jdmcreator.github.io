@@ -138,6 +138,9 @@
 		body:not([data-view-editor]) #table td {
 			border: 1px dotted lightgrey;
 		}
+		body[data-border-editor] #table-div-container{
+			cursor:crosshair;
+		}
 		body[data-border-editor] #table td {
 			border: 2px dotted lightgrey;
 		}

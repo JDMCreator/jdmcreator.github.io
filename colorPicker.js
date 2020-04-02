@@ -50,6 +50,7 @@ rgbToHsl = function(r, g, b){
 }
 
 		this.actualSettings = null;
+		this.toHex = toHex;
 		this.color = function(color){
 			color = toRGBA(color) || [0,0,0,1];
 			color = color.map(function(a){return a||0})
