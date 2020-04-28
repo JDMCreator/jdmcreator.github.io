@@ -6,7 +6,25 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
-Version 1.8.1 (2020/04/02)
+Version 1.8.3 (2020/04/28)
+==========
+
+| Note on this release:
+|     Fixes
+
+CORE
+
+[#] Fixes issues where FONT tags were not removed even if they were duplicate
+
+LATEX EXPORT
+
+[#] `textcolor` commands were duplicated in cells with multiple lines of texts (#20)
+
+LATEX IMPORT
+
+[#] `longtabu` tables were not loaded even if they were technically supported
+
+Version 1.8.2 (2020/04/02)
 ===========
 
 | Note on this release:
@@ -21,7 +39,7 @@ LATEX EXPORT
 
 [#] Text color didn't appear when a color name was used in HTML instead of an hex code
 
-Version 1.8 (2020/03/22)
+Version 1.8.1 (2020/03/22)
 ===========
 
 | Note on this release:

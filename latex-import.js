@@ -400,7 +400,7 @@ var tabular = tabularReg.exec(code);
 				}	
 		}
 		var head;
-		if(type == "tabular" || type == "xtabular" || type == "mpxtabular" || type == "longtable"){
+		if(type == "tabular" || type == "xtabular" || type == "mpxtabular" || type == "longtable" || type == "longtabu"){
 			head = header(initEnv.command.args[1]);
 		}
 		else if(type == "tabular*" || type == "tabularx" || type == "tabulary" || type == "tabularht" || type == "tabularkv"){

@@ -125,6 +125,7 @@ Table = function(table){
 			}
 			return false;
 		}
+		this.shadowFirstRow = false;
 		this.normalize = function(matrix){
 			matrix = matrix || this.matrix();
 			// First, we adjust rowspan attribute
@@ -237,6 +238,22 @@ Table = function(table){
 					}
 				}
 			}
+			if(this.shadowFirstRow){
+				var firstRow = this.element.rows[0];
+				firstRow.removeChild(firstRow.cells[firstRow.cells.length-1]);
+			}
+		}
+		this.update = function(){
+			var parent = this.element.rows[0].parentElement,
+			row = document.createElement("TR");
+			parent.insertBefore(row, parent.firstChild);
+			var matrix = this.matrix(),
+			length = matrix[0].length,
+			frag = document.createDocumentFragment();
+			for(var i=0;i<length;i++){
+				frag.appendChild(document.createElement("TD"));
+			}
+			row.appendChild(frag);
 		}
 		this.removeRow = function(nb){
 			if(!nb && nb!==0 && nb!=="0"){
@@ -324,8 +341,12 @@ Table = function(table){
 					if(callback){
 						callback.call(this, cell);
 					}
-					table.rows[i2].insertBefore(cell, actualCell ? actualCell.cell : null);
+					table.rows[i2+(this.shadowFirstRow?1:0)].insertBefore(cell, actualCell ? actualCell.cell : null);
 				}	
+			}
+			if(this.shadowFirstRow){
+				var firstRow = this.element.rows[0];
+				firstRow.appendChild(document.createElement("TD"));
 			}
 		}
 		this.insertRow = function(nb, callback){
@@ -410,7 +431,7 @@ Table = function(table){
 							j = row.length;
 						}
 					}
-					table.rows[pos.y+i].insertBefore(rows[i], before);
+					table.rows[pos.y+i+this.shadowFirstRow?1:0].insertBefore(rows[i], before);
 				}
 				
 			}
@@ -675,17 +696,17 @@ Table = function(table){
 						}
 						if(rowSpan==1){
 							if(!cell.colSpan || cell.colSpan <2){
-								rg[i][realCol]={ cell:cell, x:realCol, y:i }
+								rg[i][realCol]={ cell:cell, x:realCol, y:i - (this.shadowFirstRow?1:0) }
 							}
 							else{
-								var o = rg[i][realCol]={ cell:cell, x:realCol, y:i };
+								var o = rg[i][realCol]={ cell:cell, x:realCol, y:i - (this.shadowFirstRow?1:0)};
 								for(var k=1;k<cell.colSpan;k++){
-									rg[i][realCol+k]={refCell:o, x:realCol+k, y:i};
+									rg[i][realCol+k]={refCell:o, x:realCol+k, y:i - (this.shadowFirstRow?1:0)};
 								}
 							}
 						}
 						else{
-							var o = rg[i][realCol]={ cell:cell, x:realCol, y:i };
+							var o = rg[i][realCol]={ cell:cell, x:realCol, y:i - (this.shadowFirstRow?1:0) };
 							if(rowSpan === 0){
 								expandCells.push(o);
 							}
@@ -693,7 +714,7 @@ Table = function(table){
 								for(var l=0;l<cell.colSpan;l++){
 									// I hate four-level loops
 									if(!(k===0 && l===0)){
-										var o2 = rg[i+k][realCol+l]={refCell:o, x:realCol+l, y:i+k}
+										var o2 = rg[i+k][realCol+l]={refCell:o, x:realCol+l, y:i+k - (this.shadowFirstRow?1:0)}
 										if(rowSpan === 0){
 											expandCells.push(o2);
 										}
@@ -720,6 +741,9 @@ Table = function(table){
 						}
 					}
 				}
+			}
+			if(this.shadowFirstRow){
+				rg.shift();
 			}
 			if(Table.cache){
 				cache[html] = rg;

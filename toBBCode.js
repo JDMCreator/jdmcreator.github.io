@@ -42,7 +42,7 @@
 			this.message("The number of header rows requested is too high. Set to 0 by default.", "warning");
 			headerN = 0;
 		}
-		for(var i=0;i<element.rows.length;i++){
+		for(var i=(this.Table.shadowFirstRow?1:0);i<element.rows.length;i++){
 			str += "\n[tr]";
 			var cells = element.rows[i].cells;
 			for(var j=0;j<cells.length;j++){

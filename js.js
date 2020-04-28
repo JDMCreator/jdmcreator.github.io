@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "1.8.1";
+			this.version = "1.8.3";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -721,24 +721,28 @@ this.getHTML = (function(){
 				newnode = document.createElement(tagName);
 				cont.appendChild(newnode);
 			}
-			else if(tagName == "FONT" && node.hasAttribute("color")){
-				var ok = true;
-				if(node.color == "#000000"){
-					ok = false;
-					// black is the default color. Let's check if there's another font tag, otherwise this will pollute the DOM
-						ok = false;
-						var trav = cont;
-						do{
-							if(trav.tagName == "FONT"){
-								ok = true;
-								break;
-							}
-						}
-						while(trav = trav.parentNode)
+			else if((tagName == "FONT" && node.hasAttribute("color")) || node.style.color){
+				var rgba = toRGBA(node.color || node.style.color) || [0,0,0,1],
+				color = "#" + ((1 << 24) + (rgba[0] << 16) + (rgba[1] << 8) + rgba[2]).toString(16).slice(1);
+				rgba = rgba.join(",");
+				var ok = rgba !== "0,0,0,1";
+				// black is the default color. If there's no parent element which set another color, it will be removed
+				// If it's another color and its parent set the same color, it will also be removed.
+				var trav = cont;
+				do{
+					if((trav.tagName == "FONT" && trav.hasAttribute("color")) || trav.style.color){
+						var rgba2 = (toRGBA(trav.color || trav.style.color) || [0,0,0,1]).join(",");
+						ok = rgba != rgba2;
+						break;
+					}
+					else if(trav.tagName == "TD"){
+						break;
+					}
 				}
+				while(trav = trav.parentElement)
 				if(ok){
-					newnode = document.createElement(tagName);
-					newnode.color = node.color;
+					newnode = document.createElement("FONT");
+					newnode.color = color;
 					cont.appendChild(newnode);
 				}
 			}
@@ -794,32 +798,6 @@ this.getHTML = (function(){
 			else{
 				var frag = document.createDocumentFragment(), lastnode;
 				newnode = frag;
-				if(node.style.color){
-					var color = toRGBA(node.style.color);
-					if(color){
-						// We need the HEX value of the color. However, HTML doesn't support alpha channel yet
-						color = "#" + ((1 << 24) + (color[0] << 16) + (color[1] << 8) + color[2]).toString(16).slice(1);
-						var ok = true;
-						if(color == "#000000"){
-							// black is the default color. Let's check if there's another font tag, however this will pollute the DOM
-							ok = false;
-							var trav = newnode;
-							do{
-								if(trav.tagName == "FONT"){
-									ok = true;
-									break;
-								}
-							}
-							while(trav = trav.parentNode)
-						}
-						if(ok){
-							lastnode = document.createElement("font");
-							lastnode.color = color;
-							newnode.appendChild(lastnode);
-							newnode = lastnode;
-						}
-					}
-				}
 				if(node.style.fontWeight == "bold" || node.style.fontWeight == "bolder" || (+node.style.fontWeight)>= 700){
 					lastnode = document.createElement("B");
 					newnode.appendChild(lastnode);
@@ -872,14 +850,15 @@ this.getHTML = (function(){
 			_eqHTML(div.childNodes[i], cont)
 		}
 		var html = cont.innerHTML.replace(/<\/(b|i)\s*>(\s*)<\s*(b|i)\s*>/gi, function(full, close, space, open){
+
+			alert(open.substring(0,4).toLowerCase()+"|"+close.toLowerCase());
 			if(open.toLowerCase() == close.toLowerCase()){
 				return space;
 			}
 			return full;
 		}).replace(/\u200B/g,'');
 		if(/<br[^a-z>]*>/i.test(html)){
-			console.log(html);
-			var opentags = [], html = html.replace(/<\s*(\/?)\s*(br|b|i|u|font\s+[^>]*)[^a-z>]*>/ig,function(full,close,tag){
+			var opentags = [], html = html.replace(/<\s*(\/?)\s*(br|b|i|u|font\s+[^>]*|font)[^a-z>]*>/ig,function(full,close,tag){
 				tag = tag.toLowerCase();
 				if(tag == "br"){
 					if(opentags.length > 0){

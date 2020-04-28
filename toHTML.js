@@ -46,7 +46,7 @@
 			otable.appendChild(tbody);
 			otable = tbody;
 		}
-		for(var i=0;i<table.rows.length;i++){
+		for(var i=(this.Table.shadowFirstRow?1:0);i<table.rows.length;i++){
 			var cells = table.rows[i].cells,
 			orow = document.createElement("tr");
 			for(var j=0;j<cells.length;j++){

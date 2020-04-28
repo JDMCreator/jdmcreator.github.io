@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0a1";
+			this.version = "2.0a2";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -120,6 +120,7 @@ function $id(id) {
 				}
 				this.element.innerHTML = "";
 				this.element.appendChild(fr);
+				this.Table.update();
 				this.loadAllFootnotes();
 			};
 			this.importData = function(content, format){
@@ -726,24 +727,28 @@ this.getHTML = (function(){
 				newnode = document.createElement(tagName);
 				cont.appendChild(newnode);
 			}
-			else if(tagName == "FONT" && node.hasAttribute("color")){
-				var ok = true;
-				if(node.color == "#000000"){
-					ok = false;
-					// black is the default color. Let's check if there's another font tag, otherwise this will pollute the DOM
-						ok = false;
-						var trav = cont;
-						do{
-							if(trav.tagName == "FONT"){
-								ok = true;
-								break;
-							}
-						}
-						while(trav = trav.parentNode)
+			else if((tagName == "FONT" && node.hasAttribute("color")) || node.style.color){
+				var rgba = toRGBA(node.color || node.style.color) || [0,0,0,1],
+				color = "#" + ((1 << 24) + (rgba[0] << 16) + (rgba[1] << 8) + rgba[2]).toString(16).slice(1);
+				rgba = rgba.join(",");
+				var ok = rgba !== "0,0,0,1";
+				// black is the default color. If there's no parent element which set another color, it will be removed
+				// If it's another color and its parent set the same color, it will also be removed.
+				var trav = cont;
+				do{
+					if((trav.tagName == "FONT" && trav.hasAttribute("color")) || trav.style.color){
+						var rgba2 = (toRGBA(trav.color || trav.style.color) || [0,0,0,1]).join(",");
+						ok = rgba != rgba2;
+						break;
+					}
+					else if(trav.tagName == "TD"){
+						break;
+					}
 				}
+				while(trav = trav.parentElement)
 				if(ok){
-					newnode = document.createElement(tagName);
-					newnode.color = node.color;
+					newnode = document.createElement("FONT");
+					newnode.color = color;
 					cont.appendChild(newnode);
 				}
 			}
@@ -799,32 +804,6 @@ this.getHTML = (function(){
 			else{
 				var frag = document.createDocumentFragment(), lastnode;
 				newnode = frag;
-				if(node.style.color){
-					var color = toRGBA(node.style.color);
-					if(color){
-						// We need the HEX value of the color. However, HTML doesn't support alpha channel yet
-						color = "#" + ((1 << 24) + (color[0] << 16) + (color[1] << 8) + color[2]).toString(16).slice(1);
-						var ok = true;
-						if(color == "#000000"){
-							// black is the default color. Let's check if there's another font tag, however this will pollute the DOM
-							ok = false;
-							var trav = newnode;
-							do{
-								if(trav.tagName == "FONT"){
-									ok = true;
-									break;
-								}
-							}
-							while(trav = trav.parentNode)
-						}
-						if(ok){
-							lastnode = document.createElement("font");
-							lastnode.color = color;
-							newnode.appendChild(lastnode);
-							newnode = lastnode;
-						}
-					}
-				}
 				if(node.style.fontWeight == "bold" || node.style.fontWeight == "bolder" || (+node.style.fontWeight)>= 700){
 					lastnode = document.createElement("B");
 					newnode.appendChild(lastnode);
@@ -877,14 +856,15 @@ this.getHTML = (function(){
 			_eqHTML(div.childNodes[i], cont)
 		}
 		var html = cont.innerHTML.replace(/<\/(b|i)\s*>(\s*)<\s*(b|i)\s*>/gi, function(full, close, space, open){
+
+			alert(open.substring(0,4).toLowerCase()+"|"+close.toLowerCase());
 			if(open.toLowerCase() == close.toLowerCase()){
 				return space;
 			}
 			return full;
 		}).replace(/\u200B/g,'');
 		if(/<br[^a-z>]*>/i.test(html)){
-			console.log(html);
-			var opentags = [], html = html.replace(/<\s*(\/?)\s*(br|b|i|u|font\s+[^>]*)[^a-z>]*>/ig,function(full,close,tag){
+			var opentags = [], html = html.replace(/<\s*(\/?)\s*(br|b|i|u|font\s+[^>]*|font)[^a-z>]*>/ig,function(full,close,tag){
 				tag = tag.toLowerCase();
 				if(tag == "br"){
 					if(opentags.length > 0){
@@ -1274,6 +1254,7 @@ this.getHTML = (function(){
 					this.element.removeChild(this.element.firstChild);
 				}
 				this.element.appendChild(table);
+				this.Table.update();
 			}
 			this.exportToJSON = function(useHTML) {
 				var o = {options:{}},
@@ -1290,7 +1271,7 @@ this.getHTML = (function(){
 					option = options[i];
 					o.options[option.id.substring(option.id.indexOf("-")+1)] = (option.type == "radio" || option.type == "checkbox") ? option.checked : option.value;
 				}
-				for (var i = 0; i < table.rows.length; i++) {
+				for (var i = 1; i < table.rows.length; i++) {
 					var cells = table.rows[i].cells;
 					o.cells.push([]);
 					for (var j = 0; j < cells.length; j++) {
@@ -1792,6 +1773,44 @@ this.getHTML = (function(){
 					document.getElementById("panel-footnotes").style.display = "none";
 					document.getElementById("group-footnotes").style.display = "none";
 				}
+				table.addEventListener("click", function(e){
+					if(!document.body.hasAttribute("data-border-editor")){
+						var target = e.target || e.srcElement;
+						target = target.nodeType == 3 ? target.parentElement : target;
+						if(target.tagName == "TD" && target.parentElement.rowIndex === 0){
+							var matrix = _this.Table.matrix();
+							for(var i=0;i<matrix.length;i++){
+								var row = matrix[i];
+								for(var j=0;j<row.length;j++){
+									var cell = row[j];
+									cell = (cell.refCell||cell).cell;
+									if(j === target.cellIndex){
+										cell.setAttribute("data-selected","data-selected");
+									}
+									else if(!e.ctrlKey && cell.hasAttribute("data-selected")){
+										cell.removeAttribute("data-selected");
+									}
+								}
+							}
+						}
+						else if(target.tagName == "TR"){
+							var matrix = _this.Table.matrix();
+							for(var i=0;i<matrix.length;i++){
+								var row = matrix[i];
+								for(var j=0;j<row.length;j++){
+									var cell = row[j];
+									cell = (cell.refCell||cell).cell;
+									if(i === target.rowIndex-1 || target.rowIndex === 0){
+										cell.setAttribute("data-selected","data-selected");
+									}
+									else if(!e.ctrlKey && cell.hasAttribute("data-selected")){
+										cell.removeAttribute("data-selected");
+									}
+								}
+							}
+						}
+					}	
+				});
 				table.addEventListener("paste", function(e) {
 					if(improvePaste){
 						improvePaste = false;
@@ -1912,6 +1931,7 @@ console.dir(html);
 				document.execCommand("styleWithCSS", false, false);
 				document.execCommand("insertBrOnReturn", false, false);
 				this.Table = new Table(table);
+				this.Table.shadowFirstRow = true;
 				if(document.querySelector(".toolbar-group-container")){
 					// New code
 					var toolbarContainer = document.querySelector(".toolbar-group-container");
@@ -2097,6 +2117,7 @@ console.dir(html);
 				if(html.indexOf("<")<0 && html.indexOf("[")<0){
 					return this.fastGenerateFromHTML(html, ignoreMultiline, align);
 				}
+				console.info(html);
 				var div = document.createElement("div"), hasMultiline;
 				div.innerHTML = html;
 				var el = div.querySelectorAll("span.latex-equation");
@@ -2453,13 +2474,13 @@ console.dir(html);
 							if(!foundFirst){
 								foundFirst = true;
 								state = !document.queryCommandEnabled(command);
-								document.execCommand(command, false, null);
+								document.execCommand(command, false, value || null);
 							}
 							else{
 								if(document.queryCommandEnabled(command) == state){
-									document.execCommand(command, false, null);
+									document.execCommand(command, false, value || null);
 								}
-								document.execCommand(command, false, null);
+								document.execCommand(command, false, value || null);
 							}
 							sel.removeAllRanges();
 						}, 1);
@@ -4054,7 +4075,7 @@ console.dir(html);
 					for (var i = 0; i < row.length; i++) {
 						var cell = row[i];
 						cell = cell.cell || cell.refCell.cell;
-						if (cell.parentElement.rowIndex + cell.rowSpan != n) {
+						if (cell.parentElement.rowIndex - 1 + cell.rowSpan != n) {
 							if(border[i-1]){
 								complete = false;
 							}
