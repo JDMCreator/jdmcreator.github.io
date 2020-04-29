@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0a2";
+			this.version = "2.0a3";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -2766,7 +2766,7 @@ console.dir(html);
 				var cell = this.selectedCell;
 				do{				
 					if (cell) {
-						this.Table.removeRow(cell.parentElement.rowIndex);
+						this.Table.removeRow(cell.parentElement.rowIndex - 1);
 					}
 					if(!this.selectedCell || !this.selectedCell.parentElement){
 						this.selectedCell = null;
@@ -4090,7 +4090,7 @@ console.dir(html);
 						color = cell.style.borderBottomColor;
 						if (!bd && row2[i]) {
 							var cell = row2[i];
-							if (cell.cell || (cell.refCell.cell.parentElement.rowIndex == n + 1)) {
+							if (cell.cell || (cell.refCell.cell.parentElement.rowIndex - 1 == n + 1)) {
 								bd = (cell.cell || cell.refCell.cell)
 									.getAttribute("data-border-top"),
 								color = (cell.cell || cell.refCell.cell).style.borderTopColor;
