@@ -58,9 +58,9 @@
                     <div class="clearfix">
                         <div style="float:left">
                             <div class="dropdown" id="top-dropdown-menu">
-                            <span data-toggle="tooltip" class="top-menu-btn" onclick="table.statesManager.undo()"><img src="icons/arrow-counterclockwise.svg"></span>
+                            <span data-toggle="tooltip" title="Undo (CTRL+Z)" class="top-menu-btn" onclick="table.statesManager.undo()"><img src="icons/arrow-counterclockwise.svg"></span>
 <!--<span data-toggle="tooltip" title="Redo" class="top-menu-btn" onclick="table.statesManager.undo()"><img src="icons/arrow-clockwise.svg"></span>-->
-<span data-toggle="tooltip" title="Generate (ALT+T)" class="top-menu-btn" onclick="table.generate();"><img src="icons/play-fill.svg"></span>
+<span data-toggle="tooltip" title="Generate" class="top-menu-btn" onclick="table.generate();"><img src="icons/play-fill.svg"></span>
     <a class="dropdown-toggle" type="button" id="dropdownMenu1" role="button" data-target="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 File <span class="caret"></span>
 </a>
@@ -110,7 +110,7 @@ Output <span class="caret"></span>
                                 </span>
                             </div>
                         </div>
-                        <div style="float:right;" class="top-dropdown-menu-element"><a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">Comments/Requests/Issues</a> | <a href="#" data-target="#help-modal" data-toggle="modal">Help</a>
+                        <div style="float:right;" class="top-dropdown-menu-element"><a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">Comments/Requests/Issues</a> | <a href="index.html">Switch to old interface</a> | <a href="#" data-target="#help-modal" data-toggle="modal">Help</a>
                         </div>
                     </div>
 				<div class="toolbar-group-container" tabindex="0" role="toolbar">
@@ -183,6 +183,7 @@ Output <span class="caret"></span>
 					<div class="group-col">
 						<button onclick="table.merge()" title="Merge selected cells"><img src="icons/chevron-contract.svg" style="transform:rotate(90deg)">Merge cells</button>
 						<button onclick="table.split()" title="Split selected merged cells"><img src="icons/chevron-expand.svg" style="transform:rotate(90deg)">Split cells</button>
+						<button onclick="$('#findreplace-dialog').modal('show')" title="Find and replace text in cells"><img src="icons/find-replace.svg">Find & replace</button>
 					</div>
 					<span>Cells</span>
 				</div>
@@ -192,8 +193,8 @@ Output <span class="caret"></span>
 						<button id="button-mode-border" title="Draw borders" onclick="table.mode(table.mode() == 2 ? 0 : 2)" aria-pressed="false"><img src="icons/pencil.svg"><span>Draw borders</span></button>
 						<div class="group-col">
 							<button id="button-booktabs" title="Toggle automatic booktabs top and bottom borders" onclick="table.autoBooktabs()" aria-pressed="false"><span class="glyphicon glyphicon-book"></span>Auto-Booktabs</button>
-							<button onclick="table.setAllBorders()" title="Add all borders to selected cells"><img src="icons/square.svg">Add all borders</button>
-							<button onclick="table.removeBorders()" title="Remove all border from selected cells"><img src="icons/x.svg">Remove all borders</button>
+							<button onclick="table.setAllBorders()" title="Add all borders to selected cells"><img src="icons/border-all.svg">Add all borders</button>
+							<button onclick="table.removeBorders()" title="Remove all border from selected cells"><img src="icons/border-none.svg">Remove all borders</button>
 						</div>
 					</div>
 					<span>Borders</span>
@@ -652,6 +653,44 @@ Output <span class="caret"></span>
             </div>
         </div>
     </div>
+    <div class="modal fade" id="findreplace-dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Find & Replace</h4>
+                </div>
+                <div class="modal-body">
+		<form>
+			<div class="input-control">
+	                    <label class="control-label" for="findreplace-from">Find what :</label>
+			    <input type="input" class="form-control" id="findreplace-from">
+			</div>
+	
+			<div class="input-control">
+                	    <label class="control-label" for="findreplace-to">Replace with :</label>
+			    <input type="input" class="form-control" id="findreplace-to">
+			</div>
+			<div class="input-control">
+                	    <label class="control-label" for="findreplace-mode">In the following cells :</label>
+			    <select class="form-control" id="findreplace-mode">
+				<option>All cells</option>
+				<option>All selected cells</option>
+				<option>All unselected cells</option>
+				<option>All bold cells</option>
+				<option>All cells with a background color</option>
+		    	</select>
+			</div>
+		</form>
+                            <center style="padding-top:12px;">
+                                <button type="button" class="btn btn-primary" onclick="table.findReplace()">Replace All</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        </center>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="modal fade" id="email" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">

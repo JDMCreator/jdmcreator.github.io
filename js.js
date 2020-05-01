@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "1.8.3";
+			this.version = "1.9";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -1189,6 +1189,7 @@ this.getHTML = (function(){
 						elem = document.createElement("tr");
 					for (var j = 0; j < row.length; j++) {
 						var cellO = row[j];
+						cellO.dataset = cellO.dataset || {};
 						var cell = document.createElement("td");
 						cell = this.applyToCell(cell);
 						if (cellO.dataset.twoDiagonals){
@@ -1202,7 +1203,7 @@ this.getHTML = (function(){
 								"</div>";
 							this.setHTML(cell, cellO.html[0]);
 						} else {
-							this.setHTML(cell, cellO.html);
+							this.setHTML(cell, cellO.html || "");
 						}
 						for (var k in cellO.dataset) {
 							if (cellO.dataset.hasOwnProperty(k)) {
@@ -1247,10 +1248,14 @@ this.getHTML = (function(){
 					o.cells.push([]);
 					for (var j = 0; j < cells.length; j++) {
 						var cell = cells[j],
-							cellO = {dataset:{}};
+							cellO = {dataset:{}},
+							hasDataset = false;
 						for(var prop in cell.dataset){
 							if(cell.dataset.hasOwnProperty(prop)){
-								cellO.dataset[prop] = cell.dataset[prop]
+								cellO.dataset[prop] = cell.dataset[prop];
+								if(prop!="selected"){
+									hasDataset = true;
+								}
 							}
 						}
 						if (cell.dataset.twoDiagonals){
@@ -1264,13 +1269,22 @@ this.getHTML = (function(){
 							});
 						} else {
 							cellO.html = this.getHTML(cell).replace(/<\s*wbr[^>]*>/i, "<br>");
+							if(!cellO.html){delete cellO.html}
 						}
 						if (cellO.dataset.selected) {
 							delete cellO.dataset.selected;
 						}
+						if(!hasDataset){
+							delete cellO.dataset;
+						}
 						cellO.css = cell.style.cssText;
-						cellO.rowSpan = cell.rowSpan;
-						cellO.colSpan = cell.colSpan;
+						if(!cellO.css){delete cellO.css}
+							if(cell.rowSpan>1){
+								cellO.rowSpan = cell.rowSpan;
+							}
+							if(cellO.colSpan>1){
+								cellO.colSpan = cell.colSpan;
+							}
 						o.cells[o.cells.length - 1].push(cellO);
 					}
 				}
@@ -2177,22 +2191,47 @@ console.dir(html);
 						});
 					
 				} else if(this.shrink){
-					text = this.generateFromHTML(this.getHTML(cell), true, align).replace(/\\{2,}/g, function(full){
-						var after = "", str = "", nb = full.length;
-						if(nb % 2 == 1){
-							after = "\\";
-							nb--;
+					var tb = 0;
+					text = this.generateFromHTML(this.getHTML(cell), true, align).replace(/(?:\\{2,}|\\(?:begin|end)\{tabular\})/g, function(full){
+						if(full == "\\begin{tabular}"){
+							tb++;
+							return full;
 						}
-						for(var i=0;i<nb;i=i+2){
-							str += "\\par";
-							if(i+2<nb){
-								str+= "\\null";
-							}
-							else{
-								str += "{}";
-							}
+						else if(full == "\\end{tabular}"){
+							tb--;
+							return full;
 						}
-						return str + after;
+						else if(tb > 0){
+							var after = "", str = "", nb = full.length;
+							if(nb % 2 == 1){
+								after = "\\";
+								nb--;
+							}
+							for(var i=0;i<nb;i=i+2){
+								str += "\\\\";
+								if(i+2<nb){
+									str+= "~";
+								}
+							}
+							return str + after;
+						}
+						else{
+							var after = "", str = "", nb = full.length;
+							if(nb % 2 == 1){
+								after = "\\";
+								nb--;
+							}
+							for(var i=0;i<nb;i=i+2){
+								str += "\\par";
+								if(i+2<nb){
+									str+= "\\null";
+								}
+								else{
+									str += "{}";
+								}
+							}
+							return str + after;
+						}
 					});
 				}
 				else{

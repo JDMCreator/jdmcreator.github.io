@@ -218,6 +218,7 @@ body:not([data-view-editor]) #table tr:not(:empty)::before{
 	background:whitesmoke;
 	display:table-cell;
 	border-bottom:2px solid transparent !important;
+	vertical-align:middle;
 }
 body:not([data-view-editor]) #table tr:not(:empty):first-child::before{
 	color:transparent;

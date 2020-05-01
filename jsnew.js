@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0a3";
+			this.version = "2.0a4";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -1144,6 +1144,89 @@ this.getHTML = (function(){
 				}
 			}
 			this.log = "";
+			this.findReplace = function(){
+				var text = document.getElementById("findreplace-from").value,
+				replace = document.getElementById("findreplace-to").value,
+				mode = document.getElementById("findreplace-mode").value;
+				if(text){
+					this.statesManager.registerState();
+					var elements = this.element.querySelectorAll("td div[contenteditable]");
+					var nb = this.findReplaceElements(text,replace,elements);
+				}
+				else{nb = 0}
+				alert(nb+" instance"+(nb>1?"s":"")+" replaced");
+				$("#findreplace-dialog").modal("hide");
+			}
+			this.findReplaceElements = function(text, replace, elements){
+				// let's build a regexp
+				var regexp = "";
+				for(var i=0;i<text.length;i++){
+					if(i>0){
+						regexp+="((?:<(?!\s*\/?\s*(?:br|li|ul|p|div))[^>]+?>)*)";
+					}
+					var c = text[i];
+					regexp+="(?:";
+					if(c == ">"){
+						regexp+="&gt;";
+					}
+					else if(c == "<"){
+						regexp+="&lt;";
+					}
+					else if(c == "&"){
+						regexp+="(?:&amp;|&)";
+					}
+					else if(c == '"'){
+						regexp+='(?:&quot;|")';
+					}
+					else if(c == "\\" || c == "(" || c == ")" || c == "/" || c == "." || c == "[" || c == "]" || c ==  "?" || c == "*" || c == "+" || c == "^" || c == "$"){
+						regexp+= "\\"+c;
+					}
+					else if(c == " "){
+						regexp+="\s+";
+					}
+					else{
+						regexp+=c;
+					}
+					regexp+=")(?!([^<]+)?>)";
+				}
+				var div = document.createElement("div"), nb = 0;
+				div.innerText = replace;
+				replace = div.innerHTML;
+				for(var i=0;i<elements.length;i++){
+					var html = elements[i].innerHTML
+					var newhtml = html.replace(new RegExp(regexp,"gi"),function(full){
+						// let's build overtags;
+						var tags = [],
+						tagName = [];
+						for(var i=1;i<arguments.length-2;i++){
+							if(!arguments[i]){continue;}
+							arguments[i].replace(/<\s*(\/?)\s*([a-z]+)[^>]*?>/gi, function(full,close,tagname){
+								tagname = tagname.toLowerCase();
+								if(close){
+									if(tagName[tagName.length-1] == tagname){
+										tagName.pop();
+										tags.pop();
+									}
+									else{
+										tags.push(full);
+										tagName.push("/"+tagname);
+									}
+								}
+								else{
+									tagName.push(tagname);
+									tags.push(full);
+								}
+							});
+						}
+						nb++
+						return replace+tags.join("");
+					});
+					if(newhtml != html){
+						elements[i].innerHTML = newhtml;
+					}
+				}
+				return nb;
+			}
 			var logArchive = {};
 			this.showFootnotePanel = function(){
 				$('#right_cell').collapse('hide');
@@ -1217,6 +1300,7 @@ this.getHTML = (function(){
 						elem = document.createElement("tr");
 					for (var j = 0; j < row.length; j++) {
 						var cellO = row[j];
+						cellO.dataset = cellO.dataset || {};
 						var cell = document.createElement("td");
 						cell = this.applyToCell(cell);
 						if (cellO.dataset.twoDiagonals){
@@ -1230,7 +1314,7 @@ this.getHTML = (function(){
 								"</div>";
 							this.setHTML(cell, cellO.html[0]);
 						} else {
-							this.setHTML(cell, cellO.html);
+							this.setHTML(cell, cellO.html || "");
 						}
 						for (var k in cellO.dataset) {
 							if (cellO.dataset.hasOwnProperty(k)) {
@@ -1276,10 +1360,14 @@ this.getHTML = (function(){
 					o.cells.push([]);
 					for (var j = 0; j < cells.length; j++) {
 						var cell = cells[j],
-							cellO = {dataset:{}};
+							cellO = {dataset:{}},
+							hasDataset = false;
 						for(var prop in cell.dataset){
 							if(cell.dataset.hasOwnProperty(prop)){
-								cellO.dataset[prop] = cell.dataset[prop]
+								cellO.dataset[prop] = cell.dataset[prop];
+								if(prop!="selected"){
+									hasDataset = true;
+								}
 							}
 						}
 						if (cell.dataset.twoDiagonals){
@@ -1293,13 +1381,22 @@ this.getHTML = (function(){
 							});
 						} else {
 							cellO.html = this.getHTML(cell).replace(/<\s*wbr[^>]*>/i, "<br>");
+							if(!cellO.html){delete cellO.html}
 						}
 						if (cellO.dataset.selected) {
 							delete cellO.dataset.selected;
 						}
+						if(!hasDataset){
+							delete cellO.dataset;
+						}
 						cellO.css = cell.style.cssText;
-						cellO.rowSpan = cell.rowSpan;
-						cellO.colSpan = cell.colSpan;
+						if(!cellO.css){delete cellO.css}
+							if(cell.rowSpan>1){
+								cellO.rowSpan = cell.rowSpan;
+							}
+							if(cellO.colSpan>1){
+								cellO.colSpan = cell.colSpan;
+							}
 						o.cells[o.cells.length - 1].push(cellO);
 					}
 				}
@@ -2117,7 +2214,6 @@ console.dir(html);
 				if(html.indexOf("<")<0 && html.indexOf("[")<0){
 					return this.fastGenerateFromHTML(html, ignoreMultiline, align);
 				}
-				console.info(html);
 				var div = document.createElement("div"), hasMultiline;
 				div.innerHTML = html;
 				var el = div.querySelectorAll("span.latex-equation");
@@ -2386,22 +2482,47 @@ console.dir(html);
 						});
 					
 				} else if(this.shrink){
-					text = this.generateFromHTML(this.getHTML(cell), true, align).replace(/\\{2,}/g, function(full){
-						var after = "", str = "", nb = full.length;
-						if(nb % 2 == 1){
-							after = "\\";
-							nb--;
+					var tb = 0;
+					text = this.generateFromHTML(this.getHTML(cell), true, align).replace(/(?:\\{2,}|\\(?:begin|end)\{tabular\})/g, function(full){
+						if(full == "\\begin{tabular}"){
+							tb++;
+							return full;
 						}
-						for(var i=0;i<nb;i=i+2){
-							str += "\\par";
-							if(i+2<nb){
-								str+= "\\null";
-							}
-							else{
-								str += "{}";
-							}
+						else if(full == "\\end{tabular}"){
+							tb--;
+							return full;
 						}
-						return str + after;
+						else if(tb > 0){
+							var after = "", str = "", nb = full.length;
+							if(nb % 2 == 1){
+								after = "\\";
+								nb--;
+							}
+							for(var i=0;i<nb;i=i+2){
+								str += "\\\\";
+								if(i+2<nb){
+									str+= "~";
+								}
+							}
+							return str + after;
+						}
+						else{
+							var after = "", str = "", nb = full.length;
+							if(nb % 2 == 1){
+								after = "\\";
+								nb--;
+							}
+							for(var i=0;i<nb;i=i+2){
+								str += "\\par";
+								if(i+2<nb){
+									str+= "\\null";
+								}
+								else{
+									str += "{}";
+								}
+							}
+							return str + after;
+						}
 					});
 				}
 				else{
@@ -2683,16 +2804,16 @@ console.dir(html);
 						removeAllRules();
 					}
 					else{
-						n = Math.round(Math.max(n||1, 1));
+						n = Math.round(Math.max(n||1, 1))+1;
 						removeAllRules();
-						actual = [n, even, odd];
+						actual = [n-1, even, odd];
 						if(n%2<1){
-							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+even+";}");
-							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+odd+";}");
-						}
-						else{
 							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+odd+";}");
 							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+even+";}");
+						}
+						else{
+							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+even+";}");
+							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+odd+";}");
 						}
 
 					}

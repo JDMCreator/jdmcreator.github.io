@@ -6,6 +6,20 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 1.9 (2020/05/01)
+==========
+
+| Note on this release:
+|     Support for longer tables, Fixes
+
+CORE
+
+[+] The update to the engine core allows to edit even bigger tables now (still limited to 25MB, but now compression might be used)
+
+LATEX EXPORT
+
+[#] New bullets in unordered lists did not work when the 'shrink' option was activated
+
 Version 1.8.3 (2020/04/28)
 ==========
 
