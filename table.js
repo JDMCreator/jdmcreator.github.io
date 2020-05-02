@@ -256,6 +256,7 @@ Table = function(table){
 			row.appendChild(frag);
 		}
 		this.removeRow = function(nb){
+			if(nb >=0 && this.shadowFirstRow){nb++}
 			if(!nb && nb!==0 && nb!=="0"){
 				nb=-1;
 			}
@@ -394,7 +395,7 @@ Table = function(table){
 				if(callback){callback.call(this,cell)}
 				tr.appendChild(cell);
 			}
-			((table.rows[0]||{}).parentElement||table).insertBefore(tr,table.rows[nb]);
+			((table.rows[0]||{}).parentElement||table).insertBefore(tr,table.rows[nb+(this.shadowFirstRow?1:0)]);
 			
 		}
 		this.split = function(cells, callback){
