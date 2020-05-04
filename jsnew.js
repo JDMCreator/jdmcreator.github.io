@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0a4";
+			this.version = "2.0a5";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -1150,7 +1150,16 @@ this.getHTML = (function(){
 				mode = document.getElementById("findreplace-mode").value;
 				if(text){
 					this.statesManager.registerState();
-					var elements = this.element.querySelectorAll("td div[contenteditable]");
+					var elements;
+					if(mode == "1"){
+						elements = this.element.querySelectorAll("td[data-selected] div[contenteditable]");
+					}
+					else if(mode == "2"){
+						elements = this.element.querySelectorAll("td:not([data-selected]) div[contenteditable]");
+					}
+					else{
+						elements = this.element.querySelectorAll("td div[contenteditable]");
+					}
 					var nb = this.findReplaceElements(text,replace,elements);
 				}
 				else{nb = 0}
@@ -1394,7 +1403,7 @@ this.getHTML = (function(){
 							if(cell.rowSpan>1){
 								cellO.rowSpan = cell.rowSpan;
 							}
-							if(cellO.colSpan>1){
+							if(cell.colSpan>1){
 								cellO.colSpan = cell.colSpan;
 							}
 						o.cells[o.cells.length - 1].push(cellO);
@@ -1656,14 +1665,55 @@ this.getHTML = (function(){
 			}
 			this.removeBorders = function() {
 				this.statesManager.registerState();
+				var matrix = this.Table.matrix();
 				this.forEachSelectedCell(function(cell) {
-					var style = cell.style;
-					style.borderTop = style.borderLeft = style.borderRight = style.borderBottom = "";
+					this._removeBorders(cell, matrix);
+				});
+			}
+			this._removeBorders = function(cell, matrix){
+					var position = this.Table.position(cell, matrix);
 					cell.removeAttribute("data-border-top");
 					cell.removeAttribute("data-border-left");
 					cell.removeAttribute("data-border-right");
 					cell.removeAttribute("data-border-bottom");
-				});
+					var style = cell.style;
+					style.borderTop = style.borderLeft = style.borderRight = style.borderBottom = "";
+					//Top border
+					if(position.y>0){
+						for(var i=0;i<cell.colSpan;i++){
+							var cell2 = matrix[position.y-1][position.x+i];
+							cell2 = (cell2.refCell||cell2).cell;
+							cell2.style.borderBottom = "";
+							cell2.removeAttribute("data-border-bottom");
+						}
+					}
+					//Bottom border
+					if(matrix[position.y+cell.rowSpan]){
+						for(var i=0;i<cell.colSpan;i++){
+							var cell2 = matrix[position.y+cell.rowSpan][position.x+i];
+							cell2 = (cell2.refCell||cell2).cell;
+							cell2.style.borderTop = "";
+							cell2.removeAttribute("data-border-top");
+						}
+					}
+					//Left border
+					if(position.x>0){
+						for(var i=0;i<cell.rowSpan;i++){
+							var cell2 = matrix[position.y+i][position.x-1];
+							cell2 = (cell2.refCell||cell2).cell;
+							cell2.style.borderRight = "";
+							cell2.removeAttribute("data-border-right");
+						}
+					}
+					//Right border
+					if(matrix[position.y][position.x+1]){
+						for(var i=0;i<cell.rowSpan;i++){
+							var cell2 = matrix[position.y+i][position.x+cell.colSpan];
+							cell2 = (cell2.refCell||cell2).cell;
+							cell2.style.borderLeft = "";
+							cell2.removeAttribute("data-border-left");
+						}
+					}
 			}
 			this._absolutePosition = function(el) {
 				// Stolen from here : https://stackoverflow.com/a/32623832/8022172

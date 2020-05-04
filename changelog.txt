@@ -6,6 +6,17 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 1.9.1 (2020/05/04)
+==========
+
+| Note on this release:
+|     Fixes
+
+CORE
+
+[#] The "Remove all borders" button didn't work
+[#] Saving cells that spanned several columns didn't work (regression)
+
 Version 1.9 (2020/05/01)
 ==========
 

@@ -264,6 +264,7 @@ Output <span class="caret"></span>
 		  <li class="dropdown-header">Web</li>
         	  <li data-value="html"><a href="#">HTML</a></li>
        		   <li data-value="bbcode"><a href="#">BBCode</a></li>
+       		   <li data-value="wikicode"><a href="#">Wikicode</a></li>
  	      	   <li role="separator" class="divider"></li>
 		  <li class="dropdown-header">Data</a></li>
 	          <li data-value="csv"><a href="#">CSV</a></li>
@@ -674,11 +675,9 @@ Output <span class="caret"></span>
 			<div class="input-control">
                 	    <label class="control-label" for="findreplace-mode">In the following cells :</label>
 			    <select class="form-control" id="findreplace-mode">
-				<option>All cells</option>
-				<option>All selected cells</option>
-				<option>All unselected cells</option>
-				<option>All bold cells</option>
-				<option>All cells with a background color</option>
+				<option value="0">All cells</option>
+				<option value="1">All selected cells</option>
+				<option value="2">All unselected cells</option>
 		    	</select>
 			</div>
 		</form>
@@ -823,6 +822,7 @@ Output <span class="caret"></span>
                         <option value="md">Markdown</option>
                         <option value="html">HTML</option>
                         <option value="bbcode">BBCode</option>
+                        <option value="wikicode">Wikicode</option>
                         <option value="csv">CSV</option>
                         <option value="eplain">Eplain</option>
                         <option value="pretext">PreTeXt</option>
@@ -974,6 +974,9 @@ Output <span class="caret"></span>
                         <br>
                         <label>
                             <input type="checkbox" id="opt-tex-macro" checked> Use macros when needed</label>
+                    </div>
+                    <div class="form-group" data-option-group="wikicode" style="display:none;">
+                        <h4>Wikicode options</h4>
                     </div>
                     <div class="form-group" data-option-group="html" style="display:none;">
                         <h4>HTML options</h4>
@@ -1161,6 +1164,8 @@ placement: 'auto top'
 	<script type="text/javascript" src="xcolor.js">
 	</script>
 	<script type="text/javascript" src="toConteXt.js">
+	</script>
+	<script type="text/javascript" src="toWikicode.js">
 	</script>
 	<script type="text/javascript" src="toTextile.js">
 	</script>
