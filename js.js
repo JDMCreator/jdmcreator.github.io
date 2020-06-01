@@ -35,6 +35,7 @@ function $id(id) {
 			}
 		},
 		packagesDatabase = {
+			"adjustbox":["xkeyval","adjcalc","trimclip","graphicx","collectbox"],
 			"array" : [],
 			"arydshln" : [],
 			"booktabs" : [],
@@ -110,7 +111,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "1.9.1";
+			this.version = "2.0";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -120,6 +121,7 @@ function $id(id) {
 				}
 				this.element.innerHTML = "";
 				this.element.appendChild(fr);
+				this.Table.update();
 				this.loadAllFootnotes();
 			};
 			this.importData = function(content, format){
@@ -179,16 +181,23 @@ function $id(id) {
 					}
 				}
 				else if(format == "latex"){
-					try{
-						this.importFromJSON(table.latex.importTable(content));
-						$('#importModal').modal('hide');
-						sendGAEvent("Code", "import", "latex");
+					if(!window.isProduction){
+							this.importFromJSON(table.latex.importTable(content));
+							$('#importModal').modal('hide');
+							sendGAEvent("Code", "import", "latex");
 					}
-					catch(e){
-						if(window.console){
-							console.error(e);
+					else{
+						try{
+							this.importFromJSON(table.latex.importTable(content));
+							$('#importModal').modal('hide');
+							sendGAEvent("Code", "import", "latex");
 						}
-						$("#latex-import-error").show();
+						catch(e){
+							if(window.console){
+								console.error(e);
+							}
+							$("#latex-import-error").show();
+						}
 					}
 				}
 				else if(format == "markdown"){
@@ -216,7 +225,13 @@ function $id(id) {
 			this.selectFormat = function(format){
 				$("div[data-option-group]").hide();
 				$("div[data-option-group=\""+format+"\"]").show();
-				$id("format").value = format;
+				var drop = $id("format-drop");
+				var li = drop.querySelector('li[data-value="'+format+'"]');
+				if(li){
+					var btn = $id("format-btn");
+					btn.setAttribute("data-value", format);
+					btn.innerHTML = li.innerText+' <span class="caret"></span>';
+				}
 				$id("format-in").value = format;
 			}
 			this.removeAllSelection = function() {
@@ -483,8 +498,7 @@ function $id(id) {
 			}
 			this.textColor = function(color){
 				if(color){
-					this._id("text-color-input").value = color;
-					this._id("text-color-span").style.color = color;
+					this._id("text-color-span").style.borderBottomColor = color;
 					this._id("text-color-button").setAttribute("data-color", color);
 				}
 				else{
@@ -692,6 +706,34 @@ function $id(id) {
 						"c": "info_align_center",
 						"r": "info_align_right",
 						"d": "info_align_decimal"
+					}[value])
+					.classList.add("active");
+			}
+			this.setVAlign = function(value) {
+				this.statesManager.registerState();
+				if (value != "t" && value != "m" && value != "b") {
+					value = "m";
+				}
+				$id("info_align_top")
+					.classList.remove("active");
+				$id("info_align_middle")
+					.classList.remove("active");
+				$id("info_align_bottom")
+					.classList.remove("active");
+				if(value != "m"){
+					this.forEachSelectedCell(function(cell) {
+						cell.setAttribute("data-vertical-align", value);
+					});
+				}
+				else{
+					this.forEachSelectedCell(function(cell) {
+						cell.removeAttribute("data-vertical-align");
+					});
+				}
+				$id({
+						"t": "info_align_top",
+						"m": "info_align_middle",
+						"b": "info_align_bottom"
 					}[value])
 					.classList.add("active");
 			}
@@ -987,6 +1029,25 @@ this.getHTML = (function(){
 					this._id("info_align_left")
 						.classList.add("active");
 				}
+				// Vertical align
+				this._id("info_align_top")
+					.classList.remove("active");
+				this._id("info_align_middle")
+					.classList.remove("active");
+
+				this._id("info_align_bottom")
+					.classList.remove("active");	
+				align = element.getAttribute("data-vertical-align");
+				if (align == "t") {
+					this._id("info_align_top")
+						.classList.add("active");
+				} else if (align == "b") {
+					this._id("info_align_bottom")
+						.classList.add("active");
+				} else {
+					this._id("info_align_middle")
+						.classList.add("active");
+				}		
 				// Rotated ?
 				if(element.hasAttribute("data-rotated")){
 					this._id("info-rotated")
@@ -1053,6 +1114,7 @@ this.getHTML = (function(){
 			})(this)
 			this.selectionAllowed = true;
 			this.hasShownBorderEditorInfo = false;
+			this.topWidth = 100;
 			this.mode = function(n) {
 				if (arguments.length == 0) {
 					if (document.body.hasAttribute("data-view-editor")) {
@@ -1063,16 +1125,33 @@ this.getHTML = (function(){
 					}
 					return 0;
 				} else {
-					$id("button-mode-edit")
-						.classList.remove("active");
 					$id("button-mode-border")
 						.classList.remove("active");
+					$id("button-mode-border").setAttribute("aria-pressed","false")
 					$id("button-mode-view")
 						.classList.remove("active");
-					$id("panel-draw-border")
-						.classList.remove("active");
-					$id("button-border-draw")
-						.classList.remove("active");
+					$id("button-mode-view").setAttribute("aria-pressed","false")
+					var toolbarGroup = document.querySelector(".toolbar-groups"),
+					buttonStyleGroup = document.getElementById("btn-group-btn-style");
+					if(n !== 2){
+						if(toolbarGroup.offsetWidth == 0){
+							window.requestAnimationFrame((function(){
+								toolbarGroup.style.width = this.topWidth + "px";
+								toolbarGroup.classList.add("toolbar-group-visible")
+								buttonStyleGroup.classList.remove("toolbar-group-visible")
+								buttonStyleGroup.style.display = "none";
+							}).bind(this));
+						}
+					}
+					else{
+						this.topWidth = toolbarGroup.offsetWidth;
+						window.requestAnimationFrame(function(){
+							buttonStyleGroup.style.display = "flex";
+							toolbarGroup.style.width = "0";
+							toolbarGroup.classList.remove("toolbar-group-visible")
+							buttonStyleGroup.classList.add("toolbar-group-visible")
+						});
+					}
 					// Set
 					if (n == 1 || n == 2) {
 						var l = this.element.querySelectorAll("div[contenteditable]");
@@ -1086,7 +1165,8 @@ this.getHTML = (function(){
 							document.body.removeAttribute("data-border-editor")
 							document.body.setAttribute("data-view-editor", "data-view-editor");
 							$id("button-mode-view")
-								.classList.add("active");
+								.classList.add("active");							$id("button-mode-view")
+							$id("button-mode-view").setAttribute("aria-pressed","true");
 						} else {
 							// Border
 							if (!this.hasShownBorderEditorInfo) {
@@ -1099,10 +1179,7 @@ this.getHTML = (function(){
 							document.body.setAttribute("data-border-editor", "data-border-editor");
 							$id("button-mode-border")
 								.classList.add("active");
-							$id("panel-draw-border")
-								.classList.add("active");
-							$id("button-border-draw")
-								.classList.add("active");
+							$id("button-mode-border").setAttribute("aria-pressed","true")
 						}
 					} else {
 						// Edit
@@ -1114,8 +1191,6 @@ this.getHTML = (function(){
 							(l[i] || {})
 							.contentEditable = true
 						}
-						$id("button-mode-edit")
-							.classList.add("active");
 					}
 					if(n != 2){
 						// If we are not in the border editor, we hide information about it
@@ -1124,7 +1199,107 @@ this.getHTML = (function(){
 				}
 			}
 			this.log = "";
+			this.findReplace = function(){
+				var text = document.getElementById("findreplace-from").value,
+				replace = document.getElementById("findreplace-to").value,
+				mode = document.getElementById("findreplace-mode").value;
+				if(text){
+					this.statesManager.registerState();
+					var elements;
+					if(mode == "1"){
+						elements = this.element.querySelectorAll("td[data-selected] div[contenteditable]");
+					}
+					else if(mode == "2"){
+						elements = this.element.querySelectorAll("td:not([data-selected]) div[contenteditable]");
+					}
+					else{
+						elements = this.element.querySelectorAll("td div[contenteditable]");
+					}
+					var nb = this.findReplaceElements(text,replace,elements);
+				}
+				else{nb = 0}
+				alert(nb+" instance"+(nb>1?"s":"")+" replaced");
+				$("#findreplace-dialog").modal("hide");
+			}
+			this.findReplaceElements = function(text, replace, elements){
+				// let's build a regexp
+				var regexp = "";
+				for(var i=0;i<text.length;i++){
+					if(i>0){
+						regexp+="((?:<(?!\s*\/?\s*(?:br|li|ul|p|div))[^>]+?>)*)";
+					}
+					var c = text[i];
+					regexp+="(?:";
+					if(c == ">"){
+						regexp+="&gt;";
+					}
+					else if(c == "<"){
+						regexp+="&lt;";
+					}
+					else if(c == "&"){
+						regexp+="(?:&amp;|&)";
+					}
+					else if(c == '"'){
+						regexp+='(?:&quot;|")';
+					}
+					else if(c == "\\" || c == "(" || c == ")" || c == "/" || c == "." || c == "[" || c == "]" || c ==  "?" || c == "*" || c == "+" || c == "^" || c == "$"){
+						regexp+= "\\"+c;
+					}
+					else if(c == " "){
+						regexp+="\s+";
+					}
+					else{
+						regexp+=c;
+					}
+					regexp+=")(?!([^<]+)?>)";
+				}
+				var div = document.createElement("div"), nb = 0;
+				div.innerText = replace;
+				replace = div.innerHTML;
+				for(var i=0;i<elements.length;i++){
+					var html = elements[i].innerHTML
+					var newhtml = html.replace(new RegExp(regexp,"gi"),function(full){
+						// let's build overtags;
+						var tags = [],
+						tagName = [];
+						for(var i=1;i<arguments.length-2;i++){
+							if(!arguments[i]){continue;}
+							arguments[i].replace(/<\s*(\/?)\s*([a-z]+)[^>]*?>/gi, function(full,close,tagname){
+								tagname = tagname.toLowerCase();
+								if(close){
+									if(tagName[tagName.length-1] == tagname){
+										tagName.pop();
+										tags.pop();
+									}
+									else{
+										tags.push(full);
+										tagName.push("/"+tagname);
+									}
+								}
+								else{
+									tagName.push(tagname);
+									tags.push(full);
+								}
+							});
+						}
+						nb++
+						return replace+tags.join("");
+					});
+					if(newhtml != html){
+						elements[i].innerHTML = newhtml;
+					}
+				}
+				return nb;
+			}
 			var logArchive = {};
+			this.showFootnotePanel = function(){
+				$('#right_cell').collapse('hide');
+				$('#right_footnote').collapse('show');
+			}
+			this.toggleFootnotePanel = function(){
+				$('#right_cell').collapse('toggle');
+				$('#right_footnote').collapse('toggle');
+			}
 			this.uniqueLog = function(text, type){
 				if(!logArchive[text]){
 					this.message(text, type);
@@ -1227,6 +1402,7 @@ this.getHTML = (function(){
 					this.element.removeChild(this.element.firstChild);
 				}
 				this.element.appendChild(table);
+				this.Table.update();
 			}
 			this.exportToJSON = function(useHTML) {
 				var o = {options:{}},
@@ -1243,7 +1419,7 @@ this.getHTML = (function(){
 					option = options[i];
 					o.options[option.id.substring(option.id.indexOf("-")+1)] = (option.type == "radio" || option.type == "checkbox") ? option.checked : option.value;
 				}
-				for (var i = 0; i < table.rows.length; i++) {
+				for (var i = 1; i < table.rows.length; i++) {
 					var cells = table.rows[i].cells;
 					o.cells.push([]);
 					for (var j = 0; j < cells.length; j++) {
@@ -1379,15 +1555,16 @@ this.getHTML = (function(){
 			}
 			this.autoBooktabs = function() {
 				this.statesManager.registerState();
-				var table = this.element;
+				var table = this.element,
+				btn = $id('button-booktabs');
 				if (table.hasAttribute("data-booktabs")) {
 					table.removeAttribute("data-booktabs");
-					$id('button-booktabs')
-						.className = "btn btn-default";
+					btn.className = "";
+					btn.setAttribute("aria-pressed", "false");
 				} else {
 					table.setAttribute("data-booktabs", "data-booktabs");
-					$id('button-booktabs')
-						.className = "btn btn-default active";
+					btn.className = "active";
+					btn.setAttribute("aria-pressed", "true");
 				}
 			}
 			this._clickCellManager = function(event) {
@@ -1402,7 +1579,7 @@ this.getHTML = (function(){
 				where = where.toLowerCase();
 				var where2 = where.charAt(0).toUpperCase() + where.substring(1);
 				return element.getAttribute("data-border-" + where.toLowerCase()) == document.getElementById('border').value
-					&& areSameColors(element.style["border"+where2+"Color"], document.getElementById('border-color').value);
+					&& areSameColors(element.style["border"+where2+"Color"], document.getElementById('border-color').getAttribute("data-value"));
 			}
 			this.setBorder = function(element, where, affect, index, othercells, index2){
 				// Okay, this is an ugly fix, but it is way easier to do it
@@ -1457,7 +1634,7 @@ this.getHTML = (function(){
 				if((where == "left" || where == "right") && style == "trimfull"){
 					style = "normal";
 				}
-				var color = this._id("border-color").value;
+				var color = this._id("border-color").getAttribute("data-value");
 				var css = "1px solid " + color;
 				if(style == "toprule" || style == "bottomrule"){
 					css = "2px solid " + color;
@@ -1510,14 +1687,18 @@ this.getHTML = (function(){
 				});
 			}
 			this.borderPick = function(){
-				var _this = this;
-				ColorPicker.get(this._id("border-color"));
+				var _this = this,
+				borderColor = this._id("border-color")
+				ColorPicker.get(borderColor.style.borderBottomColor || "#000000", function(color){
+					borderColor.style.borderBottomColor = color;
+					borderColor.setAttribute("data-value", color);
+				});
 			}
 			this.setAllBorders = function() {
 				this.statesManager.registerState();
 				var borderType = document.getElementById('border')
 					.value,
-					color = this._id("border-color").value,
+					color = this._id("border-color").getAttribute("data-value"),
 					border = "1px solid " + color;
 				if (borderType == "toprule" || borderType == "bottomrule") {
 					border = "2px solid " + color;
@@ -1786,9 +1967,6 @@ this.getHTML = (function(){
 				waitingforpaste = false,
 				waitingfortab = false,
 				improvePaste = false;
-				$id("support-us").addEventListener("animationend",function(){
-					this.classList.remove("active");
-				}, false);
 				if(window.MutationObserver){
 					var observer = new MutationObserver(_this.footnoteObserver.bind(_this));
 					observer.observe(table, { childList: true, subtree: true});
@@ -1797,6 +1975,44 @@ this.getHTML = (function(){
 					document.getElementById("panel-footnotes").style.display = "none";
 					document.getElementById("group-footnotes").style.display = "none";
 				}
+				table.addEventListener("click", function(e){
+					if(!document.body.hasAttribute("data-border-editor")){
+						var target = e.target || e.srcElement;
+						target = target.nodeType == 3 ? target.parentElement : target;
+						if(target.tagName == "TD" && target.parentElement.rowIndex === 0){
+							var matrix = _this.Table.matrix();
+							for(var i=0;i<matrix.length;i++){
+								var row = matrix[i];
+								for(var j=0;j<row.length;j++){
+									var cell = row[j];
+									cell = (cell.refCell||cell).cell;
+									if(j === target.cellIndex){
+										cell.setAttribute("data-selected","data-selected");
+									}
+									else if(!e.ctrlKey && cell.hasAttribute("data-selected")){
+										cell.removeAttribute("data-selected");
+									}
+								}
+							}
+						}
+						else if(target.tagName == "TR"){
+							var matrix = _this.Table.matrix();
+							for(var i=0;i<matrix.length;i++){
+								var row = matrix[i];
+								for(var j=0;j<row.length;j++){
+									var cell = row[j];
+									cell = (cell.refCell||cell).cell;
+									if(i === target.rowIndex-1 || target.rowIndex === 0){
+										cell.setAttribute("data-selected","data-selected");
+									}
+									else if(!e.ctrlKey && cell.hasAttribute("data-selected")){
+										cell.removeAttribute("data-selected");
+									}
+								}
+							}
+						}
+					}	
+				});
 				table.addEventListener("paste", function(e) {
 					if(improvePaste){
 						improvePaste = false;
@@ -1817,7 +2033,6 @@ this.getHTML = (function(){
 						trimRight = /\S$/.test(plain);
 						d.innerHTML = e.clipboardData.getData("text/html");
 						var html = _this.getHTML(d);
-console.dir(html);
 						if(trimLeft){html = html.replace(/^\s+/, "")}
 						if(trimRight){html = html.replace(/\s+$/, "")}
 						e.preventDefault();
@@ -1917,6 +2132,145 @@ console.dir(html);
 				document.execCommand("styleWithCSS", false, false);
 				document.execCommand("insertBrOnReturn", false, false);
 				this.Table = new Table(table);
+				this.Table.shadowFirstRow = true;
+				if(document.querySelector(".toolbar-group-container")){
+					// New code
+					var toolbarContainer = document.querySelector(".toolbar-group-container");
+					var caretFont = toolbarContainer.querySelector(".btn-caret");
+					toolbarContainer.addEventListener("keydown", function(e){
+						if(e.keyCode == 37){ // Left
+							var focus = toolbarContainer.querySelector(":focus");
+							var btns = toolbarContainer.querySelectorAll(".toolbar-group-visible button, .toolbar-group-visible .btn-caret[aria-expanded='true'] + #font-color-picker td[tabindex]");
+							if(!focus){btns[0].focus()}
+							else{
+								for(var i=0;i<btns.length;i++){
+									if(btns[i] == focus){
+										if(btns[i-1]){btns[i-1].focus()}
+										break;
+									}
+								}
+							}
+						}
+						else if(e.keyCode == 39){ // Right
+							var focus = toolbarContainer.querySelector(":focus"),
+							btns = toolbarContainer.querySelectorAll(".toolbar-group-visible button, .toolbar-group-visible .btn-caret[aria-expanded='true'] + #font-color-picker td[tabindex]");
+							if(!focus){btns[0].focus()}
+							else{
+								for(var i=0;i<btns.length;i++){
+									if(btns[i] == focus){
+										if(btns[i+1]){btns[i+1].focus()}
+										break;
+									}
+								}
+							}
+						}
+						else if(e.keyCode == 36){ // Home
+							toolbarContainer.querySelector(".toolbar-group-visible button").focus();
+						}
+						else if(e.keyCode == 35){ // End
+							var allButtons = toolbarContainer.querySelectorAll(".toolbar-group-visible button");
+							allButtons[allButtons.length-1].focus();
+						}
+					},false)
+					var that = this;
+					caretFont.addEventListener("click", function(e){
+						that.toggleFontColorPicker(this);
+						e.stopPropagation();
+					}, false);
+					document.addEventListener("click", function(e){
+						if(caretFont.getAttribute("aria-expanded") == "true"){
+							that.toggleFontColorPicker(caretFont);
+						}
+					}, false);
+					document.addEventListener("keydown", function(e){
+						if(e.keyCode == 27 && caretFont.getAttribute("aria-expanded") == "true"){
+							that.toggleFontColorPicker(caretFont);
+						}
+					},false);
+					var tdFont = toolbarContainer.querySelectorAll("td[data-color]");
+					for(var i=0;i<tdFont.length;i++){
+						var color = tdFont[i].getAttribute("data-color");
+						tdFont[i].style.backgroundColor = color;
+						tdFont[i].title = color[0].toUpperCase() + color.substring(1);
+					}
+					toolbarContainer.querySelector("table").addEventListener("mousedown", function(e){e.preventDefault()}, false);
+					document.getElementById("font-color-picker").addEventListener("click", function(e){
+						if(e.originalTarget.tagName == "TD"){
+							e.preventDefault();
+							var color = e.originalTarget.getAttribute("data-color");
+							if(color){
+								that.toggleExecCommand('foreColor', color);
+								that.textColor(color);
+							}
+							else{
+								var text = e.originalTarget.innerText;
+								if(text.indexOf("Auto") >= 0){	
+									that.textColor("#000000");
+									document.getElementById("text-color-button").setAttribute("data-color", "none");
+								}
+								else if(text.indexOf("More") >= 0){
+									color = document.getElementById("text-color-button").getAttribute("data-color");
+									color = (color || "#000000");
+									ColorPicker.get(color == "none" ? "#000000" : color, that.textColor.bind(that))
+								}
+							}
+						}
+					}, false);
+					document.getElementById("format-drop").addEventListener("click", function(e){
+						var li = e.originalTarget;
+						if(li.tagName == "A"){li = li.parentElement;}
+						if(li.tagName == "LI" && li.hasAttribute("data-value")){
+							that.selectFormat(li.getAttribute("data-value"));
+						}
+						e.preventDefault();
+					}, false);
+					$(document).on("hidden.bs.collapse", "#right_footnote", function(e){
+						alert("Closed");
+					},false);
+				}
+			}
+			this.setTextColor = function(color){
+				color = color || "#000000";
+				if(color == "none"){
+					this.toggleExecCommand("foreColor", "black");
+				}
+				else{
+					this.toggleExecCommand('foreColor', color)
+				}
+			}
+			this.toggleFontColorPicker = function(el){
+				var fontPicker = document.getElementById("font-color-picker");
+				if(el.getAttribute("aria-expanded") == "false"){
+
+					var colors = ColorPicker.getTableColorScheme(),
+					themeTD = document.getElementById("font-color-theme").querySelectorAll("td");
+					for(var j=0;j<themeTD.length;j++){
+						var color = colors[j], td = themeTD[j];
+						if(color){
+							color = ColorPicker.toHex(color.map(parseFloat));
+							td.title = ntc.name(color)[1];
+							td.setAttribute("data-color", color);
+							td.tabIndex = "0";
+							td.style.backgroundColor = color;
+						}
+						else{
+							td.removeAttribute("title");
+							td.removeAttribute("data-color");
+							td.removeAttribute("tabindex");
+							td.style.backgroundColor = "transparent";
+						}
+					}
+
+
+					el.setAttribute("aria-expanded", "true");
+					fontPicker.style.display = "block";
+					fontPicker.style.left = (el.offsetLeft - document.querySelector(".toolbar-group-container").scrollLeft) + "px";
+					fontPicker.style.top = (el.offsetTop + el.offsetHeight) + "px";
+				}
+				else{
+					el.setAttribute("aria-expanded", "false");
+					fontPicker.style.display = "none";
+				}
 			}
 			this.refreshRotatedCellSize = function(td){
 				// - Get the width and set it as the height
@@ -2212,7 +2566,19 @@ console.dir(html);
 						});
 					}
 					else if((!this.blacklistPackages["multirow"] && cell.rowSpan > 1) || cell.colSpan > 1){
-						text = "\\tablenum{" + text + "}";
+						var text2 = "\\tablenum"
+						var sioptions = [];
+						if(o.decimalChars){
+							sioptions.push("table-format="+o.decimalChars[0]+"."
+									  +o.decimalChars[1]);
+						}
+						if(shrinkRatio || o.shrinkRatio){
+							sioptions.push("table-column-width="+(shrinkRatio||o.shrinkRatio)+"\\linewidth");
+						}
+						if(sioptions.length>0){
+							text2+="["+sioptions.join(",")+"]";
+						}
+						text = text2 + "{" + text + "}";
 					}
 				}else if (cell.rowSpan > 1 && (!this.blacklistPackages["makecell"] || this.shrink) && !this.blacklistPackages["multirow"]) {
 						text = this.generateFromHTML(this.getHTML(cell), false, align);
@@ -2345,13 +2711,13 @@ console.dir(html);
 							if(!foundFirst){
 								foundFirst = true;
 								state = !document.queryCommandEnabled(command);
-								document.execCommand(command, false, null);
+								document.execCommand(command, false, value || null);
 							}
 							else{
 								if(document.queryCommandEnabled(command) == state){
-									document.execCommand(command, false, null);
+									document.execCommand(command, false, value || null);
 								}
-								document.execCommand(command, false, null);
+								document.execCommand(command, false, value || null);
 							}
 							sel.removeAllRanges();
 						}, 1);
@@ -2399,8 +2765,25 @@ console.dir(html);
 					}
 				}
 				o.align = cell.getAttribute("data-align") || "l";
+				o.valign = cell.getAttribute("data-vertical-align") || "m";
 				if(o.align == "d"){
 					o.decimalChars = this.calculateDecimalCharacters(cell);
+				}
+				// calculate if you need vcell
+				if(!this.blacklistPackages["vcell"]){
+					if((before && before.vcell) || o.valign != "m"){
+						o.vcell = true;
+					}
+					else{
+						for(var i=0;i<row.length;i++){
+							if(row[i].cell && (row[i].cell.getAttribute("data-vertical-align") || "m") != "m"){
+								o.vcell = true;break;
+							}
+						}
+					}
+				}
+				else{
+					o.vcell = false;
 				}
 				o.getHeader = this.comparableHeader(before, o, after);
 				//o.header = o.getHeader(this.actualMainColor);
@@ -2432,6 +2815,25 @@ console.dir(html);
 				}
 				o.cellBackground = o.background;
 				o.content = this.generateForCell(cell, o.align, o.shrinkRatio, o);
+				o.getVCellContent = function(actualColor, forceMulti){
+					if(o.rowSpan != 1){
+						return "";
+					} else if(o.align == "d"){
+						o.content = "";
+						if(o.valign != "m"){
+							_this.uniqueLog("Vertical alignment of decimal-aligned cells is not supported yet.","warning");
+						}
+					}else if(o.valign == "t"){
+						o.content = "\\printcelltop";
+					}
+					else if(o.valign == "b"){
+						o.content = "\\printcellbottom";
+					}
+					else{
+						o.content = "\\printcellmiddle";
+					}
+					return o.getFullContent(actualColor, forceMulti);
+				}
 				o.getFullContent = function(actualColor, forceMulti){
 					var header = "", before = "",
 					content = o.content;
@@ -2486,9 +2888,14 @@ console.dir(html);
 							content = _this.multirow(ratio*cell.rowSpan, content);
 						}
 					}
-					else if(o.background){
-						_this.packages["colortbl"] = true;
-						content="{\\cellcolor"+getColor(o.background)+"}"+content;
+					else {
+						if(o.vcell && o.align != "d" && !_this.blacklistPackages["vcell"]){
+							content="\\vcell{"+content.replace(/\{tabular\}\[c\]/g,"{tabular}[b]")+"}";
+						}
+						if(o.background){
+							_this.packages["colortbl"] = true;
+							content="{\\cellcolor"+getColor(o.background)+"}"+content;
+						}
 					}
 					if(cell.colSpan != 1 || forceMulti || !o.isInPreambule){
 						header = o.getHeader(actualColor);
@@ -2554,16 +2961,16 @@ console.dir(html);
 						removeAllRules();
 					}
 					else{
-						n = Math.round(Math.max(n||1, 1));
+						n = Math.round(Math.max(n||1, 1))+1;
 						removeAllRules();
-						actual = [n, even, odd];
+						actual = [n-1, even, odd];
 						if(n%2<1){
-							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+even+";}");
-							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+odd+";}");
-						}
-						else{
 							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+odd+";}");
 							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+even+";}");
+						}
+						else{
+							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+even+";}");
+							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+odd+";}");
 						}
 
 					}
@@ -2612,6 +3019,7 @@ console.dir(html);
 									return content;
 								}
 							})(cell, refCell);
+							cell.getVCellContent = cell.getFullContent;
 						}
 						else{
 							// COLSPAN
@@ -2637,7 +3045,10 @@ console.dir(html);
 				var cell = this.selectedCell;
 				do{				
 					if (cell) {
-						this.Table.removeRow(cell.parentElement.rowIndex);
+						if(cell.closest && cell.closest("table").rows.length <= 2){
+							break;
+						}
+						this.Table.removeRow(cell.parentElement.rowIndex - 1);
 					}
 					if(!this.selectedCell || !this.selectedCell.parentElement){
 						this.selectedCell = null;
@@ -2650,6 +3061,9 @@ console.dir(html);
 				var cell = this.selectedCell;
 				do{
 					if (cell) {
+						if(cell.closest("table").rows[0].childNodes.length <= 1){
+							break;
+						}
 						this.Table.removeCol(this.Table.position(cell).x);
 					}
 					if(!this.selectedCell || !this.selectedCell.parentElement){
@@ -2756,7 +3170,7 @@ console.dir(html);
 					else if(type == "dottedline"){
 						before = char + "{\\arrayrulecolor"+getColor(color)+"}"
 						if(this.useTabu){
-							var border = "|["+this.tabuColor(color)+" on 4pt off 4pt";
+							var border = "|["+this.tabuColor(color)+" on 1pt off 1pt";
 							if(bg){
 								border += " "+this.tabuColor(bg)
 							}
@@ -2772,7 +3186,7 @@ console.dir(html);
 			this.toMWE = function(){
 				var element = this._id("c"),
 				src = element.value,
-				format = this._id("format").value;
+				format = this._id("format-in").value;
 				if(format == "latex" && src.indexOf("\\documentclass")<0){
 					var utf8 = !/^[\x00-\x7F]*$/.test(src);
 					src = src.replace(/^%\s*\\usepack/mg, "\\usepack");
@@ -2914,16 +3328,26 @@ console.dir(html);
 							o.globalDecimals = [first, second];							
 						}
 						if(o.span){
-							align2 = "c";
+							if(shrinkRatio){
+								align2 = "p{"+shrinkRatio+"\\linewidth}"
+							}
+							else{
+								align2 = "c";
+							}
 						}
 						else{
 							align2 = "S";
 							if(o.globalDecimals){
-								align2 += "[table-format="+o.globalDecimals[0]+"."+o.globalDecimals[1]+"]";
+								align2 += "[table-format="+o.globalDecimals[0]+"."
+									  +o.globalDecimals[1];
+								if(shrinkRatio){
+									align2+=",table-column-width="+shrinkRatio+"\\linewidth";
+								}
+								align2 += "]";
 							}
-						}
-						if(shrinkRatio){
-							_this.uniqueLog("The 'shrink columns' option won't work with decimal-alignment cells", "warning");
+							else if(shrinkRatio){
+								align2 += "[table-column-width="+shrinkRatio+"\\linewidth]"
+							}
 						}
 					}
 					else if(shrinkRatio){
@@ -3078,26 +3502,25 @@ console.dir(html);
 				this.buildBlacklist();
 				// Normalize the table
 				this.Table.normalize();
-				var format = $id("format")
+				var format = $id("format-in")
 					.value;
 				this.log = "";
 				if (format == "latex") {
-					$id("c")
-						.value = this.generateLaTeX();
+					$id("c").value = this.generateLaTeX();
 				} else {
 					this.interpret(format);
 				}
-				sendGAEvent("Code", "generate", format)
+				sendGAEvent("Code", "generate2", format)
 				this.message("Generated in " + ((+new Date()) - start) + "ms");
 				$id("log")
 					.innerHTML = "<strong>Log</strong> (" + ((new Date())
 						.toLocaleTimeString()) + ")<hr>" + this.log;
-				var supportus = $id("support-us");
-				supportus.classList.add("active");
 				if(!campaignUsed && start>+campaign.start && start<+campaign.end){
 					$("#campaignModal").modal("show");
 					campaignUsed = true;
 				}
+				var c = $id("c");
+				scrollTo(0, (c.getBoundingClientRect().top - document.body.getBoundingClientRect().top) - $id("nav-latex").offsetHeight - 15);
 			}
 			this.campaignClicked = function(){
 				campaignUsed = true;
@@ -3170,14 +3593,23 @@ console.dir(html);
 								cellsArrays[align] = [];
 							}
 							headernow[align]++;
+							if(cell.vcell){ // If we use `vcell`, the header will be counted twice because
+									// a fake row is used
+								headernow[align]++;
+							}
 							cellsArrays[align].push(cell);
 						}
 					}
 					var max = 0, value = "l";
 					for (var k in headernow) {
-						if (headernow.hasOwnProperty(k) && headernow[k] > max) {
-							max = headernow[k];
-							value = k;
+						if (headernow.hasOwnProperty(k)){
+							if(headernow[k] > max) {
+								max = headernow[k];
+								value = k;
+							}
+							else if(headernow[k] == max && k.length>value.length){
+								value = k;
+							}
 						}
 					}
 					var cellsArray = cellsArrays[value];
@@ -3333,6 +3765,7 @@ console.dir(html);
 				if(this.useTabu){
 					// we avoid \arrayrulecolor
 					this.actualMainColor = this.actualColor = "#000000";
+					this.message("Usage of <tt>tabu</tt> is <a href=\"https://github.com/tabu-issues-for-future-maintainer/tabu\">not recommanded</a> by the LaTeX3 Project Team.","warning");
 				}
 				if(!this.useTabu && (this.hasBorderType("hdashline") || this.hasBorderType("dottedline"))){
 					this.packages["arydshln"] = true;
@@ -3421,36 +3854,55 @@ console.dir(html);
 					}
 				}
 				else{
-					if(float){
-						firstPart = "\\begin{"+ (rotateTable ? "sidewaystable" : "table") +"}\n";
-					}
-					else{
-						firstPart = "\\noindent\\begin{minipage}{\\linewidth}\n";
-					}
-					if(this._id("table-opt-center").checked){
-						firstPart += "\\centering\n"
-					}
-					if(booktabColor){
-						firstPart += booktabColor;
-					}
-					if (caption.caption) {
-						if(caption.numbered){
-							this.packages["caption"] = true;
-							firstPart += "\\captionsetup{labelformat=empty}\n";
+					if(!float && rotateTable){
+						this.packages["adjustbox"] = true;
+						var adjustargs = ["angle=90","nofloat=table"];
+						if(caption.caption){
+							adjustargs.push("caption={"+caption.caption+"}");
 						}
+						if(caption.label){
+							adjustargs.push("label={"+caption.label+"}");
+						}
+						firstPart = "\\begin{adjustbox}{"+adjustargs.join(",")+"}\n";
+						if(this._id("table-opt-center").checked){
+							firstPart += "\\centering\n"
+						}
+						if(booktabColor){
+							firstPart += booktabColor;
+						}
+					}
+					else{ 
 						if(float){
-							firstPart += "\\caption{" + caption.caption + "}\n";
+							firstPart = "\\begin{"+ (rotateTable ? "sidewaystable" : "table") +"}\n";
 						}
 						else{
-							this.packages["caption"] = true;
-							firstPart += "\\captionof{table}{" + caption.caption + "}";
+							firstPart = "\\noindent\\begin{minipage}{\\linewidth}\n";
 						}
-					}
-					if (caption.label) {
-						if(!caption.caption){
-							firstPart += "\\refstepcounter{table}\n";
+						if(this._id("table-opt-center").checked){
+							firstPart += "\\centering\n"
 						}
-						firstPart += "\\label{" + caption.label + "}\n";
+						if(booktabColor){
+							firstPart += booktabColor;
+						}
+						if (caption.caption) {
+							if(caption.numbered){
+								this.packages["caption"] = true;
+								firstPart += "\\captionsetup{labelformat=empty}\n";
+							}
+							if(float){
+								firstPart += "\\caption{" + caption.caption + "}\n";
+							}
+							else{
+								this.packages["caption"] = true;
+								firstPart += "\\captionof{table}{" + caption.caption + "}";
+							}
+						}
+						if (caption.label) {
+							if(!caption.caption){
+								firstPart += "\\refstepcounter{table}\n";
+							}
+							firstPart += "\\label{" + caption.label + "}\n";
+						}
 					}
 					if(!areSameColors(startingColor, "black")){
 						firstPart += "\\arrayrulecolor" + getColor(startingColor) + "\n";
@@ -3466,11 +3918,15 @@ console.dir(html);
 				if(!useLongtable){
 					str += "\\begin{"+(useTabu ? "tabu" : "tabular")+"}{" + header + "}";
 				}
-				var rg2 = [],
-				multiRows = {};
+				var rg2 = [],rowIndex = [],isVCell = [],
+				multiRows = {},rowI=0;
 				for(var i=0;i<rg.length;i++){
 					var cells = rg[i];
 					var row = [];
+					var valign = false;
+					//if(!this.blacklistPackages["vcell"]){
+					//	valign = this.vcell(i,rg); // Vertical align
+					//}
 					for(var j=0;j<cells.length;j++){
 						var cell = cells[j],
 						header = colHeaders[j] || "l";
@@ -3496,6 +3952,9 @@ console.dir(html);
 								text = this.rowColor(i, rg);
 								if(text){ text += " " }
 							}
+							if(cell.vcell){
+								valign = true;
+							}
 							text += cell.getFullContent(this.actualColor);
 							row.push({
 									text: text, 
@@ -3503,42 +3962,86 @@ console.dir(html);
 								 })
 						}
 					}
+					isVCell.push(false);
+					rowIndex.push(rowI);
 					rg2.push(row);
+					if(valign){
+						row = [];
+						for(var j=0;j<cells.length;j++){
+							var cell = cells[j],
+							text = "";
+							if(!cell || cell.ignore){
+								row.push(false);
+							}
+							else{
+								var text = "";
+								if(j == 0){
+									// rowColor;
+									text = this.rowColor(i, rg);
+									if(text){ text += " " }
+								}
+								cell.vcell = false;
+								if((cell.refCell||cell).rowSpan == 1){
+									text += cell.getVCellContent(this.actualColor);
+								}
+								else{
+									var refCell = rg[(cell.refCell||cell).y+1][(cell.refCell||cell).x];											text += refCell.getVCellContent(this.actualColor);
+								}
+								row.push({
+									text: text, 
+									colSpan : cell.colSpan || (cell.refCell ? cell.refCell.colSpan : 1) || 1
+								})
+							}
+						}
+						rg2.push(row);
+						rowIndex.push(rowI);
+						isVCell.push(true);
+					}
+					rowI++;
 				}
 				var beautifyRows = this.beautifyRows(rg2);
 				var foundFirst = false;
 				for(var i=0;i<beautifyRows.length;i++){
 					var row = beautifyRows[i];
-					if (i === 0 && booktabs) {
-						if(borderNewLine){
-							border = " \n\\toprule";
+					if (isVCell[i]){
+						str += " \\\\";
+						if(useLongtable){
+							str += "*";
 						}
-						else{
-							border = " \\toprule";
-						}
-					} else {
-						border = this.getBorder(i, rg);
-						if(borderNewLine){
-							border = border ? " \n" + border : ""
-						}
-						else{
-							border = border ? " " + border : "";
-						}
+						str += "[-\\rowheight]";
 					}
-					if (i !== 0) {
-						if(!foundFirst && useLongtable && !multiRows[i]){
-							str += " \\endfirsthead";
+					else{
+						if (i === 0 && booktabs) {
+							if(borderNewLine){
+								border = " \n\\toprule";
+							}
+							else{
+								border = " \\toprule";
+							}
+						} else {
+							border = this.getBorder(rowIndex[i], rg);
+							if(borderNewLine){
+								border = border ? " \n" + border : ""
+							}
+							else{
+								border = border ? " " + border : "";
+							}
 						}
-						else{						
-							str += " \\\\";
+						if (rowIndex[i] !== 0) {
+							if(!foundFirst && useLongtable && !multiRows[rowIndex[i]]){
+								str += " \\endfirsthead";
+							}
+							else{						
+								str += " \\\\";
+							}
+							if(asteriskMultirow && multiRows[rowIndex[i]]){
+								str+= "*";
+							}
+							else{foundFirst = true;}
+							str += border
+						} else {
+							str += border;
 						}
-						if(asteriskMultirow && multiRows[i]){
-							str+= "*";
-						}
-						else{foundFirst = true;}
-						str += border
-					} else {
-						str += border;
 					}
 					str += "\n" + row;
 				}
@@ -3576,6 +4079,10 @@ console.dir(html);
 				if(str.indexOf("\\hhline")>-1){
 					this.packages["hhline"] = true;
 				}
+				if(str.indexOf("\\vcell")>-1){
+					this.packages["vcell"] = true;
+					this.uniqueLog("If you get an <kbd>File 'vcell.sty' not found</kbd> error, download the file <a href='https://ctan.org/pkg/vcell' target='_blank'>here</a> and install it in the same repertory as your table.","warning");
+				}
 				if(str.indexOf("\\arrayrulecolor") > -1 || firstPart.indexOf("\\arrayrulecolor") > -1 
 				   || str.indexOf("\\doublerulesepcolor") > -1 || firstPart.indexOf("\\doublerulesepcolor") > -1){
 					this.packages["colortbl"] = true;
@@ -3610,8 +4117,12 @@ console.dir(html);
 						str +="\\end{"+(rotateTable ? "sidewaystable" : "table")+"}";
 					}
 					else{
-						this.message("Rotated tables without float are not supported for now.","warning"); //TODO
-						str += "\\end{minipage}";
+						if(rotateTable){
+							str+= "\\end{adjustbox}";
+						}
+						else{
+							str += "\\end{minipage}";
+						}
 					}
 				}
 				else if(rotateTable){
@@ -3947,7 +4458,7 @@ console.dir(html);
 					for (var i = 0; i < row.length; i++) {
 						var cell = row[i];
 						cell = cell.cell || cell.refCell.cell;
-						if (cell.parentElement.rowIndex + cell.rowSpan != n) {
+						if (cell.parentElement.rowIndex - 1 + cell.rowSpan != n) {
 							if(border[i-1]){
 								complete = false;
 							}
@@ -3962,7 +4473,7 @@ console.dir(html);
 						color = cell.style.borderBottomColor;
 						if (!bd && row2[i]) {
 							var cell = row2[i];
-							if (cell.cell || (cell.refCell.cell.parentElement.rowIndex == n + 1)) {
+							if (cell.cell || (cell.refCell.cell.parentElement.rowIndex - 1 == n + 1)) {
 								bd = (cell.cell || cell.refCell.cell)
 									.getAttribute("data-border-top"),
 								color = (cell.cell || cell.refCell.cell).style.borderTopColor;
@@ -4078,7 +4589,7 @@ console.dir(html);
 					.href = "";
 			}
 			this.prepareEmail = function(){
-				var format = $id("format").value,
+				var format = $id("format-in").value,
 				result = "";
 				if (format == "latex") {
 					result = this.generateLaTeX();
@@ -4087,6 +4598,32 @@ console.dir(html);
 				}
 				this._id("link-email").href = "mailto:?subject=Table&body=" + encodeURIComponent(result);
 				$('#email').modal('show');
+			}
+			this.vcell = function(n, matrix){
+				matrix = matrix || this.matrix();
+				var row = matrix[n];
+				if(!row || !row.length){return;}
+				var align = null,needVCell = false;
+				for(var i=0;i<row.length;i++){
+					var cell = row[i];
+					if(cell.refCell){continue;}
+					var cellalign = (cell.refCell||cell).cell.getAttribute("data-vertical-align") || "m";
+					if(align && cellalign != align){
+						needVCell = true;
+					}
+					else{
+						align = cellalign;
+					}
+				}
+				if(needVCell){
+					for(var i=0;i<row.length;i++){
+						var cell = row[i];
+						if(cell.refCell){continue}
+						(cell.refCell||cell).vcell = true;
+					}
+					return true;
+				}
+				return false;
 			}
 			this.rowColor = function (n, matrix){
 				matrix = matrix || this.matrix();
@@ -5082,8 +5619,8 @@ console.dir(html);
 window.addEventListener("beforeunload", function() {
 	if (window.table) {
 		localStorage.setItem("table", JSON.stringify(table.exportToJSON()));
-		if ($id("format")) {
-			localStorage.setItem("table_format", $id("format")
+		if ($id("format-in")) {
+			localStorage.setItem("table_format", $id("format-in")
 				.value);
 		}
 	}

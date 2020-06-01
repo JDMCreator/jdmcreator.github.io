@@ -58,12 +58,6 @@
 				else if(cell.getAttribute("data-align") == "r"){
 					ocell.style.textAlign = "right";
 				}
-				if(cell.getAttribute("data-vertical-align") == "b"){
-					ocell.style.verticalAlign = "bottom";
-				}
-				else if(cell.getAttribute("data-vertical-align") == "t"){
-					ocell.style.verticalAlign = "top";
-				}
 				if(booktabs){
 					if(i === 0){
 						ocell.style.borderTop = "2px solid black";

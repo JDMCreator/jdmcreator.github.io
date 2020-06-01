@@ -6,51 +6,6 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
-Version 2.0 (2020/05/31)
-==========
-
-| Note on this release:
-|     Vertical alignment of cells, new interface and Wikicode export
-
-CORE
-
-[+] New look for the toolbar, with new icons and new labels
-[+] Better accessibility for the toolbar
-[+] New "Find & Replace" function
-[+] Rows and columns are now numbered. You can click on the letter/number to
-    select it.
-[+] The webpage now scrolls to the textarea when the code is generated
-[+] New "vcell" and "adjustbox" package options ("adjustbox" is disabled)
-[+] New icons for diagonal cells
-[+] New "caret" and transitions to hide the right toolbar
-[/] Output format and settings moved next to the "Generate" button
-[/] "Undo" and "Generate" icons moved next to the `File` dropdown
-[/] "Tables properties" section moved in a modal dialog
-[/] "Borders" section moved to the toolbar
-[#] It's now impossible to remove a row/column if it's the only one
-
-LATEX EXPORT
-
-[+] Support for vertical alignment with `vcell`
-[+] `Shrink` option is now supported with decimal-aligned cells
-[+] New algorithm for the header of the table now try to use the longest "header" of the column
-    when there's a tie to avoid long `multicolumn`
-[+] Rotated table without float are now supported
-[+] Warning when `tabu` is used (not recommanded anymore by the LaTeX3 Project Team) 
-[#] Fixed a bug where dotted borders could appeared dashed with `tabu`
-
-LATEX IMPORT
-
-[+] Support for vertical alignment with `vcell`
-
-WIKICODE EXPORT
-
-[+] New module
-
-HTML EXPORT
-
-[+] Support for vertical alignment
-
 Version 1.9.1 (2020/05/04)
 ==========
 

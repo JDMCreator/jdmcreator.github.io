@@ -238,3 +238,12 @@ html #table[data-booktabs] tr:first-child td{
 	padding-top:0.65ex !important;
 	border-top:2px solid black !important;
 }
+#table td{
+	vertical-align:middle;
+}
+#table td[data-vertical-align="t"]{
+	vertical-align:top;
+}
+#table td[data-vertical-align="b"]{
+	vertical-align:bottom;
+}

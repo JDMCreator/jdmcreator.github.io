@@ -110,7 +110,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0a5";
+			this.version = "1.9.1";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -120,7 +120,6 @@ function $id(id) {
 				}
 				this.element.innerHTML = "";
 				this.element.appendChild(fr);
-				this.Table.update();
 				this.loadAllFootnotes();
 			};
 			this.importData = function(content, format){
@@ -217,13 +216,7 @@ function $id(id) {
 			this.selectFormat = function(format){
 				$("div[data-option-group]").hide();
 				$("div[data-option-group=\""+format+"\"]").show();
-				var drop = $id("format-drop");
-				var li = drop.querySelector('li[data-value="'+format+'"]');
-				if(li){
-					var btn = $id("format-btn");
-					btn.setAttribute("data-value", format);
-					btn.innerHTML = li.innerText+' <span class="caret"></span>';
-				}
+				$id("format").value = format;
 				$id("format-in").value = format;
 			}
 			this.removeAllSelection = function() {
@@ -490,7 +483,8 @@ function $id(id) {
 			}
 			this.textColor = function(color){
 				if(color){
-					this._id("text-color-span").style.borderBottomColor = color;
+					this._id("text-color-input").value = color;
+					this._id("text-color-span").style.color = color;
 					this._id("text-color-button").setAttribute("data-color", color);
 				}
 				else{
@@ -1059,7 +1053,6 @@ this.getHTML = (function(){
 			})(this)
 			this.selectionAllowed = true;
 			this.hasShownBorderEditorInfo = false;
-			this.topWidth = 100;
 			this.mode = function(n) {
 				if (arguments.length == 0) {
 					if (document.body.hasAttribute("data-view-editor")) {
@@ -1070,33 +1063,16 @@ this.getHTML = (function(){
 					}
 					return 0;
 				} else {
+					$id("button-mode-edit")
+						.classList.remove("active");
 					$id("button-mode-border")
 						.classList.remove("active");
-					$id("button-mode-border").setAttribute("aria-pressed","false")
 					$id("button-mode-view")
 						.classList.remove("active");
-					$id("button-mode-view").setAttribute("aria-pressed","false")
-					var toolbarGroup = document.querySelector(".toolbar-groups"),
-					buttonStyleGroup = document.getElementById("btn-group-btn-style");
-					if(n !== 2){
-						if(toolbarGroup.offsetWidth == 0){
-							window.requestAnimationFrame((function(){
-								toolbarGroup.style.width = this.topWidth + "px";
-								toolbarGroup.classList.add("toolbar-group-visible")
-								buttonStyleGroup.classList.remove("toolbar-group-visible")
-								buttonStyleGroup.style.display = "none";
-							}).bind(this));
-						}
-					}
-					else{
-						this.topWidth = toolbarGroup.offsetWidth;
-						window.requestAnimationFrame(function(){
-							buttonStyleGroup.style.display = "flex";
-							toolbarGroup.style.width = "0";
-							toolbarGroup.classList.remove("toolbar-group-visible")
-							buttonStyleGroup.classList.add("toolbar-group-visible")
-						});
-					}
+					$id("panel-draw-border")
+						.classList.remove("active");
+					$id("button-border-draw")
+						.classList.remove("active");
 					// Set
 					if (n == 1 || n == 2) {
 						var l = this.element.querySelectorAll("div[contenteditable]");
@@ -1110,8 +1086,7 @@ this.getHTML = (function(){
 							document.body.removeAttribute("data-border-editor")
 							document.body.setAttribute("data-view-editor", "data-view-editor");
 							$id("button-mode-view")
-								.classList.add("active");							$id("button-mode-view")
-							$id("button-mode-view").setAttribute("aria-pressed","true");
+								.classList.add("active");
 						} else {
 							// Border
 							if (!this.hasShownBorderEditorInfo) {
@@ -1124,7 +1099,10 @@ this.getHTML = (function(){
 							document.body.setAttribute("data-border-editor", "data-border-editor");
 							$id("button-mode-border")
 								.classList.add("active");
-							$id("button-mode-border").setAttribute("aria-pressed","true")
+							$id("panel-draw-border")
+								.classList.add("active");
+							$id("button-border-draw")
+								.classList.add("active");
 						}
 					} else {
 						// Edit
@@ -1136,6 +1114,8 @@ this.getHTML = (function(){
 							(l[i] || {})
 							.contentEditable = true
 						}
+						$id("button-mode-edit")
+							.classList.add("active");
 					}
 					if(n != 2){
 						// If we are not in the border editor, we hide information about it
@@ -1144,107 +1124,7 @@ this.getHTML = (function(){
 				}
 			}
 			this.log = "";
-			this.findReplace = function(){
-				var text = document.getElementById("findreplace-from").value,
-				replace = document.getElementById("findreplace-to").value,
-				mode = document.getElementById("findreplace-mode").value;
-				if(text){
-					this.statesManager.registerState();
-					var elements;
-					if(mode == "1"){
-						elements = this.element.querySelectorAll("td[data-selected] div[contenteditable]");
-					}
-					else if(mode == "2"){
-						elements = this.element.querySelectorAll("td:not([data-selected]) div[contenteditable]");
-					}
-					else{
-						elements = this.element.querySelectorAll("td div[contenteditable]");
-					}
-					var nb = this.findReplaceElements(text,replace,elements);
-				}
-				else{nb = 0}
-				alert(nb+" instance"+(nb>1?"s":"")+" replaced");
-				$("#findreplace-dialog").modal("hide");
-			}
-			this.findReplaceElements = function(text, replace, elements){
-				// let's build a regexp
-				var regexp = "";
-				for(var i=0;i<text.length;i++){
-					if(i>0){
-						regexp+="((?:<(?!\s*\/?\s*(?:br|li|ul|p|div))[^>]+?>)*)";
-					}
-					var c = text[i];
-					regexp+="(?:";
-					if(c == ">"){
-						regexp+="&gt;";
-					}
-					else if(c == "<"){
-						regexp+="&lt;";
-					}
-					else if(c == "&"){
-						regexp+="(?:&amp;|&)";
-					}
-					else if(c == '"'){
-						regexp+='(?:&quot;|")';
-					}
-					else if(c == "\\" || c == "(" || c == ")" || c == "/" || c == "." || c == "[" || c == "]" || c ==  "?" || c == "*" || c == "+" || c == "^" || c == "$"){
-						regexp+= "\\"+c;
-					}
-					else if(c == " "){
-						regexp+="\s+";
-					}
-					else{
-						regexp+=c;
-					}
-					regexp+=")(?!([^<]+)?>)";
-				}
-				var div = document.createElement("div"), nb = 0;
-				div.innerText = replace;
-				replace = div.innerHTML;
-				for(var i=0;i<elements.length;i++){
-					var html = elements[i].innerHTML
-					var newhtml = html.replace(new RegExp(regexp,"gi"),function(full){
-						// let's build overtags;
-						var tags = [],
-						tagName = [];
-						for(var i=1;i<arguments.length-2;i++){
-							if(!arguments[i]){continue;}
-							arguments[i].replace(/<\s*(\/?)\s*([a-z]+)[^>]*?>/gi, function(full,close,tagname){
-								tagname = tagname.toLowerCase();
-								if(close){
-									if(tagName[tagName.length-1] == tagname){
-										tagName.pop();
-										tags.pop();
-									}
-									else{
-										tags.push(full);
-										tagName.push("/"+tagname);
-									}
-								}
-								else{
-									tagName.push(tagname);
-									tags.push(full);
-								}
-							});
-						}
-						nb++
-						return replace+tags.join("");
-					});
-					if(newhtml != html){
-						elements[i].innerHTML = newhtml;
-					}
-				}
-				return nb;
-			}
 			var logArchive = {};
-			this.showFootnotePanel = function(){
-				$('#right_cell').collapse('hide');
-				$('#right_footnote').collapse('show');
-			}
-			this.toggleFootnotePanel = function(){
-				$('#right_cell').collapse('toggle');
-				$('#right_footnote').collapse('toggle');
-			}
 			this.uniqueLog = function(text, type){
 				if(!logArchive[text]){
 					this.message(text, type);
@@ -1347,7 +1227,6 @@ this.getHTML = (function(){
 					this.element.removeChild(this.element.firstChild);
 				}
 				this.element.appendChild(table);
-				this.Table.update();
 			}
 			this.exportToJSON = function(useHTML) {
 				var o = {options:{}},
@@ -1364,7 +1243,7 @@ this.getHTML = (function(){
 					option = options[i];
 					o.options[option.id.substring(option.id.indexOf("-")+1)] = (option.type == "radio" || option.type == "checkbox") ? option.checked : option.value;
 				}
-				for (var i = 1; i < table.rows.length; i++) {
+				for (var i = 0; i < table.rows.length; i++) {
 					var cells = table.rows[i].cells;
 					o.cells.push([]);
 					for (var j = 0; j < cells.length; j++) {
@@ -1500,16 +1379,15 @@ this.getHTML = (function(){
 			}
 			this.autoBooktabs = function() {
 				this.statesManager.registerState();
-				var table = this.element,
-				btn = $id('button-booktabs');
+				var table = this.element;
 				if (table.hasAttribute("data-booktabs")) {
 					table.removeAttribute("data-booktabs");
-					btn.className = "";
-					btn.setAttribute("aria-pressed", "false");
+					$id('button-booktabs')
+						.className = "btn btn-default";
 				} else {
 					table.setAttribute("data-booktabs", "data-booktabs");
-					btn.className = "active";
-					btn.setAttribute("aria-pressed", "true");
+					$id('button-booktabs')
+						.className = "btn btn-default active";
 				}
 			}
 			this._clickCellManager = function(event) {
@@ -1524,7 +1402,7 @@ this.getHTML = (function(){
 				where = where.toLowerCase();
 				var where2 = where.charAt(0).toUpperCase() + where.substring(1);
 				return element.getAttribute("data-border-" + where.toLowerCase()) == document.getElementById('border').value
-					&& areSameColors(element.style["border"+where2+"Color"], document.getElementById('border-color').getAttribute("data-value"));
+					&& areSameColors(element.style["border"+where2+"Color"], document.getElementById('border-color').value);
 			}
 			this.setBorder = function(element, where, affect, index, othercells, index2){
 				// Okay, this is an ugly fix, but it is way easier to do it
@@ -1579,7 +1457,7 @@ this.getHTML = (function(){
 				if((where == "left" || where == "right") && style == "trimfull"){
 					style = "normal";
 				}
-				var color = this._id("border-color").getAttribute("data-value");
+				var color = this._id("border-color").value;
 				var css = "1px solid " + color;
 				if(style == "toprule" || style == "bottomrule"){
 					css = "2px solid " + color;
@@ -1632,18 +1510,14 @@ this.getHTML = (function(){
 				});
 			}
 			this.borderPick = function(){
-				var _this = this,
-				borderColor = this._id("border-color")
-				ColorPicker.get(borderColor.style.borderBottomColor || "#000000", function(color){
-					borderColor.style.borderBottomColor = color;
-					borderColor.setAttribute("data-value", color);
-				});
+				var _this = this;
+				ColorPicker.get(this._id("border-color"));
 			}
 			this.setAllBorders = function() {
 				this.statesManager.registerState();
 				var borderType = document.getElementById('border')
 					.value,
-					color = this._id("border-color").getAttribute("data-value"),
+					color = this._id("border-color").value,
 					border = "1px solid " + color;
 				if (borderType == "toprule" || borderType == "bottomrule") {
 					border = "2px solid " + color;
@@ -1912,6 +1786,9 @@ this.getHTML = (function(){
 				waitingforpaste = false,
 				waitingfortab = false,
 				improvePaste = false;
+				$id("support-us").addEventListener("animationend",function(){
+					this.classList.remove("active");
+				}, false);
 				if(window.MutationObserver){
 					var observer = new MutationObserver(_this.footnoteObserver.bind(_this));
 					observer.observe(table, { childList: true, subtree: true});
@@ -1920,44 +1797,6 @@ this.getHTML = (function(){
 					document.getElementById("panel-footnotes").style.display = "none";
 					document.getElementById("group-footnotes").style.display = "none";
 				}
-				table.addEventListener("click", function(e){
-					if(!document.body.hasAttribute("data-border-editor")){
-						var target = e.target || e.srcElement;
-						target = target.nodeType == 3 ? target.parentElement : target;
-						if(target.tagName == "TD" && target.parentElement.rowIndex === 0){
-							var matrix = _this.Table.matrix();
-							for(var i=0;i<matrix.length;i++){
-								var row = matrix[i];
-								for(var j=0;j<row.length;j++){
-									var cell = row[j];
-									cell = (cell.refCell||cell).cell;
-									if(j === target.cellIndex){
-										cell.setAttribute("data-selected","data-selected");
-									}
-									else if(!e.ctrlKey && cell.hasAttribute("data-selected")){
-										cell.removeAttribute("data-selected");
-									}
-								}
-							}
-						}
-						else if(target.tagName == "TR"){
-							var matrix = _this.Table.matrix();
-							for(var i=0;i<matrix.length;i++){
-								var row = matrix[i];
-								for(var j=0;j<row.length;j++){
-									var cell = row[j];
-									cell = (cell.refCell||cell).cell;
-									if(i === target.rowIndex-1 || target.rowIndex === 0){
-										cell.setAttribute("data-selected","data-selected");
-									}
-									else if(!e.ctrlKey && cell.hasAttribute("data-selected")){
-										cell.removeAttribute("data-selected");
-									}
-								}
-							}
-						}
-					}	
-				});
 				table.addEventListener("paste", function(e) {
 					if(improvePaste){
 						improvePaste = false;
@@ -2078,145 +1917,6 @@ console.dir(html);
 				document.execCommand("styleWithCSS", false, false);
 				document.execCommand("insertBrOnReturn", false, false);
 				this.Table = new Table(table);
-				this.Table.shadowFirstRow = true;
-				if(document.querySelector(".toolbar-group-container")){
-					// New code
-					var toolbarContainer = document.querySelector(".toolbar-group-container");
-					var caretFont = toolbarContainer.querySelector(".btn-caret");
-					toolbarContainer.addEventListener("keydown", function(e){
-						if(e.keyCode == 37){ // Left
-							var focus = toolbarContainer.querySelector(":focus");
-							var btns = toolbarContainer.querySelectorAll(".toolbar-group-visible button, .toolbar-group-visible .btn-caret[aria-expanded='true'] + #font-color-picker td[tabindex]");
-							if(!focus){btns[0].focus()}
-							else{
-								for(var i=0;i<btns.length;i++){
-									if(btns[i] == focus){
-										if(btns[i-1]){btns[i-1].focus()}
-										break;
-									}
-								}
-							}
-						}
-						else if(e.keyCode == 39){ // Right
-							var focus = toolbarContainer.querySelector(":focus"),
-							btns = toolbarContainer.querySelectorAll(".toolbar-group-visible button, .toolbar-group-visible .btn-caret[aria-expanded='true'] + #font-color-picker td[tabindex]");
-							if(!focus){btns[0].focus()}
-							else{
-								for(var i=0;i<btns.length;i++){
-									if(btns[i] == focus){
-										if(btns[i+1]){btns[i+1].focus()}
-										break;
-									}
-								}
-							}
-						}
-						else if(e.keyCode == 36){ // Home
-							toolbarContainer.querySelector(".toolbar-group-visible button").focus();
-						}
-						else if(e.keyCode == 35){ // End
-							var allButtons = toolbarContainer.querySelectorAll(".toolbar-group-visible button");
-							allButtons[allButtons.length-1].focus();
-						}
-					},false)
-					var that = this;
-					caretFont.addEventListener("click", function(e){
-						that.toggleFontColorPicker(this);
-						e.stopPropagation();
-					}, false);
-					document.addEventListener("click", function(e){
-						if(caretFont.getAttribute("aria-expanded") == "true"){
-							that.toggleFontColorPicker(caretFont);
-						}
-					}, false);
-					document.addEventListener("keydown", function(e){
-						if(e.keyCode == 27 && caretFont.getAttribute("aria-expanded") == "true"){
-							that.toggleFontColorPicker(caretFont);
-						}
-					},false);
-					var tdFont = toolbarContainer.querySelectorAll("td[data-color]");
-					for(var i=0;i<tdFont.length;i++){
-						var color = tdFont[i].getAttribute("data-color");
-						tdFont[i].style.backgroundColor = color;
-						tdFont[i].title = color[0].toUpperCase() + color.substring(1);
-					}
-					toolbarContainer.querySelector("table").addEventListener("mousedown", function(e){e.preventDefault()}, false);
-					document.getElementById("font-color-picker").addEventListener("click", function(e){
-						if(e.originalTarget.tagName == "TD"){
-							e.preventDefault();
-							var color = e.originalTarget.getAttribute("data-color");
-							if(color){
-								that.toggleExecCommand('foreColor', color);
-								that.textColor(color);
-							}
-							else{
-								var text = e.originalTarget.innerText;
-								if(text.indexOf("Auto") >= 0){	
-									that.textColor("#000000");
-									document.getElementById("text-color-button").setAttribute("data-color", "none");
-								}
-								else if(text.indexOf("More") >= 0){
-									color = document.getElementById("text-color-button").getAttribute("data-color");
-									color = (color || "#000000");
-									ColorPicker.get(color == "none" ? "#000000" : color, that.textColor.bind(that))
-								}
-							}
-						}
-					}, false);
-					document.getElementById("format-drop").addEventListener("click", function(e){
-						var li = e.originalTarget;
-						if(li.tagName == "A"){li = li.parentElement;}
-						if(li.tagName == "LI" && li.hasAttribute("data-value")){
-							that.selectFormat(li.getAttribute("data-value"));
-						}
-						e.preventDefault();
-					}, false);
-					$(document).on("hidden.bs.collapse", "#right_footnote", function(e){
-						alert("Closed");
-					},false);
-				}
-			}
-			this.setTextColor = function(color){
-				color = color || "#000000";
-				if(color == "none"){
-					this.toggleExecCommand("foreColor", "black");
-				}
-				else{
-					this.toggleExecCommand('foreColor', color)
-				}
-			}
-			this.toggleFontColorPicker = function(el){
-				var fontPicker = document.getElementById("font-color-picker");
-				if(el.getAttribute("aria-expanded") == "false"){
-
-					var colors = ColorPicker.getTableColorScheme(),
-					themeTD = document.getElementById("font-color-theme").querySelectorAll("td");
-					for(var j=0;j<themeTD.length;j++){
-						var color = colors[j], td = themeTD[j];
-						if(color){
-							color = ColorPicker.toHex(color.map(parseFloat));
-							td.title = ntc.name(color)[1];
-							td.setAttribute("data-color", color);
-							td.tabIndex = "0";
-							td.style.backgroundColor = color;
-						}
-						else{
-							td.removeAttribute("title");
-							td.removeAttribute("data-color");
-							td.removeAttribute("tabindex");
-							td.style.backgroundColor = "transparent";
-						}
-					}
-
-
-					el.setAttribute("aria-expanded", "true");
-					fontPicker.style.display = "block";
-					fontPicker.style.left = (el.offsetLeft - document.querySelector(".toolbar-group-container").scrollLeft) + "px";
-					fontPicker.style.top = (el.offsetTop + el.offsetHeight) + "px";
-				}
-				else{
-					el.setAttribute("aria-expanded", "false");
-					fontPicker.style.display = "none";
-				}
 			}
 			this.refreshRotatedCellSize = function(td){
 				// - Get the width and set it as the height
@@ -2645,13 +2345,13 @@ console.dir(html);
 							if(!foundFirst){
 								foundFirst = true;
 								state = !document.queryCommandEnabled(command);
-								document.execCommand(command, false, value || null);
+								document.execCommand(command, false, null);
 							}
 							else{
 								if(document.queryCommandEnabled(command) == state){
-									document.execCommand(command, false, value || null);
+									document.execCommand(command, false, null);
 								}
-								document.execCommand(command, false, value || null);
+								document.execCommand(command, false, null);
 							}
 							sel.removeAllRanges();
 						}, 1);
@@ -2854,16 +2554,16 @@ console.dir(html);
 						removeAllRules();
 					}
 					else{
-						n = Math.round(Math.max(n||1, 1))+1;
+						n = Math.round(Math.max(n||1, 1));
 						removeAllRules();
-						actual = [n-1, even, odd];
+						actual = [n, even, odd];
 						if(n%2<1){
-							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+odd+";}");
-							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+even+";}");
-						}
-						else{
 							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+even+";}");
 							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+odd+";}");
+						}
+						else{
+							addRule("#table tr:nth-child(2n+"+n+") td {background-color:"+odd+";}");
+							addRule("#table tr:nth-child(2n+"+(n+1)+") td {background-color:"+even+";}");
 						}
 
 					}
@@ -2937,7 +2637,7 @@ console.dir(html);
 				var cell = this.selectedCell;
 				do{				
 					if (cell) {
-						this.Table.removeRow(cell.parentElement.rowIndex - 1);
+						this.Table.removeRow(cell.parentElement.rowIndex);
 					}
 					if(!this.selectedCell || !this.selectedCell.parentElement){
 						this.selectedCell = null;
@@ -3072,7 +2772,7 @@ console.dir(html);
 			this.toMWE = function(){
 				var element = this._id("c"),
 				src = element.value,
-				format = this._id("format-in").value;
+				format = this._id("format").value;
 				if(format == "latex" && src.indexOf("\\documentclass")<0){
 					var utf8 = !/^[\x00-\x7F]*$/.test(src);
 					src = src.replace(/^%\s*\\usepack/mg, "\\usepack");
@@ -3378,25 +3078,26 @@ console.dir(html);
 				this.buildBlacklist();
 				// Normalize the table
 				this.Table.normalize();
-				var format = $id("format-in")
+				var format = $id("format")
 					.value;
 				this.log = "";
 				if (format == "latex") {
-					$id("c").value = this.generateLaTeX();
+					$id("c")
+						.value = this.generateLaTeX();
 				} else {
 					this.interpret(format);
 				}
-				sendGAEvent("Code", "generate2", format)
+				sendGAEvent("Code", "generate", format)
 				this.message("Generated in " + ((+new Date()) - start) + "ms");
 				$id("log")
 					.innerHTML = "<strong>Log</strong> (" + ((new Date())
 						.toLocaleTimeString()) + ")<hr>" + this.log;
+				var supportus = $id("support-us");
+				supportus.classList.add("active");
 				if(!campaignUsed && start>+campaign.start && start<+campaign.end){
 					$("#campaignModal").modal("show");
 					campaignUsed = true;
 				}
-				var c = $id("c");
-				scrollTo(0, (c.getBoundingClientRect().top - document.body.getBoundingClientRect().top) - $id("nav-latex").offsetHeight - 15);
 			}
 			this.campaignClicked = function(){
 				campaignUsed = true;
@@ -4246,7 +3947,7 @@ console.dir(html);
 					for (var i = 0; i < row.length; i++) {
 						var cell = row[i];
 						cell = cell.cell || cell.refCell.cell;
-						if (cell.parentElement.rowIndex - 1 + cell.rowSpan != n) {
+						if (cell.parentElement.rowIndex + cell.rowSpan != n) {
 							if(border[i-1]){
 								complete = false;
 							}
@@ -4261,7 +3962,7 @@ console.dir(html);
 						color = cell.style.borderBottomColor;
 						if (!bd && row2[i]) {
 							var cell = row2[i];
-							if (cell.cell || (cell.refCell.cell.parentElement.rowIndex - 1 == n + 1)) {
+							if (cell.cell || (cell.refCell.cell.parentElement.rowIndex == n + 1)) {
 								bd = (cell.cell || cell.refCell.cell)
 									.getAttribute("data-border-top"),
 								color = (cell.cell || cell.refCell.cell).style.borderTopColor;
@@ -4377,7 +4078,7 @@ console.dir(html);
 					.href = "";
 			}
 			this.prepareEmail = function(){
-				var format = $id("format-in").value,
+				var format = $id("format").value,
 				result = "";
 				if (format == "latex") {
 					result = this.generateLaTeX();
@@ -5381,8 +5082,8 @@ console.dir(html);
 window.addEventListener("beforeunload", function() {
 	if (window.table) {
 		localStorage.setItem("table", JSON.stringify(table.exportToJSON()));
-		if ($id("format-in")) {
-			localStorage.setItem("table_format", $id("format-in")
+		if ($id("format")) {
+			localStorage.setItem("table_format", $id("format")
 				.value);
 		}
 	}
