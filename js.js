@@ -111,7 +111,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0";
+			this.version = "2.0.1";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -2195,15 +2195,15 @@ this.getHTML = (function(){
 					}
 					toolbarContainer.querySelector("table").addEventListener("mousedown", function(e){e.preventDefault()}, false);
 					document.getElementById("font-color-picker").addEventListener("click", function(e){
-						if(e.originalTarget.tagName == "TD"){
+						if((e.target || e.originalTarget || e.srcElement).tagName == "TD"){
 							e.preventDefault();
-							var color = e.originalTarget.getAttribute("data-color");
+							var color = (e.target || e.originalTarget || e.srcElement).getAttribute("data-color");
 							if(color){
 								that.toggleExecCommand('foreColor', color);
 								that.textColor(color);
 							}
 							else{
-								var text = e.originalTarget.innerText;
+								var text = (e.target || e.originalTarget || e.srcElement).innerText;
 								if(text.indexOf("Auto") >= 0){	
 									that.textColor("#000000");
 									document.getElementById("text-color-button").setAttribute("data-color", "none");
@@ -2217,7 +2217,7 @@ this.getHTML = (function(){
 						}
 					}, false);
 					document.getElementById("format-drop").addEventListener("click", function(e){
-						var li = e.originalTarget;
+						var li = e.target || e.originalTarget || e.srcElement;
 						if(li.tagName == "A"){li = li.parentElement;}
 						if(li.tagName == "LI" && li.hasAttribute("data-value")){
 							that.selectFormat(li.getAttribute("data-value"));

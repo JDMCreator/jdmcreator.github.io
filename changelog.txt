@@ -6,6 +6,18 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+
+Version 2.0.1 (2020/06/29)
+==========
+
+| Note on this release:
+|     Bug fixes
+
+CORE
+
+[/] Changed style of selected cells because of changes of the Chrome core styling
+[#] Impossible to select font color for other browser than Firefox (#25)
+
 Version 2.0 (2020/05/31)
 ==========
 

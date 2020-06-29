@@ -1014,3 +1014,6 @@ html #table[data-booktabs] tr:first-child td{
 #table td[data-vertical-align="b"]{
 	vertical-align:bottom;
 }
+#table div[contenteditable]:focus{
+	outline:1px dotted #222;
+}
