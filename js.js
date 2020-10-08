@@ -14,9 +14,9 @@ function $id(id) {
 	/* ==== START CAMPAIGN INFO ==== */
 
 	var campaign = {
-		start: new Date(2018,11,2),
-		end: new Date(2018,11,17),
-		year:2019
+		start: new Date(2020,10,2),
+		end: new Date(2020,11,20),
+		year:2020
 	},
 	campaignUsed = localStorage.getItem("campaign") == campaign.year,
 
@@ -111,7 +111,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0.1";
+			this.version = "2.0.2";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -892,8 +892,6 @@ this.getHTML = (function(){
 			_eqHTML(div.childNodes[i], cont)
 		}
 		var html = cont.innerHTML.replace(/<\/(b|i)\s*>(\s*)<\s*(b|i)\s*>/gi, function(full, close, space, open){
-
-			alert(open.substring(0,4).toLowerCase()+"|"+close.toLowerCase());
 			if(open.toLowerCase() == close.toLowerCase()){
 				return space;
 			}
@@ -3377,7 +3375,12 @@ this.getHTML = (function(){
 								before += "\\RaggedLeft"
 							}
 						}
-						align2 = "p{"+shrinkRatio+"\\linewidth}";
+						if(o.vcell){
+							align2 = "p{"+shrinkRatio+"\\linewidth}";
+						}
+						else{
+							align2 = "m{"+shrinkRatio+"\\linewidth}";
+						}
 					}
 					if(rightBorder){
 						rightColor = rightColor || "#000000";

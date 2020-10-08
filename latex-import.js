@@ -400,7 +400,7 @@ var tabular = tabularReg.exec(code);
 				}	
 		}
 		var head;
-		if(type == "tabular" || type == "xtabular" || type == "mpxtabular" || type == "longtable" || type == "longtabu"){
+		if(type == "tabular" || type == "xtabular" || type == "mpxtabular" || type == "longtable"){
 			head = header(initEnv.command.args[1]);
 		}
 		else if(type == "tabular*" || type == "tabularx" || type == "tabulary" || type == "tabularht" || type == "tabularkv"){
@@ -409,7 +409,7 @@ var tabular = tabularReg.exec(code);
 		else if(type == "tabularht*" || type == "tabularhtx"){
 			head = header(initEnv.command.args[3]);
 		}
-		else if(type == "tabu" || type == "tabu*"){
+		else if(type == "tabu" || type == "tabu*" || type == "longtabu" || type == "longtabu*"){
 			// Because "tabu" supports "tabu to <dim>" and "tabu spread <dim>", we need to handle these special and rarely used cases
 			if(initEnv.command.args.length == 2){
 				head = header(initEnv.command.args[1]);

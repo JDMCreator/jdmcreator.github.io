@@ -7,6 +7,25 @@ Legend
 Dates use a YYYY/MM/DD format.
 
 
+Version 2.0.2 (2020/10/08)
+==========
+
+| Note on this release:
+|     Bug fixes
+
+CORE
+
+[#] An alert dialog could show up in some cases
+
+LATEX EXPORT
+
+[#] Issue with middle-aligned cells when using `Shrink` option (#26)
+
+LATEX IMPORT
+
+[#] Impossible to load `longtabu* to <dim>` and `longtabu* spread <dim>` environments
+[#] Impossible to load `longtabu to <dim>` and `longtabu spread <dim>` environments (#29)
+
 Version 2.0.1 (2020/06/29)
 ==========
 
