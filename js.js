@@ -111,7 +111,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0.2";
+			this.version = "2.0.3";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -2311,7 +2311,7 @@ this.getHTML = (function(){
 					}
 				});
 			}
-			this.generateFromHTML = function(html, ignoreMultiline, align) {
+			this.generateFromHTML = function(html, ignoreMultiline, align, oldEq) {
 				align = align || "l";
 				if(html.indexOf("<")<0 && html.indexOf("[")<0){
 					return this.fastGenerateFromHTML(html, ignoreMultiline, align);
@@ -2319,7 +2319,7 @@ this.getHTML = (function(){
 				var div = document.createElement("div"), hasMultiline;
 				div.innerHTML = html;
 				var el = div.querySelectorAll("span.latex-equation");
-				var eq = []
+				var eq = oldEq || []
 				for (var i = 0; i < el.length; i++) {
 					var equation_text = (el[i].innerText || el[i].textContent);
 					if(/\S/.test(equation_text)){
@@ -2350,7 +2350,7 @@ this.getHTML = (function(){
 								continueWhile = false;
 							}
 						}
-						lis.push(this.generateFromHTML(liHTML, false, align));
+						lis.push(this.generateFromHTML(liHTML, false, align, eq));
 					}
 					if(align.charAt(0) == "p"){
 						ULs.push("\\begin{tabular}{@{}>{\\labelitemi\\hspace{\\dimexpr\\labelsep+0.5\\tabcolsep}}"+align+"}"
