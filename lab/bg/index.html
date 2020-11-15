@@ -15,6 +15,12 @@
 .content,button,button.btn-style-1{
 	font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
+.full-height{
+	min-height:100vh;
+	min-height:-webkit-fill-available;
+	//min-height:-moz-available;
+	min-height:stretch;
+}
 .content h1, .content h2, .content p{
 	margin-top:3px;
 	margin-bottom:3px;
@@ -183,7 +189,7 @@ viewport and otherwise they will act like a static background.</p>
 </p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
 </p>
 </div>
-<div class="bg bg-split content" style="--bg-split:75%;height:100vh;--bg1:lavender;--bg2:#734f96;">
+<div class="bg bg-split content full-height" style="--bg-split:60%;--bg1:lavender;--bg2:#734f96;">
 <div class="flex split-menu">
 	<span>Home</span>
 	<span>About Us</span>
@@ -192,8 +198,8 @@ viewport and otherwise they will act like a static background.</p>
 	<span>Donate</span>	
 </div>
 &nbsp;
-	<div style="margin-left:auto;margin-right:auto;transform:translateX(100pt);--bg-left-offset:100pt;
-		    margin-top:50vh;padding:2rem;width:60%;box-sizing:border-box;--bg-width:60" class="bg bg-split bg-switch">
+	<div style="margin-left:auto;margin-right:auto;transform:translateX(40pt);--bg-left-offset:40pt;
+		    margin-top:50vh;padding:2rem;width:40%;box-sizing:border-box;--bg-width:40" class="bg bg-split bg-switch">
 
 <div style="font-family: 'Titillium Web', sans-serif;font-size:3.5em;">Hi.</div>
 <button class="btn-style-1">Join</button>

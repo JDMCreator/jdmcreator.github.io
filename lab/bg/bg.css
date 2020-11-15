@@ -21,6 +21,12 @@ html,body{margin:0;padding:0;}
 	--bg-emph-intensity:20;
 	--bg-effect-background:linear-gradient(0deg, rgba(0,0,0,calc(var(--bg-emph-intensity) / 200)),rgba(0,0,0,calc(var(--bg-emph-intensity) / 200))),linear-gradient(0deg, rgba(255,255,255,calc(var(--bg-emph-intensity) / 100)),rgba(255,255,255,calc(var(--bg-emph-intensity) / 100)));
 }
+:root .bg-emph-hover{
+	--bg-emph-hover-intensity:20;
+}
+:root .bg-emph-hover:hover{
+	--bg-effect-background:linear-gradient(0deg, rgba(0,0,0,calc(var(--bg-emph-hover-intensity) / 200)),rgba(0,0,0,calc(var(--bg-emph-hover-intensity) / 200))),linear-gradient(0deg, rgba(255,255,255,calc(var(--bg-emph-hover-intensity) / 100)),rgba(255,255,255,calc(var(--bg-emph-hover-intensity) / 100)));
+}
 :root .bg-bold{
 	--bg-bold-start-point:50%;
 	--bg-emph-intensity:20;
@@ -49,7 +55,13 @@ html,body{margin:0;padding:0;}
 
 .bg.bg-snap:not(.bg-parallax):before{
 	height:100%;
+	height:-webkit-fill-available;
+	//height:-moz-available;
+	height:stretch;
 	max-height:100vh;
+	max-height:-webkit-fill-available;
+	//max-height:-moz-available;
+	max-height:stretch;
 	top:0px;
 	position:sticky;
 	display:block;
