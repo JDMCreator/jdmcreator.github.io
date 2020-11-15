@@ -1,0 +1,123 @@
+.bg{
+--bg-effect-background:none;
+--bg-snd-background:none;
+}
+.bg:not(.bg-inherit){
+	--bg:rgba(0,0,0,0);
+	--img:linear-gradient(var(--bg),var(--bg));
+	--bg-position:center;
+	--bg-size:cover;
+	--bg-repeat:no-repeat;
+	--bg-filter:none;
+	--bg-animation:none;
+	--bg-opacity:1;
+}
+html,body{margin:0;padding:0;}
+/*************/
+/** EFFECTS **/
+/*************/
+
+:root .bg-emph{
+	--bg-emph-intensity:20;
+	--bg-effect-background:linear-gradient(0deg, rgba(0,0,0,calc(var(--bg-emph-intensity) / 200)),rgba(0,0,0,calc(var(--bg-emph-intensity) / 200))),linear-gradient(0deg, rgba(255,255,255,calc(var(--bg-emph-intensity) / 100)),rgba(255,255,255,calc(var(--bg-emph-intensity) / 100)));
+}
+:root .bg-bold{
+	--bg-bold-start-point:50%;
+	--bg-emph-intensity:20;
+	--bg-effect-background:radial-gradient(at top left, transparent,transparent var(--bg-bold-start-point), rgba(0,0,0,calc(var(--bg-bold-intensity,var(--bg-emph-intensity) / 40)))),radial-gradient(at top left, transparent,transparent var(--bg-bold-start-point), rgba(255,255,255,calc(var(--bg-bold-intensity,var(--bg-emph-intensity)) / 50)));
+}
+
+
+/*************/
+/*  POSITION */
+/*************/
+
+.bg.bg-parallax, .bg.bg-snap, .bg.bg-static, .bg.bg-split{
+	--bg-top-margin:0px;
+	position:relative;
+}
+.bg.bg-parallax:before, .bg.bg-snap:before, .bg.bg-static:before, .bg.bg-split:before{
+	content:"";
+	z-index:-1;
+	background:var(--bg-snd-background),var(--bg-effect-background),var(--bg-position) / var(--bg-size) var(--bg-repeat) var(--img);
+	filter:var(--bg-filter);
+	animation:var(--bg-animation);
+	opacity:var(--bg-opacity);
+}
+
+/* Snap */
+
+.bg.bg-snap:not(.bg-parallax):before{
+	height:100%;
+	max-height:100vh;
+	top:0px;
+	position:sticky;
+	display:block;
+}
+.bg.bg-snap > *:first-child{
+	margin-top:-100vh;
+}
+/* Parallax */
+.bg.bg-parallax{
+	--bg-speed:2;
+height:100%;
+transform-origin-x:100%;
+transform-style:preserve-3d;
+perspective-origin: bottom right;
+}
+.bg.bg-parallax:before{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateZ(calc(var(--bg-speed) * -1px)) scale(calc(1.1 + var(--bg-speed)));
+}
+.bg-parallax-container{
+	height:100vh;
+	overflow-y:auto;
+	perspective:1px;
+	perspective-origin-x: 100%;
+	overflow-x:hidden;
+}
+/* Static */
+.bg-static:before, .bg-split:before{
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+}
+/* Split */
+.bg-split:before{
+	--img: linear-gradient(to right,var(--bg1, var(--bg)) var(--bg-split, 50%),var(--bg2) var(--bg-split, 50%));
+}
+/* Switch */
+.bg-switch.bg-split:before{
+	--img: linear-gradient(to right,var(--bg2) var(--bg-split, 50%),var(--bg1, var(--bg)) var(--bg-split, 50%));
+	background:initial;
+	background-image:var(--img);
+	background-position:left calc(50% - var(--bg-left-offset, 0pt)) top 0;
+	background-size:calc(100% / var(--bg-width, 100) * 100) 100vh;
+}
+/* Default */
+.bg{
+	//transform: translate3d(0,0,0);
+}
+.bg:not(.bg-parallax):not(.bg-snap):not(.bg-static):not(.bg-split){
+	background:var(--bg-snd-background),var(--bg-effect-background),var(--img);
+}
+
+
+
+
+/*============EXAMPLES=============*/
+
+@keyframes colorchange
+    {
+      0%   {--bg: red;}
+      25%  {--bg: yellow;}
+      50%  {--bg: blue;}
+      75%  {--bg: green;}
+      100% {--bg: red;}
+    }

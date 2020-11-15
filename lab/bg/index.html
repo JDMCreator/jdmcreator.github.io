@@ -1,0 +1,255 @@
+<html>
+<head>
+<link href="prism.css" rel="stylesheet">
+<link href="bg.css" rel="stylesheet">
+<script type="text/javascript" src="prism.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@900&display=swap" rel="stylesheet"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bg.css</title>
+<style>
+*,div{
+    margin-block-start:0;
+        margin-block-end:0;
+}
+.content,button,button.btn-style-1{
+	font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.content h1, .content h2, .content p{
+	margin-top:3px;
+	margin-bottom:3px;
+}
+.content p{
+	text-indent:2ex;
+}
+.content code:not([class]){
+	background:rgba(133,133,133,0.5);
+	border-radius:3px;
+	padding:3px;
+}
+.btn-style-1{
+	all:unset;
+	background:black;
+	color:lavender;
+	padding:0.5ex 3ex;
+	border-radius:40px;
+	cursor:pointer;
+}
+.flex{display:flex;}
+.flex > *{flex-grow:1;}
+.split-menu > *{
+	text-align:center;
+	font-weight:bold;
+	font-size:16pt;
+	text-decoration:underline;
+	text-decoration-thickness: 3px;
+}
+.split-menu > *:hover{
+	text-decoration:underline;
+	color:red;
+}
+.btn-style-1:hover, .btn-style-1:focus{
+	background:lavender;
+	color:black;
+}
+</style>
+</head>
+<body>
+<div class="<!--bg-parallax-container-->">
+<div class="bg bg-static content" style="
+	--bg:lavender;min-height:100vh;padding:20vmin;">
+<h1>BG.CSS</h1>
+<h2>Basics</h2>
+
+<strong>bg.css</strong> provides several classes and tools to easily build complex backgrounds. They should help your website to stand out
+and to give it the character you are looking for. A very basic background, such this lavender one, can be written as such :
+
+
+<script type="text/plain" class="language-html">
+<section class="bg bg-static" style="--bg:lavender;min-height:100vh;">
+	Your content.
+</section>
+</script>
+
+<h2>CSS Variables</h2>
+
+<ul>
+	<li> <code>--img</code> : The url of an image to use as background (e.g. <code>--img:url(yourimage.jpeg);</code>).
+	<li> <code>--bg</code> : A <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value" target="_blank"><code>&lt;color&gt;</code></a>
+	to use as background.
+	<li> <code>--bg-position</code> : Equivalent of CSS property <code>background-position</code>. Default : <code>center</code>.
+	<li> <code>--bg-size</code> : Equivalent of CSS property <code>background-size</code>. Default : <code>cover</code>.
+	<li> <code>--bg-repeat</code> : Equivalent of CSS property <code>background-repeat</code>. Default : <code>no-repeat</code>.
+	<li> <code>--bg-filter</code> : Equivalent of CSS property <code>filter</code>. Default : <code>none</code>.
+	<li> <code>--bg-animation</code> : Equivalent of CSS property <code>animation</code>, to animate the background. Default : <code>none</code>.
+	<li> <code>--bg-opacity</code> : Opacity of the whole background. Default : <code>1</code>.
+</ul>
+
+</div>
+
+<div class="bg bg-emph <!--bg-parallax-->" style="
+	--img:url(https://images.pexels.com/photos/1878095/pexels-photo-1878095.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940);
+	white-spaces:pre;color:white;">
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p></div>
+
+
+
+
+
+<div class="bg bg-static bg-bold" style="--bg:lavender;--bg-opacity:0.8;--bg-animation:colorchange 50s;">
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p>
+</div>
+
+<div class="bg bg-snap" style="
+	--img:url(https://images.pexels.com/photos/1878095/pexels-photo-1878095.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940);
+	white-spaces:pre;
+">
+	<div style="margin-left:20vw;width:60vw;padding:40vh 3rem;--bg:white;--bg-opacity:0.8;" class="bg bg-static content">
+
+<h2>Snap background</h2>
+
+<p>Snap backgrounds are backgrounds that "lock" once they are in the viewport and then "unlock" once you have scroll past the content.
+
+<p>Snap backgrounds create impressive and visually-pleasing effects. They also help create immersive reading of the content. Because they are
+written in pure CSS, they are really responsive.
+
+<p>They are also really useful for programmers because they are <strong>height independant</strong> : They will only work if the height of the content is higher than
+viewport and otherwise they will act like a static background.</p>
+
+<p>The minimal code for snap background is a block container inside another block container with classes <code>bg</code> and <code>bg-snap</code>&nbsp;:</p>
+
+<script type="text/plain" class="language-html">
+<section class="bg bg-snap" style="--img:url(yourimage.jpeg);">
+	<!-- Your content need to be inside another block element -->
+	<div>
+		Your content...
+	</div>
+</section>
+
+</script>
+<p>There are no specific CSS variables for snap backgrounds.
+
+</div>
+</div>
+
+<div class="bg bg-sticky" style="--bg:lavender;">
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et purus in est suscipit feugiat id vel diam. Aenean faucibus pharetra purus lacinia porttitor. Nulla aliquet nibh vel arcu scelerisque sagittis. Aliquam sed elit tincidunt, dignissim felis a, tincidunt urna. In convallis, libero in lobortis hendrerit, nisl ipsum efficitur nisl, vel fermentum ex dolor a metus. Suspendisse vitae tempus enim. Nunc quis erat quis sem ullamcorper cursus. In nec orci vel nulla scelerisque ullamcorper.
+</p>
+</div>
+<div class="bg bg-split content" style="--bg-split:75%;height:100vh;--bg1:lavender;--bg2:#734f96;">
+<div class="flex split-menu">
+	<span>Home</span>
+	<span>About Us</span>
+	<span>Our Mission</span>
+	<span>Our Team</span>
+	<span>Donate</span>	
+</div>
+&nbsp;
+	<div style="margin-left:auto;margin-right:auto;transform:translateX(100pt);--bg-left-offset:100pt;
+		    margin-top:50vh;padding:2rem;width:60%;box-sizing:border-box;--bg-width:60" class="bg bg-split bg-switch">
+
+<div style="font-family: 'Titillium Web', sans-serif;font-size:3.5em;">Hi.</div>
+<button class="btn-style-1">Join</button>
+</div>
+</div>
+<div class="content bg bg-static" style="margin-left:20vw;width:60vw;padding:3rem;--bg:white;">
+
+<h2>Split background</h2>
+
+<p>Split backgrounds are a serie of utilies that help you build a background made of two colors.
+
+<p>The minimal code for snap background is a block container with classes <code>bg</code> and <code>bg-split</code>&nbsp;:</p>
+
+<script type="text/plain" class="language-html">
+<section class="bg bg-split" style="--bg1:yellow;--bg2:red;--bg-split:70%">
+	Your content
+</section>
+</script>
+The following specific variables can be used :
+
+<ul>
+	<li> <code>--bg1</code> or <code>--bg</code> : Your first color.
+	<li> <code>--bg2</code> : Your second color.
+	<li> <code>--bg-split</code> : A dimension where the split will occur. Default : 50%.
+</ul>
+
+<h3>Switch background</h3>
+
+Inside a split background, you may want to use switch background to easily provide contrast. The width of such a block should be a defined as a percentage
+of its parent width and it should be placed relative to the center.
+
+<script type="text/plain" class="language-html">
+<section class="bg bg-split switch-block-container">
+	Your text over.
+	<div class="bg bg-split bg-switch switch-block">Your content</div>
+	Your text under.
+</section>
+</script>
+<script type="text/plain" class="language-css">
+.switch-block-container {
+	--bg1:yellow;
+	--bg2:red;
+	--bg-split:70%;
+}
+.switch-block{
+	// margin-left and margin-right centers the DIV
+	margin-left:auto;
+	margin-right:auto;
+	width:60%
+	// We just copy the width but without the percentage sign.
+	--bg-width:60;
+	// The container will be off-center by `100px`
+	transform:translateX(100px);
+	--bg-left-offset:100px;
+}
+</script>
+</div>
+</body>
+</html>
