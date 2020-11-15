@@ -2,6 +2,7 @@
 <head>
 <link href="prism.css" rel="stylesheet">
 <link href="bg.css" rel="stylesheet">
+<script type="text/javascript" src="bg.js"></script>
 <script type="text/javascript" src="prism.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@900&display=swap" rel="stylesheet"> 
@@ -16,10 +17,8 @@
 	font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 .full-height{
-	min-height:100vh;
-	min-height:-webkit-fill-available;
-	//min-height:-moz-available;
-	min-height:stretch;
+	min-height:var(--bg-vh,100vh);
+	min-height:var(--bg-vh,-webkit-fill-available);
 }
 .content h1, .content h2, .content p{
 	margin-top:3px;
@@ -72,10 +71,13 @@ and to give it the character you are looking for. A very basic background, such 
 
 
 <script type="text/plain" class="language-html">
-<section class="bg bg-static" style="--bg:lavender;min-height:100vh;">
+<section class="bg bg-static min-full-height" style="--bg:lavender;">
 	Your content.
 </section>
 </script>
+
+Backgrounds are rendered as a pseudo-element (<code>::before</code>) with a <code>z-index</code> of <code>-1</code> and this is why you should use provided CSS Variables to manipulate it instead
+of using traditional CSS properties.
 
 <h2>CSS Variables</h2>
 
@@ -90,6 +92,13 @@ and to give it the character you are looking for. A very basic background, such 
 	<li> <code>--bg-animation</code> : Equivalent of CSS property <code>animation</code>, to animate the background. Default : <code>none</code>.
 	<li> <code>--bg-opacity</code> : Opacity of the whole background. Default : <code>1</code>.
 </ul>
+
+<h2>JavaScript File</h2>
+
+<p>A small (<0.5KB) Javascript File, named <code>bg.js</code> is provided to fix an <a href="https://css-tricks.com/the-trick-to-viewport-units-on-mobile/">issue with viewport units in mobile</a>.
+This file is <strong>optional</strong> and everything should work regardless. However, some margins may appears here and there.
+
+<p> You can include the file anywhere you want in your webpage, at any time, and everything will work by itself.
 
 </div>
 
@@ -193,7 +202,6 @@ viewport and otherwise they will act like a static background.</p>
 <div class="flex split-menu">
 	<span>Home</span>
 	<span>About Us</span>
-	<span>Our Mission</span>
 	<span>Our Team</span>
 	<span>Donate</span>	
 </div>

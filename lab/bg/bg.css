@@ -13,6 +13,22 @@
 	--bg-opacity:1;
 }
 html,body{margin:0;padding:0;}
+
+/***************/
+/** VH SUPPORT */
+/***************/
+
+@supports (height: -webkit-fill-available) {
+	:root{
+		--bg-back-vh: -webkit-fill-available;
+	}
+}
+@supports not (height: -webkit-fill-available) {
+	:root{
+		--bg-back-vh : 100vh;
+	}
+}
+
 /*************/
 /** EFFECTS **/
 /*************/
@@ -55,19 +71,13 @@ html,body{margin:0;padding:0;}
 
 .bg.bg-snap:not(.bg-parallax):before{
 	height:100%;
-	height:-webkit-fill-available;
-	//height:-moz-available;
-	height:stretch;
-	max-height:100vh;
-	max-height:-webkit-fill-available;
-	//max-height:-moz-available;
-	max-height:stretch;
+	max-height:var(--bg-vh, var(--bg-back-vh));
 	top:0px;
 	position:sticky;
 	display:block;
 }
 .bg.bg-snap > *:first-child{
-	margin-top:-100vh;
+	margin-top:calc(var(--bg-vh, 100vh) * -1);
 }
 /* Parallax */
 .bg.bg-parallax{
@@ -120,6 +130,13 @@ perspective-origin: bottom right;
 	background:var(--bg-snd-background),var(--bg-effect-background),var(--img);
 }
 
+/*********/
+/* UTILS */
+/*********/
+
+.min-full-height{
+	min-height:var(--bg-vh, var(--bg-back-vh));
+}
 
 
 
