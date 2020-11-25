@@ -24,6 +24,15 @@ if (screen.colorDepth >= 48   && window.matchMedia('(color-gamut: p3)').matches)
 	html:not(.avif) #avif-supported{display:none}
 	html.hdr #hdr-notsupported{display:none;}
 	html:not(.hdr) #hdr-supported{display:none;}
+
+#b{display:none;border:3px solid red;}
+#a{border:3px solid green;display:inline-block;}
+#h:hover #a{
+	display:none;
+}
+#h:hover #b{
+	display:inline-block;
+}
 </style>
 </head>
 <body>
@@ -33,9 +42,18 @@ if (screen.colorDepth >= 48   && window.matchMedia('(color-gamut: p3)').matches)
 	<div id="hdr-supported" class="supported">HDR supported</div>
 	<div id="hdr-notsupported" class="notsupported">HDR not supported</div>
 </div>
-	<picture>
-		<source srcset="photo.avif" type="image/avif">
-		<img src="photo.png" alt="Description of Photo">
+<div id="h">
+<div id="a">
+	<picture  style="width:90%">
+		<source srcset="photo.avif" style="width:90%" type="image/avif">
+		<img src="photo.png" style="width:90%" alt="Description of Photo">
 	</picture>
+</div>
+<div id="b">
+	<picture >
+		<img src="photo.png" style="width:90%" alt="Description of Photo">
+	</picture>
+</div>
+</div>
 </body>
 </html>
