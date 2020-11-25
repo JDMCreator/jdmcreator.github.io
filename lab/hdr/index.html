@@ -1,0 +1,23 @@
+<html>
+<head>
+<script type="text/javascript">
+var AVIF = new Image();
+AVIF.onload = AVIF.onerror = function () {
+	if(AVIF.height == 2){
+		alert("Supported");
+	}
+	else{
+		alert("Not supported");
+	}
+}
+AVIF.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=';
+
+</script>
+</head>
+<body>
+	<picture>
+		<source srcset="photo.avif" type="image/avif">
+		<img src="photo.png" alt="Description of Photo">
+	</picture>
+</body>
+</html>S
