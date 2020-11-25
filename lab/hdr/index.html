@@ -1,23 +1,41 @@
 <html>
 <head>
 <script type="text/javascript">
+var html = document.querySelector("html");
 var AVIF = new Image();
+var avifSupport = false;
+var hdrSupport = false;
 AVIF.onload = AVIF.onerror = function () {
 	if(AVIF.height == 2){
-		alert("Supported");
-	}
-	else{
-		alert("Not supported");
+		html.classList.add("avif");
+		avifSupport = true;
 	}
 }
 AVIF.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=';
-
+if (screen.colorDepth >= 48   && window.matchMedia('(color-gamut: p3)').matches){
+	html.classList.add("hdr");
+	hdrSupport = true;
+}
 </script>
+<style media="all" type="text/css">
+	.supported{color:green;font-weight:bold;}
+	.notsupported{color:red;font-weight:bold;}
+	html.avif #avif-notsupported{display:none;}
+	html:not(.avif) #avif-supported{display:none}
+	html.hdr #hdr-notsupported{display:none;}
+	html:not(.hdr) #hdr-supported{display:none;}
+</style>
 </head>
 <body>
+<div>
+	<div id="avif-supported" class="supported">AVIF supported</div>
+	<div id="avif-notsupported" class="notsupported">AVIF not supported</div>
+	<div id="hdr-supported" class="supported">HDR supported</div>
+	<div id="hdr-notsupported" class="notsupported">HDR not supported</div>
+</div>
 	<picture>
 		<source srcset="photo.avif" type="image/avif">
 		<img src="photo.png" alt="Description of Photo">
 	</picture>
 </body>
-</html>S
+</html>
