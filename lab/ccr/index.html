@@ -1,0 +1,622 @@
+<div id="a">COPY COPY COPY <ol>
+<li> A1
+<li> B1
+<li> C1
+<ol><li>C.1
+<li>C.2</ol>
+<li>D</ol></div>
+<div contenteditable style="border:1px dotted black" id="b">heyd</div>
+
+<div contenteditable style="border:1px dotted black" id="c">Paste here</div>
+
+<textarea id="d"></textarea>
+
+<textarea id="e"></textarea>
+<div id="div">
+<ol data-list-format="$1°$| ($2)$3)$>." data-list-style="font-weight:bold;" data-list-type="0" start="3" id="r">
+	<li> A
+	<li data-list-start-group> B
+	<li data-list-end-group value="3"> B
+	<li> C
+		<ol data-list-type="0">
+			<li> D
+				<ol>
+					<li> E
+					<li> F
+				</ol>
+			<li> G
+
+				<ol data-list-format="$1$| ($2)($3)$>.">
+					<li> E
+					<li> F
+				</ol>
+		</ol>
+	</li>
+	<li> H
+</ol>
+
+dd
+</div>
+<button onclick="COPYWORD()">Copy to Word</button>
+<div>
+<textarea id="z"></textarea>
+<script type="text/javascript">
+
+var text = `<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<style>
+<!--
+ /* List Definitions */
+ @list l0
+	{mso-list-id:1210384442;
+	mso-list-template-ids:1935573208;}
+@list l0:level1
+	{mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:18.0pt;
+	text-indent:-18.0pt;}
+@list l0:level2
+	{mso-level-text:"%1\.%2\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:39.6pt;
+	text-indent:-21.6pt;}
+@list l0:level3
+	{mso-level-text:"%1\.%2\.%3\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:61.2pt;
+	text-indent:-25.2pt;}
+@list l0:level4
+	{mso-level-text:"%1\.%2\.%3\.%4\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:86.4pt;
+	text-indent:-32.4pt;}
+@list l0:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:111.6pt;
+	text-indent:-39.6pt;}
+@list l0:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:136.8pt;
+	text-indent:-46.8pt;}
+@list l0:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:162.0pt;
+	text-indent:-54.0pt;}
+@list l0:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:187.2pt;
+	text-indent:-61.2pt;}
+@list l0:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:216.0pt;
+	text-indent:-72.0pt;}
+@list l1
+	{}
+@list l1:level1
+	{mso-level-start-at:2;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:18.0pt;
+	text-indent:-18.0pt;}
+@list l1:level2
+	{mso-level-number-format:decimal-enclosed-circle;
+	mso-level-text:"2\.1%2";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:39.6pt;
+	text-indent:-21.6pt;}
+@list l1:level3
+	{mso-level-text:"%1\.%2\.%3\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:61.2pt;
+	text-indent:-25.2pt;}
+@list l1:level4
+	{mso-level-text:"%1\.%2\.%3\.%4\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:86.4pt;
+	text-indent:-32.4pt;}
+@list l1:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:111.6pt;
+	text-indent:-39.6pt;}
+@list l1:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:136.8pt;
+	text-indent:-46.8pt;}
+@list l1:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:162.0pt;
+	text-indent:-54.0pt;}
+@list l1:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:187.2pt;
+	text-indent:-61.2pt;}
+@list l1:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:216.0pt;
+	text-indent:-72.0pt;}
+@list l2
+	{mso-list-id:1414545061;
+	mso-list-template-ids:1579866302;}
+@list l2:level1
+	{mso-level-start-at:2;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:18.0pt;
+	text-indent:-18.0pt;}
+@list l2:level2
+	{mso-level-start-at:2;
+	mso-level-text:"%1\.%2\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:39.6pt;
+	text-indent:-21.6pt;}
+@list l2:level3
+	{mso-level-text:"%1\.%2\.%3\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:61.2pt;
+	text-indent:-25.2pt;}
+@list l2:level4
+	{mso-level-text:"%1\.%2\.%3\.%4\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:86.4pt;
+	text-indent:-32.4pt;}
+@list l2:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:111.6pt;
+	text-indent:-39.6pt;}
+@list l2:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:136.8pt;
+	text-indent:-46.8pt;}
+@list l2:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:162.0pt;
+	text-indent:-54.0pt;}
+@list l2:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:187.2pt;
+	text-indent:-61.2pt;}
+@list l2:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9\.";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:216.0pt;
+	text-indent:-72.0pt;}
+ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+</head>
+
+<body>
+<!--StartFragment-->
+<![if !supportLists]>
+OL/UL
+<![endif]>
+<!--[if supportLists]>
+Word Lists
+<![endif]-->
+<p style='mso-list:l0 level1 lfo1;mso-add-space:auto;'><![if !supportLists]><span><span style='mso-list:Ignore'>1.<span>&nbsp;&nbsp;&nbsp;&nbsp; </span></span></span>
+<![endif]><span>Allo</span></p>
+
+<p style='mso-list:l0 level1 lfo1;mso-add-space:auto;'><![if !supportLists]><span><span style='mso-list:Ignore'>2.<span>&nbsp;&nbsp;&nbsp;&nbsp; </span></span></span><![endif]><span>Test</span></p>
+
+<p style='mso-list:l0 level2 lfo1;mso-add-space:auto;'><![if !supportLists]><span><span style='mso-list:Ignore'>2.1.<span>&nbsp; </span></span></span><![endif]><span>Test</span></p>
+
+<p style='mso-list:l1 level2 lfo3;mso-add-space:auto;'><![if !supportLists]><span><span style='mso-list:Ignore'>2.1dddda<span> </span></span></span><![endif]><span>Test</span></p>
+
+<p style='mso-list:l0 level2 lfo1;mso-add-space:auto;'><![if !supportLists]><span><span style='mso-list:Ignore'>2.2.<span>&nbsp; </span></span></span><![endif]><span>Test</span></p>
+
+<p style='mso-list:l0 level1 lfo1;mso-add-space:auto;'><![if !supportLists]><span><span style='mso-list:Ignore'>3.<span>&nbsp;&nbsp;&nbsp;&nbsp; </span></span></span><![endif]><span>a</span></p>
+
+<!--EndFragment-->
+</body>
+
+</html>`;
+function getHTML(){
+	var selection = window.getSelection();
+	if (selection.rangeCount > 0) {
+		var range = selection.getRangeAt(0);
+		var clonedSelection = range.cloneContents();
+		var div = document.createElement('div');
+		div.appendChild(clonedSelection);
+		return div.innerHTML;
+	}
+	return "";
+}
+function createClass(name,rules){
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    document.getElementsByTagName('head')[0].appendChild(style);
+    if(!(style.sheet||{}).insertRule) 
+        (style.styleSheet || style.sheet).addRule(name, rules);
+    else
+        style.sheet.insertRule(name+"{"+rules+"}",0);
+}
+document.querySelector("#a").addEventListener('copy', function(e) {
+  alert(getHTML());
+  e.clipboardData.setData('text/plain', 'Hello, world!');
+  e.clipboardData.setData('text/html', text);
+
+  // This is necessary to prevent the current document selection from
+  // being written to the clipboard.
+  e.preventDefault();
+});
+document.querySelector("#div").addEventListener('copy', function(e) {
+  var html = COPYWORD();
+ // e.clipboardData.setData('text/plain', 'Hello, world!');
+  e.clipboardData.setData('text/html', html);
+console.info(html);
+
+  // This is necessary to prevent the current document selection from
+  // being written to the clipboard.
+  e.preventDefault();
+});
+document.querySelector("#c").addEventListener('paste', function(e) {
+	var val = e.clipboardData.types.join(",");
+	if (e.clipboardData.types.indexOf('application/x-vnd.google-docs-document-slice-clip+wrapped') > -1){
+    		document.getElementById("e").value=(e.clipboardData.getData('application/x-vnd.google-docs-document-slice-clip+wrapped'));
+	}
+	if (e.clipboardData.types.indexOf('text/html') > -1) {
+    		val += "\n"+(e.clipboardData.getData('text/html'));
+	}
+	document.getElementById("d").value = val;
+});
+
+var listStyles = {
+	"a" : "lower-alpha",
+	"A" : "upper-alpha",
+	"0" : "decimal-leading-zero",
+	"1" : "decimal",
+	"i" : "lower-roman",
+	"I" : "upper-roman",
+	"alpha" : "lower-greek"
+}
+var wordListStyles = {
+	"a" : "alpha-lower",
+	"A" : "alpha-upper",
+	"0" : "decimal-zero",
+	"i" : "roman-lower",
+	"I" : "roman-upper",
+	"alpha" : "greek-lower"
+}
+function getActualFormat(format, level){
+	format = format.replace(new RegExp("(?:\\$"+(level+1)+".*?\\$\\>|\\$"+(level+1)+".*)",""),"$>");
+	if(format.indexOf("$|",format.lastIndexOf("$"+level)) > -1){
+		var next = "";
+		if(format.indexOf("$>") > -1){
+			next = format.substring(format.indexOf("$>")+2);
+		}
+		format = format.substring(0,format.indexOf("$|",format.lastIndexOf("$"+level))) + next;
+	}
+	return format.replace(/\$[\|\>]/g, "");
+}
+function defineStyle(el, counters){
+	var format = null, parent = el;
+	var level = 0;
+	if(!counters){counters = []}
+	do{
+		if(parent.tagName != "LI" && parent.tagName != "OL" && parent.tagName != "UL"){
+			break;
+		}
+		if(parent.tagName == "OL" || parent.tagName == "UL"){
+			level++;
+		}
+		if(!format && parent.hasAttribute("data-list-format")){
+			format = parent.getAttribute("data-list-format");
+		}
+	}while(parent = parent.parentElement);
+	if(!format){format = "$1."};
+	if(level <= 0){level = 1};
+	var start = (Number(el.getAttribute("start")) || 1) - 1;
+	var id="list"+Math.ceil(Math.random()*10000);
+	var type = el.getAttribute("data-list-type") || "1";
+	type = listStyles[type] || type;
+	counters.push("counter("+id+", "+type+")");
+	format = getActualFormat(format,level)
+	for(var i=0;i<counters.length;i++){
+		format = format.replace(new RegExp("\\$"+(i+1),"g"), "\" "+counters[i]+" \"");
+	}
+	format = "\"" + format + "\"";
+	el.setAttribute("data-list-format-id",id);
+	createClass("[data-list-format-id='"+id+"']","list-style-type:none;counter-reset:"+id+" "+start+";")
+	createClass("ol[data-list-format-id='"+id+"'] > li:before, li[data-list-format-id='"+id+"']:before","counter-increment:"+id+";content:"+format+";"+(el.getAttribute("data-list-style")||""))
+
+	var ol = el.querySelectorAll(":scope > li > ol");
+	for(var i=0;i<ol.length;i++){
+		defineStyle(ol[i], counters.slice());
+	}
+	for(var i=0,c;i<el.childNodes.length;i++){
+		var c = el.childNodes[i];
+		if(c.tagName == "LI" && c.hasAttribute("value")){
+			var value = Number(c.value)-1;
+			if(value){
+				c.style.counterSet = id+" "+value;
+			}
+		}
+	}
+}
+var wordIndent = [18,36,54,72,90,108,126,144,162]
+var wordIds = [];
+function COPYWORD(){
+	var selection = window.getSelection();
+	if (selection.rangeCount > 0) {
+		var range = selection.getRangeAt(0);
+		var clonedSelection = range.cloneContents();
+		var ca = range.commonAncestorContainer;
+		var div = document.createElement("div");
+		var div2 = document.createElement("div");
+		div2.appendChild(clonedSelection);
+		var clonedSelection = range.cloneContents();
+		var webHTML = div2.innerHTML;
+		var firstContainer = range.startContainer.nodeType == 1 ? range.startContainer : range.startContainer.parentElement;
+		if(ca.tagName == "LI" || (ca.tagName == "OL" && !ca.isSameNode(range.startContainer))){
+			var parent = (ca.tagName == "LI") ? ca.parentElement : ca;
+			var el = parent.cloneNode(false);
+			var start = parent.start || 1;
+			for(var i=0;i<parent.childNodes.length;i++){
+				var c = parent.childNodes[i];
+				if(c.tagName != "LI"){
+					continue;
+				}
+				if(c.isSameNode(ca.tagName == "LI" ? ca : firstContainer)){break;}
+				if(c.value){start = c.value}
+				else{start++;}
+			}
+			if(start > 1){
+				el.start = start;
+			}
+			if(ca.tagName == "LI"){
+				var ca2 = ca.cloneNode(false);
+				ca2.appendChild(clonedSelection);
+				el.appendChild(ca2);
+			}
+			else{
+				el.appendChild(clonedSelection);
+			}
+			div.appendChild(el);
+		}
+		else{
+			div.appendChild(clonedSelection);
+		};
+		var ol = div.querySelectorAll(":not(li) > ol");
+		wordIds = [];
+		for(var i=0;i<ol.length;i++){
+			getWordStyle(ol[i], wordIds.length, true);
+			transformOL(ol[i]);
+		}
+		var css = getWordCSS();
+		var wordHTML = div.innerHTML.replace(/\-\-mso\-list\s*:/ig, "mso-add-space:auto;mso-list:");
+
+		// Now we have all component. Let's build;
+
+		var fullHTML = "<html><head>"+css+"</head><body><!--StartFragment--><![if !supportLists]>"+webHTML+"<![endif]><!--[if supportLists]>"
+		+wordHTML+"<![endif]--><!--EndFragment--></body></html>";
+		return fullHTML;
+	}
+	return "";
+}
+function transformOL(el,frag){
+	var replace = !frag;
+	if(!frag){
+		frag = document.createDocumentFragment();
+	}
+	var div = document.createElement("div");
+	for(var i=0;i<el.childNodes.length;i++){
+		var c = el.childNodes[i];
+		if(c.tagName == "LI"){
+			div.innerHTML = c.outerHTML.replace(/^\s*<\s*li/i,"<p ").replace(/\/\s*li\s*>\s*$/i,"/p>");
+			frag.appendChild(div.firstChild);
+			for(var j=0, d;j<div.childNodes.length;j++){
+				d = div.childNodes[j];
+				if(d.tagName == "UL" || d.tagName == "OL"){
+					transformOL(d, frag);
+				}
+			}
+		}
+		else if(c.tagName == "OL" || c.tagName == "UL"){
+			transformOL(c, frag);
+		}
+		else{
+			frag.appendChild(c.cloneNode(true));
+		}
+	}
+	if(replace){
+		el.parentElement.replaceChild(frag, el);
+	}
+}
+function word(el){
+	getWordStyle(el, wordIds.length);
+	return getWordCSS();
+}
+function getWordCSS(){
+	var css = "";
+	for(var i=0;i<wordIds.length;i++){
+		css += "\n\n@list l"+i+" {}";
+		var wi = wordIds[i];
+		for(var j=0;j<wi.length;j++){
+			css += wi[j];
+		}
+	}
+	return "<style>\n<!--\n"+css.trim()+"\n-->\n</style>";
+}
+function startLevels(el){
+	var sl = [];
+	var level = 1;	
+	parent = el;
+	while(parent = parent.parentElement){
+		if(parent.tagName != "LI" && parent.tagName != "OL" && parent.tagName != "UL"){
+			break;
+		}
+		else if(parent.tagName == "LI"){
+			el = parent;continue;
+		}
+		else if(parent.tagName == "UL"){
+			sl.push(1);
+		}
+		else if(parent.tagName == "OL"){
+			var s = parent.start || 1;
+			li: for(var i=0,c;i<parent.childNodes.length;i++){
+				c = parent.childNodes[i];
+				if(c.tagName != "LI"){continue li;}
+				if(c.value){s = c.value;}
+				if(c.isSameNode(el)){break li;}
+				s++;
+			}
+			sl.push(s);
+		}
+	}	
+	sl.reverse();
+	return sl;
+}
+function getWordStyle(el,id,setStyle){
+	var css = "";
+	var format = null, parent = el;
+	var level = 0;
+	do{
+		if(parent.tagName != "LI" && parent.tagName != "OL" && parent.tagName != "UL"){
+			break;
+		}
+		if(parent.tagName == "OL" || parent.tagName == "UL"){
+			level++;
+		}
+		if(!format && parent.hasAttribute("data-list-format")){
+			format = parent.getAttribute("data-list-format");
+		}
+	}while(parent = parent.parentElement);
+	if(!format){format = "$1."};
+	if(level <= 0){level = 1};
+	id = id || 0;
+	if(wordIds[Number(id)]){
+		if(wordIds[Number(id)][level-1]){
+			wordIds[wordIds.length] = [];
+			var sl = startLevels(el)
+			for(i=0;i<level-1;i++){
+				wordIds[wordIds.length-1].push(wordIds[Number(id)][i]
+					.replace(new RegExp("@list l"+id,"i"), "@list l"+(wordIds.length-1))
+					.replace(/\s*mso-level-start-at\s*\:\s*\d*;?/g, "")
+					.replace(/\s*\}\s*$/,"\n    mso-level-start-at:"+sl[i]+";\n}")
+				);
+			}
+			id = wordIds.length-1;
+		}
+	}
+	else{
+		wordIds[Number(id)] = [];
+	}
+	start = (Number(el.getAttribute("start")) || 1) - 1;
+	if(arguments.length > 3){
+		start = Number(arguments[3]||1)-1;
+	}
+	var actualFormat = getActualFormat(format, level);
+	// We could use a RegExp to replace everything, but it doesn't work everytime;
+	var af = "";
+	for(var i=0,c,d;i<actualFormat.length;i++){
+		c = actualFormat[i],
+		d = actualFormat[i+1];
+		if(c == "$"){
+			if(d == "$"){
+				af += "\\$";i++;
+			}
+			else if(/[1-9]/.test(d)){
+				af += "%"+d;i++;
+			}
+			else{
+				af += "\\$";
+			}
+		}
+		else if(/[a-z0-9\s]/i.test(c)){
+			af += c;
+		}
+		else{
+			af += "\\"+c;
+		}
+	}
+	// Type
+	var type = el.getAttribute("data-list-type") || "1";
+	type = wordListStyles[type];
+	css += "\n\n@list l"+id+":level"+level+"{";
+	css += "\n    mso-level-text:\""+af+"\";";
+	if(type){
+		css += "\n    mso-level-number-format:\""+type+"\";";
+	}
+	if(start > 0){
+		css += "\n    mso-level-start-at:"+(start+1)+";";
+	}
+	css += "\n    	mso-level-tab-stop:none;";
+	css += "\n}";
+	wordIds[id][level-1] = css;
+	var subid = id;
+	if(arguments.length <= 3){
+		for(var i=0, c;i<el.childNodes.length;i++){
+			var c = el.childNodes[i];
+			if(c.tagName != "LI"){continue}
+			if(c.hasAttribute("value")){
+				subid++;
+				getWordStyle(el, subid, setStyle, c.value);
+			}
+			c.style.setProperty("--mso-list", "l"+subid+" level"+level+" lfo1");
+			var ol = c.querySelectorAll(":scope > ol");
+			for(var j=0;j<ol.length;j++){
+				getWordStyle(ol[j], subid, setStyle);
+			}
+		}
+	}
+	return css;
+}
+defineStyle(document.getElementById("r"));
+document.getElementById("z").value = word(document.getElementById("r"));
+</script>
+
+<div>
+<strong>mso-list: &lt;String list-id> &lt;String level> &lt;String group-id>;</strong>
+<dl>
+  <dt>list-id</dt>
+  <dd>ID of the list specification, as written in <strong>@list</strong></dd>
+  <dt>level</dt>
+  <dd>level1, level2, level3, level4, level5, level6, level7, level8 or level9</dd>
+  <dt>group-id</dt>
+  <dd>An ID of a group of list items</dd>
+</dl>
+</div>
+<d
