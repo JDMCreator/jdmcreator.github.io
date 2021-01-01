@@ -19,6 +19,51 @@ var romanToInt = function(s) {
    }
    return result; //move it outside loop
 }
+function cureText(el){
+	el = el.cloneNode(true);
+	var text = "";
+	for(var j=0,c;j<el.childNodes.length;j++){
+		c=el.childNodes[j]
+		if(c.nodeType == 3){
+			text += c.data;
+		}
+		else if(c.nodeType == 1){
+			if(c.classList.contains("wb-invisible")){
+				continue;
+			}
+			else if(c.classList.contains("DefinitionRef")){
+				text+=c.innerHTML;
+			}
+			else if(c.classList.contains("DefinedTerm") && c.closest("dd")){
+				text += "<dfn style=\"font-weight:bold;\">"+c.innerText+"</dfn>";
+			}
+			else if(c.classList.contains("Repealed")){
+				text += "<span style=\"color:#600\" class=\"repealed\">"+c.innerHTML+"</span>";
+			}
+			else if(c.classList.contains("otherLang")){
+				text+="<i>"+c.innerHTML+"</i>";
+			}
+			else if((c.classList.contains("DefinedTermLink") && c.lang ) || c.classList.contains("DefinedTerm")){
+				text+="<em>"+c.innerHTML+"</em>";
+			}
+			else if(c.tagName == "EM"){
+				text += "<i>"+c.innerHTML+"</i>";
+			}
+			else if(c.tagName == "CITE"){
+				text += "<a href=\""+c.firstElementChild.href+"\">"+c.firstElementChild.innerHTML+"</a>";
+			}
+			else if(c.tagName == "A"){
+				if(c.innerText.indexOf("*") < 0){
+					text += "<a href=\""+c.href+"\">"+c.innerHTML+"</a>";
+				}
+			}
+			else{
+				console.log(o.number+"|"+c.className+"|"+c.tagName);
+			}
+		}
+	}
+	return text;
+}
 	function getContent(div)
 	{
 		for(var i=0;i<div.childNodes.length;i++){
@@ -48,18 +93,21 @@ var romanToInt = function(s) {
 			el.style.display = "none";
 		}
 		else if(el.tagName == "DD"){
-			el.style.marginLeft = "0pt";
+			el.style.marginLeft = "15pt";
+			if(el.querySelector("p")){
+				el.querySelector("p").style.textIndent = "-15pt";
+			}
 		}
 		if(el.classList.contains("wb-invisible")){
 			remove = true;
 		}
-		if(el.classList.contains("MarginalNote")){
+		if(el.classList.contains("MarginalNote") || el.classList.contains("MarginalNoteDefinedTerm")){
 			if(el.querySelector(".wb-invisible")){
 				el.removeChild(el.querySelector(".wb-invisible"));
 			}
 			if(el.nextElementSibling){
 				var strong = document.createElement("strong");
-				strong.innerText="["+el.innerText.trim()+"]";
+				strong.innerHTML="["+cureText(el).trim()+"]";
 				if(el.nextElementSibling.classList.contains("Section")){
 					var before = el.nextElementSibling.firstElementChild.nextSibling;
 					before.parentElement.insertBefore(strong, before);
@@ -124,7 +172,7 @@ var romanToInt = function(s) {
 		}
 		if(el.tagName == "LI"){
 			var para = el.firstElementChild;
-			if(para && para.classList.contains("MarginalNote")){
+			if(para && (para.classList.contains("MarginalNote") || para.classList.contains("MarginalNoteDefinedTerm"))){
 				para = para.nextElementSibling;
 			}
 			if(para && para.tagName == "P"){
@@ -211,7 +259,7 @@ var romanToInt = function(s) {
 		el.removeAttribute("id");
 	}
 	var a = [];
-	var mn = Array.from(document.querySelectorAll("section.intro + section > .MarginalNote"));
+	var mn = Array.from(document.querySelectorAll("section.intro + section > .MarginalNote, section.intro + section > .MarginalNoteDefinedTerm"));
 	var div = document.createElement("div");
 	for(var i=0,m;i<mn.length;i++){
 		m = mn[i];
@@ -240,7 +288,7 @@ var romanToInt = function(s) {
 				else if(c.classList.contains("otherLang")){
 					text+="<i>"+c.innerHTML+"</i>";
 				}
-				else if(c.classList.contains("DefinedTermLink") && c.lang){
+				else if((c.classList.contains("DefinedTermLink") && c.lang ) || c.classList.contains("DefinedTerm")){
 					text+="<em>"+c.innerHTML+"</em>";
 				}
 				else if(c.tagName == "EM"){
