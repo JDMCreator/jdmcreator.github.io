@@ -6,6 +6,16 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 2.0.4 (2021/02/17)
+==========
+
+| Note on this release:
+|     Bug fixes
+
+LATEX IMPORT
+
+[#] Issue with some character commands (\$, \%, \#, \_ and \&) (#33)
+
 Version 2.0.3 (2020/10/20)
 ==========
 

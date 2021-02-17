@@ -133,6 +133,11 @@ specialSeparators = {
 		o.full = "\\\\"+(o.asterisk ? "*" : "");
 		return o;
 	}
+	else if(realname == "$" || realname == "%" || realname == "_" || realname == "&" || realname == "#"){
+		o.name = realname;
+		o.full = "\\"+realname;
+		return o;
+	}
 	else if(nextchar == "*"){
 		o.asterisk = true;
 		nextchar = code.charAt(name.length+1);

@@ -49,7 +49,7 @@ function cureText(el){
 			else if(c.tagName == "EM"){
 				text += "<i>"+c.innerHTML+"</i>";
 			}
-			else if(c.tagName == "CITE"){
+			else if(c.tagName == "CITE" && c.firstElementChild && c.firstElementChild.href){
 				text += "<a href=\""+c.firstElementChild.href+"\">"+c.firstElementChild.innerHTML+"</a>";
 			}
 			else if(c.tagName == "A"){
@@ -294,7 +294,7 @@ function cureText(el){
 				else if(c.tagName == "EM"){
 					text += "<i>"+c.innerHTML+"</i>";
 				}
-				else if(c.tagName == "CITE"){
+				else if(c.tagName == "CITE" && c.firstElementChild && c.firstElementChild.tagName == "A"){
 					text += "<a href=\""+c.firstElementChild.href+"\">"+c.firstElementChild.innerHTML+"</a>";
 				}
 				else{
