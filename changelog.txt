@@ -6,6 +6,15 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 2.0.6 (2021/03/17)
+==========
+
+| Note on this release:
+|     Accessibility and layout
+
+CORE
+
+[/] Better accessibility and tooltips
 
 Version 2.0.5 (2021/02/26)
 ==========

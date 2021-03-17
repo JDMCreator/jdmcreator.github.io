@@ -516,6 +516,11 @@
 			transform: rotate(-90deg);
 		}
 		
+
+		#table td[data-rotated="45"]:not([data-selected]) div[contenteditable],
+		body[data-view-editor] #table td[data-rotated="45"] div[contenteditable] {
+			transform: rotate(-45deg);
+		}
 		body:not([data-view-editor]) #table td[data-selected]{
 			//overflow:hidden;
 }

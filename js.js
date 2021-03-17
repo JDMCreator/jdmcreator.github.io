@@ -111,7 +111,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.0.5";
+			this.version = "2.0.6";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -2278,8 +2278,14 @@ this.getHTML = (function(){
 				range.selectNodeContents(td.querySelector("div[contenteditable]"));
 				var size = range.getBoundingClientRect();
 				range.detach() // We don't need the range anymore
-				td.style.height=(size.width+6)+"px";
-				td.style.width=(size.height+6)+"px";
+				if(td.getAttribute("data-rotated") == "45"){
+					td.style.width = (Math.abs(size.width * Math.sin(-45*Math.PI/180)) + Math.abs(size.height * Math.cos(-45*Math.PI/180)) + 6) + "px";
+					td.style.height = (Math.abs(size.width * Math.cos(-45*Math.PI/180)) + Math.abs(size.height * Math.sin(-45*Math.PI/180)) + 6) + "px";
+				}
+				else{
+					td.style.height=(size.width+6)+"px";
+					td.style.width=(size.height+6)+"px";
+				}
 			}
 			this.fastGenerateFromHTML = function(html, ignoreMultiline, align){
 				return html.replace(/(?:&([^;]+);|[_\\$%^_\{\}#\[`\|\xb6~])/g, function(full, inside){
