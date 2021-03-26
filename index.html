@@ -130,6 +130,8 @@ Output <span class="caret"></span>
 						<div class="group-col">
 							<div class="group-row">
 								<button title="Unordered list" onclick="table.toggleExecCommand('insertunorderedlist');return false;"><img src="icons/list-ul.svg"></button>
+								<button title="Indent" onclick="table.indentList();return false;"><img src="icons/indent.svg"></button>
+								<button title="Outdent" onclick="table.indentList(true) ;return false;"><img src="icons/outdent.svg"></button>
 								<button title="Text color" onclick="table.setTextColor(this.getAttribute('data-color'));return false;" data-color="red" id="text-color-button"><span class="glyphicon" style="border-bottom:3px solid red;padding:2px;height:auto;width:auto;font-size:1.2rem;margin-bottom:2px;" id="text-color-span"><span class="glyphicon-font"></span></span></button>
 								<button type="button" class="btn-caret dropdown-toggle" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
 
@@ -151,6 +153,8 @@ Output <span class="caret"></span>
 								<button title="Bold" onclick="table.toggleExecCommand('bold');return false;"><img src="icons/type-bold.svg"></button>
 								<button title="Italic" onclick="table.toggleExecCommand('italic');return false;"><img src="icons/type-italic.svg"></button>
 								<button title="Underline" onclick="table.toggleExecCommand('underline');return false;"><img src="icons/type-underline.svg"></button>
+								<button title="Strikethrough" onclick="table.toggleExecCommand('strikethrough');return false;"><img src="icons/strikethrough.svg"></button>
+								<button title="Superscript" onclick="table.toggleExecCommand('superscript');return false;"><img src="icons/superscript.svg"></button>
 							</div>
 						</div>
 						<div class="group-col">
@@ -855,6 +859,15 @@ Output <span class="caret"></span>
                             <label>
                                 <input type="checkbox" id="opt-latex-border" checked> Border commands are on separated lines</label>
                         </div>
+			<div>
+                            <label>
+                                <input type="checkbox" id="opt-latex-command"> Don't escape L<span class="latex-a">a</span>T<span class="latex-e">e</span>X commands</label> 
+				<span class="label label-warning">BETA</span>
+				<a title="The editor will try to detect LaTeX commands in your text and won't encode those. Special care is taken for \verb
+and \(...\)" data-toggle="tooltip">
+					<span class=" glyphicon glyphicon-question-sign "></span>
+				</a>
+                        </div>
                         <h5>Table's caracteristics</h5>
                         <div>
                             <label>
@@ -961,19 +974,17 @@ Output <span class="caret"></span>
                         </div>
                         <h5>Advanced options</h5>
 
-                        <label>
+                        <div><label>
                             <input type="checkbox" id="opt-latex-tabu"> Force table to use <code>tabu</code> when possible</label> <span class="label label-danger">not recommanded</span>
-			    <a href="https://github.com/tabu-issues-for-future-maintainer/tabu" target="_blank"><span class=" glyphicon glyphicon-question-sign "></span></a>
-                        <!--
-<h5>Colors</h5>
-<select id="opt-color" class="form-control"><option value="rgb">RGB</option>
-<option value="cmyk">CYMK</option></select>
--->
+			    <a href="https://github.com/tabu-issues-for-future-maintainer/tabu" target="_blank"><span class=" glyphicon glyphicon-question-sign "></span></a></label></div>
+			<div><label>
+                            <input type="checkbox" id="opt-latex-color"> Use a substractive color model (CMYK) instead of RGB
+			    <a title="RGB colors will be converted to CMYK which might not be always accurate." data-toggle="tooltip"><span class=" glyphicon glyphicon-question-sign "></span></a></label></div>
                         <h5>Microfixes</h5>
                         <div><small>Microfixes are features that improves the presentation of your table, but may use a lot of ressources.</small></div>
                         <div>
                             <label>
-                                <input type="checkbox" id="opt-latex-microfix-alignment"> Correct alignment with borders <span class="label label-warning">BETA</span></div>
+                                <input type="checkbox" id="opt-latex-microfix-alignment"> Correct alignment with borders</label> <span class="label label-warning">BETA</span></div>
                     </div>
                     <div class="form-group" data-option-group="md" style="display:none;">
                         <h4>Markdown options</h4>
@@ -1102,12 +1113,13 @@ placement: 'auto top'
 			function createTableCreater(){
 				var table = $id("create_table"),
 				frag = document.createDocumentFragment();
-				for(var i=0;i<8;i++){
+				for(var i=0;i<16;i++){
 					var tr = document.createElement("tr");
-					for(var j=0;j<8;j++){
+					for(var j=0;j<16;j++){
 						var td = document.createElement("td");
 						td.dataset.row = i+1;
 						td.dataset.col = j+1;
+						td.title = (j+1) + " x " + (i+1);
 						td.addEventListener("mouseenter", createTableHover, false);
 						td.addEventListener("click", function(){
 							window.table.create(this.dataset.col, this.dataset.row);
@@ -1120,8 +1132,8 @@ placement: 'auto top'
 				table.appendChild(frag);
 			}
 			function createTableHover(){
-				var row = this.dataset.row;
-				var col = this.dataset.col;
+				var row = +this.dataset.row;
+				var col = +this.dataset.col;
 				var selected = document.querySelectorAll("#create_table td");
 				$id("create_table_x").innerHTML = col;
 				$id("create_table_y").innerHTML = row;
