@@ -115,7 +115,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.2";
+			this.version = "2.2.1";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -909,10 +909,10 @@ this.getHTML = (function(){
 		var div;
 		if(cell.tagName == "TD" || cell.tagName == "TH"){
 			if(!n){
-				div = cell.firstElementChild.firstElementChild;
+				div = cell.querySelector("div[contenteditable]");
 			}
 			else{
-				div = cell.firstElementChild.children[n]
+				div = cell.querySelectorAll("div[contenteditable]")[n]
 			}
 		}
 		else{
@@ -2105,7 +2105,12 @@ this.getHTML = (function(){
 						var trimLeft = /^\S/.test(plain),
 						trimRight = /\S$/.test(plain);
 						var dataHtml = e.clipboardData.getData("text/html");
-						d.innerHTML = dataHtml;
+						if(dataHtml){
+							d.innerHTML = dataHtml;
+						}
+						else{
+							d.innerText = plain;
+						}
 						var html = _this.getHTML(d);
 						if(trimLeft){html = html.replace(/^\s+/, "")}
 						if(trimRight){html = html.replace(/\s+$/, "")}
@@ -2116,6 +2121,10 @@ this.getHTML = (function(){
 						}
 						else if(document.queryCommandEnabled("paste")){
 							document.execCommand("paste",false, html);
+							//return false;
+						}
+						else if(document.queryCommandEnabled("insertText")){
+							document.execCommand("insertText",false, plain);
 							//return false;
 						}
 						else{

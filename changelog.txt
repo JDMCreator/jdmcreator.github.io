@@ -6,11 +6,23 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 2.2.1
+==========
+
+| Note on this release:
+|     Bug fixes
+
+Core
+
+[#] Pasting values stored as plain text didn't work (#9)
+[#] The editor conflicted with the LanguageTool browser extension (#44)
+
 Version 2.2
 ==========
 
 | Note on this release:
-|     Accessibility and layout
+|     Merge horizontally & vertically, tabularray basic support,
+|     ninecolors support
 
 CORE
 
