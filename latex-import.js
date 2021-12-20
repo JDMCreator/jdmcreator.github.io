@@ -1212,11 +1212,11 @@ var tabular = tabularReg.exec(code);
 						var o = row[k];
 						o = o.refCell || o;
 						if(first){
-							o.dataset.borderTop = border;
+							o.dataset.borderTop = name;
 							o.css+="border-top:1px "+type+" "+rulecolor+";";
 						}
 						else{
-							o.dataset.borderBottom = border;
+							o.dataset.borderBottom = name;
 							o.css+="border-bottom:1px "+type+" "+rulecolor+";";
 						}
 					}
