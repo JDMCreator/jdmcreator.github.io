@@ -12,7 +12,12 @@ function $id(id) {
 
 
 	/* ==== START CAMPAIGN INFO ==== */
-
+	window.sendGAEvent = function(category, action, label){
+			var hash = (location.hash||"").toLowerCase();
+			if(window.isProduction && window.ga && hash != "#anonymous" && hash != "#/anonymous"){
+				ga('send', 'event', category, action, label);
+			}
+		}
 	var campaign = {
 		start: new Date(2021,10,2),
 		end: new Date(2021,11,20),
@@ -27,12 +32,6 @@ function $id(id) {
 				colHeader = (/[a-z].*/i.exec(colHeader) || ["l"])[0];
 			}
 			return cellHeader == colHeader
-		},
-		sendGAEvent = function(category, action, label){
-			var hash = (location.hash||"").toLowerCase();
-			if(window.isProduction && window.ga && hash != "#anonymous" && hash != "#/anonymous"){
-				ga('send', 'event', category, action, label);
-			}
 		},
 		packagesDatabase = {
 			"adjustbox":["xkeyval","adjcalc","trimclip","graphicx","collectbox"],
