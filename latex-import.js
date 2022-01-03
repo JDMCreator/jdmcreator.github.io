@@ -688,7 +688,7 @@ var tabular = tabularReg.exec(code);
 		if(type == "tabular" || type == "xtabular" || type == "mpxtabular" || type == "longtable" || type == "NiceTabular" || type == "supertabular" || type == "mpsupertabular" || type == "tabularew"){
 			head = header(initEnv.command.args[1]);
 		}
-		else if(type == "tabular*" || type == "tabularx" || type == "tabulary" || type == "tabularht" || type == "tabularkv" || type == "NiceTabularX" || type == "NiceTabular*" || type == "supertabular*" || type == "mpsupertabular*" || type="xtabular*" || type == "mpxtabular*"){
+		else if(type == "tabular*" || type == "tabularx" || type == "tabulary" || type == "tabularht" || type == "tabularkv" || type == "NiceTabularX" || type == "NiceTabular*" || type == "supertabular*" || type == "mpsupertabular*" || type == "xtabular*" || type == "mpxtabular*"){
 			head = header(initEnv.command.args[2]);
 		}
 		else if(type == "tabularht*" || type == "tabularhtx"){
