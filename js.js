@@ -115,7 +115,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "2.3";
+			this.version = "2.3.1";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -4006,7 +4006,7 @@ this.getHTML = (function(){
 					$("#campaignModal").modal("show");
 					campaignUsed = true;
 				}
-				var c = $id("c");
+				var c = $id("generate-button");
 				scrollTo(0, (c.getBoundingClientRect().top - document.body.getBoundingClientRect().top) - $id("nav-latex").offsetHeight - 15);
 			}
 			this.campaignClicked = function(){
