@@ -6,6 +6,16 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 2.3.1.2 (2022/01/13)
+==========
+
+| Note on this release:
+|     Urgent fix
+
+LATEX IMPORT
+
+[#] Some LaTeX tables could not be imported (#56 and #57)
+
 Version 2.3.1.1 (2022/01/03)
 ==========
 

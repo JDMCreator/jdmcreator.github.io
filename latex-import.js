@@ -423,7 +423,7 @@ tblrkeyval = function(str){
 		return o;
 	}
 	if(nextchar!="[" && nextchar!="{" && !/^\s$/.test(nextchar) && !commandNumbers[realname] &&
-	  (!specialSeparators[realname] && nextchar != specialSeparators[realname][0])){
+	  (!specialSeparators[realname] || nextchar != specialSeparators[realname][0])){
 		o.name = realname;
 		o.args.push(nextchar);
 		o.full="\\"+realname+""+(o.asterisk ? "*" : "")+nextchar;
