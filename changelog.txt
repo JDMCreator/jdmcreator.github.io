@@ -14,7 +14,7 @@ Version 2.3.1.2 (2022/01/13)
 
 LATEX IMPORT
 
-[#] Some LaTeX tables could not be imported (#56 and #57)
+[#] Some LaTeX tables could not be imported (#55 and #57)
 
 Version 2.3.1.1 (2022/01/03)
 ==========

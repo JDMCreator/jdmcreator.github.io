@@ -1,0 +1,141 @@
+﻿<!doctype>
+<html>
+<head>
+	<meta charset="UTF-8"> 
+	<title>Ressources | LaTeX Tables Editor</title>
+	<link href="default.min.css" rel="stylesheet">
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<meta name="viewport" id="meta-viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Ressources for writing LaTeX tables.">
+	<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+	<style>
+		p{
+			margin:1rem;
+			margin-left:2rem;
+		}
+		img{
+			vertical-align:baseline;
+			margin-right:0.5rem;
+			margin-left:-1rem;
+			z-index:1;
+		}
+		.container{
+			max-width:60em;
+		}
+		table{font-size:inherit;}
+		.table{margin:2rem 0;}
+		.latex-table{margin:2rem auto;display:block;transform:scale(0.75)}
+		.latex-table td{
+			padding:3px 6px;
+		}
+		.h4, .h5, .h6, h4, h5, h6{
+			padding-bottom:2.5rem;
+			padding-top:2.5rem;
+			color:#000;
+		}
+
+ h2{
+	font-size:2rem;
+}
+		.all-borders td{border:1px solid black;}
+		pre code.hljs{white-space:pre;}
+.thumbnail-description{
+	font-size:3rem;
+	text-align:center;
+	padding:4rem 0;
+}
+	</style>
+</head>
+<body>
+<nav class="navbar navbar-default" style="position:sticky;top:0;z-index:2;">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html"><img src="../logo-cropped.png" style="height:100%;display:inline;"> LaTeX Complex Editor</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="../index.html">Editor <span class="sr-only">(current)</span></a></li>
+        <li class="active"><a href="#">Ressources <span class="sr-only">(current)</span></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="https://github.com/JDMCreator/LaTeXTableEditor" target="_blank">GitHub</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+<h2>Ressources</h2>
+<h4>Summary</h4>
+
+<p>This website provide several ressources to easily learn to write LaTeX tables <u>without</u> using a generator! Check out our articles:</p>
+
+<div class="row">
+  <div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+      <div class="thumbnail-description bg-warning">Tabular</div>
+      <div class="caption">
+        <h2>LaTeX Tables 101: Tabular</h2>
+        <p>Learn to write tables with the <code>tabular</code> environment.</p>
+        <p><a href="tabular.html" class="btn btn-primary" role="button">Read</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+      <div class="thumbnail-description bg-info">Tabularray</div>
+      <div class="caption">
+        <h2>LaTeX Tables 101: Tabularray</h2>
+        <p>Learn to write modern tables with the <code>tblr</code> environment.</p>
+        <p><a href="tabularray.html" class="btn btn-primary" role="button">Read</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+      <div class="thumbnail-description bg-danger" style="background:red;">Plain TeX</div>
+      <div class="caption">
+        <h2>LaTeX Tables: Historical</h2>
+        <p>LaTeX comes from TeX. Learn how to write a table in Plain TeX.</p>
+        <p><a href="ressources/tabularray.html" class="btn btn-primary disabled" role="button">Coming Soon</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+				<hr>
+				<center><a href="../privacy.html" target="_blank">Privacy</a> |  
+				<a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">Github</a> | Our other project : <a href="https://www.timemaths.com" target="_blank">TimeMaths : An Online Time Calculator</a></center>
+
+<script>
+		window.isProduction = (function() {
+			return /\b(github|latex-tables)\b/.test(location.hostname || "");
+		})();
+		if (isProduction) {
+			(function(i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function() {
+					(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o),
+					m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+			ga('create', 'UA-102898458-1', 'auto');
+			ga('send', 'pageview');
+		}
+</script>
+</body>
+</html>

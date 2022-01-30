@@ -1056,3 +1056,24 @@ html #table[data-booktabs] tr:first-child td{
 #table div[contenteditable]:focus{
 	outline:1px dotted #222;
 }
+
+ins.adsbygoogle a {
+    display: none !important;
+}
+ins.adsbygoogle[data-ad-status="unfilled"] a {
+    display: block;
+}
+
+#page-content h2{
+	font-size:2rem;
+	padding-bottom:2.5rem;
+	padding-top:2.5rem;
+}
+#page-content ul{
+	list-style-type:square;
+}
+#page-content .thumbnail-description{
+	font-size:3rem;
+	text-align:center;
+	padding:4rem 0;
+}

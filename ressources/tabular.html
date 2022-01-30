@@ -1,0 +1,284 @@
+﻿<!doctype>
+<html>
+<head>
+	<meta charset="UTF-8"> 
+	<title>LaTeX Tables 101: Tabularray | Ressources | LaTeX Tables Editor</title>
+	<link href="default.min.css" rel="stylesheet">
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<meta name="viewport" id="meta-viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+	<meta name="description" content="A tutorial for beginners on the tabular environment and writing LaTeX tables.">
+	<script type="text/javascript" src="highlight.min.js"></script>
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5146982563696073"
+     crossorigin="anonymous"></script>
+	<style>
+		p{
+			margin:1rem;
+			margin-left:2rem;
+		}
+		img{
+			vertical-align:baseline;
+			margin-right:0.5rem;
+			margin-left:-1rem;
+			z-index:1;
+		}
+		.container{
+			max-width:60em;
+		}
+		table{font-size:inherit;}
+		.table{margin:2rem 0;}
+		.latex-table{margin:2rem auto;display:block;transform:scale(0.75)}
+		.latex-table td{
+			padding:3px 6px;
+		}
+		.h4, .h5, .h6, h4, h5, h6{
+			padding-bottom:2.5rem;
+			padding-top:2.5rem;
+			color:#000;
+		}
+		.all-borders td{border:1px solid black;}
+		pre code.hljs{white-space:pre;}
+	</style>
+</head>
+<body>
+<nav class="navbar navbar-default" style="position:sticky;top:0;z-index:2;">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html"><img src="../logo-cropped.png" style="height:100%;display:inline;"> LaTeX Complex Editor</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="../index.html">Editor <span class="sr-only">(current)</span></a></li>
+        <li class="active"><a href="index.html">Ressources <span class="sr-only">(current)</span></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="https://github.com/JDMCreator/LaTeXTableEditor" target="_blank">GitHub</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+<h2>LaTeX Tables 101: Tabular</h2>
+<h4>Summary</h4>
+
+<p>A basic table is built with a <code>tabular</code> environment. Its first argument contains what we call a <strong>preamble</strong> which contains a definition of each column. The <strong>preamble</strong> is <u>mandatory</u>. Inside the environnment, each column is separated by <code>&</code>. In LaTeX, <code>&</code> is what we call an <strong>active character</strong>. If you want to insert an ampersand in your text, you have to use the <code>\&</code> command instead. Finally, each row is separated by the command <code>\\</code>. A simple table would therefore be:
+
+<pre><code>
+\begin{tabular}{lll}
+A1 & B1 & C1 \\
+A2 & B2 & C2 \\
+A3 & B3 & C3
+\end{tabular}
+</code></pre>
+
+
+<p>This would result in the following table:
+
+<img class="latex-table" src="tabular-1.png">
+
+<p>The <strong>preamble</strong> consists of a serie of column definition. Each column definition contains a character to set the text-alignment and may contains optional supplemental characters to customize the column. Here are some of the most important characters that can be used:</p>
+
+<table class="table table-condensed"><tr><th>Character</th><th>Description</th></tr>
+<tr><td><code>l</code></td><td>Left-aligned column</td></tr>
+<tr><td><code>c</code></td><td>Center-aligned column</td></tr>
+<tr><td><code>r</code></td><td>Right-aligned column</td></tr>
+<tr><td><code>|</code></td><td>Vertical border</td></tr>
+<tr><td><code>@{&lt;Content&gt;}</code></td><td><code>&lt;Content&gt;</code> is inserted in the cell and the margin of the cell is removed</td></tr>
+</table>
+
+<p>Therefore, if we take for example this table:</p>
+
+<pre><code>
+\begin{tabular}{|@{Row:}l|c||r|}
+Left Top (no left margin) & Center Top & Right Top \\
+Left Bottom (no left margin) & Center Bottom & Right Bottom
+\end{tabular}
+</code></pre>
+
+<p>The preamble is separated in this way:</p>
+
+<table class="table table-condensed"><tr><th>Column 1</th><th>Column 2</th><th>Column 3</th></tr>
+<tr><td><code>|@{Row:}l|</code></td><td><code>c||</code></td><td><code>r|</code></td></table>
+
+<p>This code would result in the following table:</p>
+
+
+<img class="latex-table" src="tabular-2.png">
+
+<h4>Adding borders</h4>
+
+<p>We've already seen how to add vertical borders. However, how can we add horizontal borders? To do so, we use the command <code>\hline</code>. Using the command twice, with <code>\hline\hline</code>, produces a double horizontal border. Horizontal borders are <strong>always</strong> placed after a line break (<code>\\</code>), even on the last row. If you are looking for a partial horizontal border, one can use <code>\cline{&lt;i&gt;-&lt;j&gt;}</code> instead. This command will draw a horizontal border starting from the column <code>i</code> (columns start at 1) and ending at the column <code>j</code>.
+
+<pre><code>
+\begin{tabular}{|l|l|l|}
+\hline
+A1 & B1 & C1 \\ \hline
+A2 & B2 & C2 \\ \cline{1-2}
+A3 & B3 & C3 \\ \hline
+\end{tabular}
+</code></pre>
+
+<img class="latex-table" src="tabular-3.png">
+
+
+<h4>Customizing a cell</h4>
+
+<p>For now, we looked into how to use columns definition with a <strong>preamble</strong>. However, sometimes, you might want to have a cell that would not follow the definition of its column. To do this, we use the command <code>\multicolumn</code>.
+
+<p><code>\multicolumn</code> is a command that allows you to merge several columns. It takes the following arguments:
+
+<pre class="language-latex"><code>\multicolumn{&lt;Nb-of-columns&gt;}{&lt;Column-definition&gt;}{&lt;Content&gt;}</code></pre>
+
+<p>Therefore, if you want to change the column definition of a cell, we use <code>\multicolumn</code> and set the first argument to <code>1</code>. This code shows you how:</p>
+
+<pre><code>
+\begin{tabular}{|l|l|l|}
+\hline
+Very very long text                 & Very very long text  & Very very long text \\ \hline
+Left-aligned                        & Left-aligned         & Left-aligned        \\ \hline
+\multicolumn{1}{|r|}{Right-aligned} & Left-aligned         & Left-aligned        \\ \hline
+\end{tabular}
+</code></pre>
+
+<p>This would result in this table:</p>
+
+
+<img class="latex-table" src="tabular-4.png">
+
+<p>As you may have noted, we chose <code>|r|</code> as the second argument of <code>\multicolumn</code> to have a right-aligned cell, <u>but</u> keep the borders.</p>
+
+
+
+<h4>Merging cells</h4>
+
+<p>As we saw earlier, we use <code>\multicolumn{&lt;Nb-of-columns&gt;}{&lt;Column-definition&gt;}{&lt;Content&gt;}</code> to merge columns. We have to provide the column definition in the second argument. When we use <code>\multicolumn</code>, we omit the <code>&</code> active characters.</p>
+
+<p>To merge rows, we use instead <code>\multirow</code>, which comes from the package multirow. It takes the following argument:
+
+<pre class="language-latex"><code>\multirow{&lt;Nb-of-rows&gt;}{&lt;Width&gt;}{&lt;Content&gt;}</code></pre>
+
+<p>However, instead of specifying the second argument (the width of the cell), we can use the special character <code>*</code> which will calculate the width for us. If you want to combine merged columns and merged cells, <code>\multirow</code> <u>must</u> be inside <code>\multicolumn</code>. See the following example:
+
+<pre><code>
+% Insert the following commented line before \begin{document}:
+% \usepackage{multirow} 
+
+\begin{tabular}{|l|l|l|l|} \hline
+\multicolumn{4}{|l|}{Merged columns}                                                               \\ \hline
+\multirow{2}{*}{Merged rows} & B2 & C2 & D2                                                        \\ \cline{2-4}
+                             & B3 & \multicolumn{2}{l|}{\multirow{2}{*}{Merged columns and rows}}  \\ \cline{1-2}
+A4                           & B4 & \multicolumn{2}{l|}{}                                          \\ \hline
+\end{tabular}
+</code></pre>
+
+<p>Which will result in the following table:</p>
+
+
+<img class="latex-table" src="tabular-5.png">
+
+<p>As you can see, this can become very tedious. Our <a href="../index.html">editor</a> take care of the code for you, so you can concentrate on the content of your table. Notice that we have to use <code>\cline</code> instead of <code>\hline</code> for some rows, otherwise the horizontal border would cross the merged table cell.</p>
+
+
+<h4>Making beautiful tables</h4>
+
+<p>LaTeX is a typographical system and certain conventions have been adopted by its users regarding tables. The <code>booktabs</code> tables add some commands to help follow these conventions. One of these is that there should never be vertical borders in a table.</p>
+
+<p><code>booktabs</code> add several commands related to horizontal borders:</p>
+
+<table class="table table-condensed"><tr><th>Command</th><th>Description</th></tr>
+<tr><td><code>\toprule</code></td><td>Top border</td></tr>
+<tr><td><code>\bottomrule</code></td><td>Bottom rule</td></tr>
+<tr><td><code>\midrule</code></td><td>Any horizontal rule in the middle</td></tr>
+<tr><td><code>\cmidrule{&lt;i&gt;-&lt;j&gt;}</code></td><td>The equivalent of <code>\cline</code></td></tr>
+</table>
+
+<p>Here is an example of a booktabs table:</p>
+
+<pre><code>
+% Insert the following commented line before \begin{document}:
+% \usepackage{booktabs} 
+
+\begin{tabular}{lll} \toprule
+A1 & B1 & C1  \\ \midrule
+A2 & B2 & C2  \\
+A3 & B3 & C3  \\ \bottomrule
+\end{tabular}
+</code></pre>
+
+<p>which will result in this table:</p>
+
+<img class="latex-table" src="tabular-6.png">
+
+<p>You might recognize this type of table. The top and bottom border are thicker and the table is spaced more evenly.
+
+<h4>Captions, labels and the <code>table</code> environment</h4>
+
+<p>Finally, it might be useful to have a caption for your table and a label. A label allows you to refer to your table with <code>\ref{&lt;label&gt;}</code> to print the number of the table, or <code>\pageref{&lt;label&gt;}</code> to print the number of the page where the table is located.
+
+<p>The caption is defined with <code>\caption{&lt;text&gt;}</code> and the label with <code>\label{&lt;text&gt;}</code>. The caption and the label are instead in the <code>table</code> environment. The <code>table</code> environment is what is called a <strong>float</strong>. This means that LaTeX might place your table somewhere else in the document to have the best typographical presentation possible.</p>
+
+<p>Here is how we use the <code>table</code> environment:</p>
+
+<pre><code>
+\begin{table}
+	\centering                       % Center your table
+	\caption{Your caption}           % Caption
+	\label{tab:my-first-table}       % Label
+
+	\begin{tabular}{|l|l|l|} \hline  % Your table
+		A1 & B1 & C1  \\ \hline
+		A2 & B2 & C2  \\ \hline
+		A3 & B3 & C3  \\ \hline
+	\end{tabular}
+
+\end{table}
+</code></pre>
+
+
+<p>which will result in this table:</p>
+
+<img class="latex-table" src="tabular-7.png">
+
+<p>If you prefer when the caption is under the table, move the <code>\caption</code> command before the end of the <code>table</code> environment.</p>
+
+<h4>Conclusion</h4>
+
+<p>In this article, you learned the basic components of a table and how to build them with LaTeX. Of course, you may do much more, including colors, border thickness, border types, rotated cells... However, this is a strong beginning. In the mean time, use our <a href="../index.html">editor</a>. As you may know, or as you will discover, coding tables by hand in LaTeX may become troublesome as soon as your table is a little bit complex. We take care of packages compatibility issues and typographical issues for you.</p>
+
+				<hr>
+				<center><a href="../privacy.html" target="_blank">Privacy</a> |  
+				<a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">Github</a> | Our other project : <a href="https://www.timemaths.com" target="_blank">TimeMaths : An Online Time Calculator</a></center>
+
+<script>hljs.highlightAll();</script>
+<script>
+		window.isProduction = (function() {
+			return /\b(github|latex-tables)\b/.test(location.hostname || "");
+		})();
+		if (isProduction) {
+			(function(i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function() {
+					(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o),
+					m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+			ga('create', 'UA-102898458-1', 'auto');
+			ga('send', 'pageview');
+		}
+</script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+﻿<!doctype>
+<html>
+<head>
+	<meta charset="UTF-8"> 
+	<title>LaTeX Tables 101: Tabular | Ressources | LaTeX Tables Editor</title>
+	<link href="default.min.css" rel="stylesheet">
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<meta name="viewport" id="meta-viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+	<meta name="description" content="A tutorial for beginners on the tblr environment from the tabularray package and writing LaTeX tables.">
+	
+	<script type="text/javascript" src="highlight.min.js"></script>
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5146982563696073"
+     crossorigin="anonymous"></script>
+	<style>
+		p{
+			margin:1rem;
+			margin-left:2rem;
+		}
+		img{
+			vertical-align:baseline;
+			margin-right:0.5rem;
+			margin-left:-1rem;
+			z-index:1;
+		}
+		.container{
+			max-width:60em;
+		}
+		table{font-size:inherit;}
+		.table{margin:2rem 0;}
+		.latex-table{margin:2rem auto;display:block;transform:scale(0.75)}
+		.latex-table td{
+			padding:3px 6px;
+		}
+		.h4, .h5, .h6, h4, h5, h6{
+			padding-bottom:2.5rem;
+			padding-top:2.5rem;
+			color:#000;
+		}
+		.all-borders td{border:1px solid black;}
+		pre code.hljs{white-space:pre;}
+	</style>
+</head>
+<body>
+<nav class="navbar navbar-default" style="position:sticky;top:0;z-index:2;">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html"><img src="../logo-cropped.png" style="height:100%;display:inline;"> LaTeX Complex Editor</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="../index.html">Editor <span class="sr-only">(current)</span></a></li>
+        <li class="active"><a href="index.html">Ressources <span class="sr-only">(current)</span></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="https://github.com/JDMCreator/LaTeXTableEditor" target="_blank">GitHub</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+<h2>LaTeX Tables 101: Tabularray</h2>
+<h4>Introduction</h4>
+
+<p>For a long time, the <code>tabular</code> environment was used to build tables. However, writing tables with tabular can be troublesome for beginners and really complex tables can be near impossible to write. Also, tables built with the <code>tabular</code> environment have some typographical issues and, when color is used, can be misread by PDF readers. Therefore, more and more LaTeX users are calling to use the <code>tblr</code> environment from the <code>tabularray</code> package instead.</p>
+
+<p>This tutorial aims to teach beginner to write simple tables with the <code>tblr</code> environment.
+
+<h4>The <code>tblr</code> environment</h4>
+
+<p>The <code>tblr</code> environment, like HTML and CSS, separates the content and the style of table cells. To do so, it uses <strong>keyval</strong> arguments to define options for columns, rows or cells. A <strong>keyval</strong> argument is an argument that takes the form of: <pre><code>option1=value, option2=value</code></pre>
+
+<p> If a value contains commas, it must be surrounded by brackets in this way:</p>
+<pre><code>mylist = {element1, element2, and element 3}, option2=value</code></pre>
+
+<p>The <code>tblr</code> environment takes a single mandatory argument, a keyval argument containing a list of options for styling the table. Inside the environnment, each column is separated by <code>&</code>. In LaTeX, <code>&</code> is what we call an <strong>active character</strong>. If you want to insert an ampersand in your text, you have to use the <code>\&</code> command instead. Finally, each row is separated by the command <code>\\</code>. A really basic table would be this:</p>
+
+<pre><code>
+% Insert the following commented line before \begin{document}:
+% \usepackage{tabularray} 
+
+\begin{tblr}{}
+A1 & B1 & C1  \\
+A2 & B2 & C2  \\
+A3 & B3 & C3
+\end{tblr}</pre></code>
+
+<p>This would result in the following table:</p>
+
+<img class="latex-table" src="tabularray-1.png">
+
+<p>In the mandatory argument, you can define options for columns, rows and cells using those keys:
+
+<table class="table table-condensed"><tr><th>Key</th><th>Description</th></tr>
+<tr><td><code>cells</code></td><td>Options for all cells</td></tr>
+<tr><td><code>cell{&lt;Row-Number&gt;}{&lt;Column-Number&gt;}</code></td><td>Options for specific cells</td></tr>
+<tr><td><code>columns</code></td><td>Options for all columns</td></tr>
+<tr><td><code>column{&lt;Column-Number&gt;}</code></td><td>Option for specific columns</td></tr>
+<tr><td><code>rows</code></td><td>Options for all rows</td></tr>
+<tr><td><code>row{&lt;Row-Number&gt;}</code></td><td>Options for specific rows</td></tr>
+</table>
+
+<p>The values <code>&lt;Row-Number&gt;</code> and <code>&lt;Column-Number&gt;</code> can be a single number (<code>1</code>, for the first column or row), a range (<code>1-3</code>) or a special value (like <code>odd</code> or <code>even</code>). The characters <code>X</code>, <code>Y</code> and <code>Z</code> are converted to the indexes of the last three child, respectively.</p>
+
+<p>The following example use the key <code>bg</code> to set the color of the background of each cell and <code>fg</code> to set the color of the text:</p>
+
+<pre><code>
+% Insert the following commented lines before \begin{document}:
+% \usepackage{color}
+% \usepackage{tabularray} 
+
+\begin{tblr}{
+	row{odd}     = {bg = red},
+	cell{2}{2-3} = {bg = green},
+	column{1}    = {bg = blue, fg = white}
+}
+A1 & B1 & C1  \\
+A2 & B2 & C2  \\
+A3 & B3 & C3
+\end{tblr}
+</code></pre>
+
+<p>This would result in the following colorful table:
+
+
+<img class="latex-table" src="tabularray-2.png">
+
+<h4>Some basic options</h4>
+
+<p>We already saw two options which can be used to style table cells. However, there are much more. Here are some of them:</p>
+
+<table class="table table-condensed"><tr><th>Option</th><th>Description</th><th>Value</th></tr>
+<tr><td><code>bg</code></td><td>Background color</td><td>Color name</td></tr>
+<tr><td><code>fg</code></td><td>Color of the text</td><td>Color name</td></tr>
+<tr><td><code>halign</code></td><td>Horizontal alignment of the text</td><td><code>l</code> (left)<br><code>c</code> (center)<br><code>r</code> (right)</td></tr>
+<tr><td><code>valign</code></td><td>Vertical alignment of the text</td><td><code>t</code> (top)<br><code>m</code> (middle)<br><code>b</code> (bottom)<br><code>h</code> (head)<br><code>f</code> (foot)</td></tr>
+<tr><td><code>mode</code></td><td>Mode of the cell</td><td><code>math</code><br><code>imath</code><br><code>dmath</code><br><code>text</code></td></tr>
+</table>
+
+<p>As a trick, you can omit the name of the keys <code>bg</code>, <code>halign</code> and <code>valign</code> and simply enter their value, separated by a comma:</p>
+
+<pre><code>
+% Insert the following commented lines before \begin{document}:
+% \usepackage{color}
+% \usepackage{tabularray} 
+
+\begin{tblr}{
+	row{odd}     = {red},
+	cell{2}{2-3} = {green},
+	column{1}    = {blue, fg = white},
+	cell{3}{1}   = {r},
+	cell{2}{3}   = {r},
+	cell{2}{2}   = {c},
+	cell{3}{3}   = {c}
+}
+A very very long text & A very very long text & A very very long text  \\
+Left                  & Center                & Right                  \\
+Right                 & Left                  & Center
+\end{tblr}
+</code></pre>
+
+<p>This would result in this colorful table:</p>
+
+
+<img class="latex-table" src="tabularray-3.png">
+
+<h4>Adding borders</h4>
+
+<p>To add borders to the table, we use other "superkeys" like <code>cell</code> or <code>row</code>. However, instead, we use <code>hlines</code> to set all horizontal borders, <code>hline</code> to set specific horizontal borders, <code>vlines</code> to set all vertical borders and <code>vline</code> to set specific vertical borders.</p>
+
+<p>With those superkeys, we can set several options: the thickness of the border, the color of the border and its style (<code>solid</code>, <code>dashed</code> or <code>dotted</code>). If the brackets are empty, a normal black border will be used. See this basic example:</p>
+
+<pre><code>
+% Insert the following commented line before \begin{document}:
+% \usepackage{tabularray} 
+
+\begin{tblr}{
+	vlines = {},
+	hlines = {}
+}
+A1 & B1 & C1  \\
+A2 & B2 & C2  \\
+A3 & B3 & C3
+\end{tblr}
+</code></pre>
+
+<p>with this result:</p>
+
+
+<img class="latex-table" src="tabularray-4.png">
+
+<p>or this more complex example:</p>
+
+<pre><code>
+% Insert the following commented lines before \begin{document}:
+% \usepackage{color}
+% \usepackage{tabularray} 
+
+\begin{tblr}{
+	vline{1,4} = {3pt},
+	hline{1,4} = {},
+	hline{2}   = {blue,dotted}
+}
+A1 & B1 & C1  \\
+A2 & B2 & C2  \\
+A3 & B3 & C3
+\end{tblr}
+</code></pre>
+
+
+<p>with this result:</p>
+
+
+<img class="latex-table" src="tabularray-5.png">
+
+<h4>Merging cells</h4>
+
+<p>It is way easier to merge columns or rows with <code>tblr</code> than <code>tabular</code>. To do so, you only have to use the <code>r</code> key to set the number of rows or <code>c</code> to set the number of cells. However, <u>and this is very important</u>, you can only use these keys with the <code>cell</code> superkey and they <strong><u>must</u></strong> be surrounded by distinct brackets. Also, unlike with <code>tabular</code>, you <strong><u>don't</u></strong> omit ampersands. See the following example:
+
+<pre><code>
+% Insert the following commented line before \begin{document}:
+% \usepackage{tabularray} 
+
+\begin{tblr}{
+	vlines = {},
+	hlines = {},
+	cell{1}{1} = {c = 4}{halign = c},
+	cell{2}{1} = {r = 3}{valign = m},
+	cell{3}{3} = {c = 2, r = 2}{c,m}
+}
+A1 &    &    &    \\
+A2 & B2 & C2 & D2 \\
+   & B3 &    &    \\
+   & B4 &    &   
+\end{tblr}
+</code></pre>
+
+<p>This would result in this table:</p>
+
+
+<img class="latex-table" src="tabularray-6.png">
+
+<h4>Captions, labels and the <code>table</code> environment</h4>
+
+<p>Finally, it might be useful to have a caption for your table and a label. A label allows you to refer to your table with <code>\ref{&lt;label&gt;}</code> to print the number of the table, or <code>\pageref{&lt;label&gt;}</code> to print the number of the page where the table is located.
+
+<p>The caption is defined with <code>\caption{&lt;text&gt;}</code> and the label with <code>\label{&lt;text&gt;}</code>. The caption and the label are instead in the <code>table</code> environment. The <code>table</code> environment is what is called a <strong>float</strong>. This means that LaTeX might place your table somewhere else in the document to have the best typographical presentation possible.</p>
+
+<p>Here is how we use the <code>table</code> environment:</p>
+
+<pre><code>
+% Insert the following commented line before \begin{document}:
+% \usepackage{tabularray} 
+
+\begin{table}
+	\centering                       % Center your table
+	\caption{Your caption}           % Caption
+	\label{tab:my-first-table}       % Label
+
+	\begin{tblr}{hlines, vlines}     % Your table
+		A1 & B1 & C1  \\
+		A2 & B2 & C2  \\
+		A3 & B3 & C3
+	\end{tblr}
+
+\end{table}
+</code></pre>
+
+
+<p>which will result in this table:</p>
+
+<img class="latex-table" src="tabularray-7.png">
+
+<p>If you prefer when the caption is under the table, move the <code>\caption</code> command before the end of the <code>table</code> environment.</p>
+
+
+<h4>Conclusion</h4>
+
+<p>In this article, you learned the basic components of a table and how to build them with LaTeX and the <code>tblr</code> environment. Of course, you may do much more. However, this is a strong beginning. In the mean time, use our <a href="../index.html">editor</a>. Our editor uses the <code>tabular</code> environment for now but will soon move to use both <code>tabular</code> and <code>tblr</code> depending of your table. As you may know, or as you will discover, coding tables by hand in LaTeX may become troublesome as soon as your table is a little bit complex. We take care of packages compatibility issues and typographical issues for you.</p>
+
+				<hr>
+				<center><a href="../privacy.html" target="_blank">Privacy</a> |  
+				<a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">Github</a> | Our other project : <a href="https://www.timemaths.com" target="_blank">TimeMaths : An Online Time Calculator</a></center>
+
+<script>hljs.highlightAll();</script>
+<script>
+		window.isProduction = (function() {
+			return /\b(github|latex-tables)\b/.test(location.hostname || "");
+		})();
+		if (isProduction) {
+			(function(i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function() {
+					(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o),
+					m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+			ga('create', 'UA-102898458-1', 'auto');
+			ga('send', 'pageview');
+		}
+</script>
+</body>
+</html>
