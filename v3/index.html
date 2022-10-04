@@ -2,13 +2,14 @@
 <html>
 
 <head>
+	<base href="../"
 	<meta charset="UTF-8">
 	<meta name="viewport" id="meta-viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="A powerful and robust LaTeX, ConTeXt, Plain TeX, PreTeXt, EPlain, Markdown, Textile, CSV and HTML Table Editor and Generator. Import data from LaTeX, Excel, LibreOffice and more.">
 	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5146982563696073"
      crossorigin="anonymous"></script>
 	<title>LaTeX Tables Editor</title>
-	<link href="css.css" rel="stylesheet">
+	<link href="v3/css.css" rel="stylesheet">
 	<link href="css/bootstrap.min.css" rel="stylesheet">
 	<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -22,7 +23,7 @@
 	</script>
 	<script type="text/javascript" src="tableDecimal.js">
 	</script>
-	<script type="text/javascript" src="js.js"></script>
+	<script type="text/javascript" src="v3/js.js"></script>
 	<script type="text/javascript">
 		Table.new = true;
 	</script>
@@ -264,9 +265,9 @@
 					</div>
 					<hr style="margin:0;margin-bottom:2px;">
 				</nav>
-<div class="alert alert-info" role="alert" style="margin-top:10px;">
+					<div class="alert alert-info" role="alert" style="margin-top:10px;">
 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<span class="glyphicon glyphicon-info-sign"></span> <strong>Try an alpha release of version 3.</strong> To try a preview release of this editor, with support to generate <code>tabularray</code> tables (better looking tables and cleaner code) and a better support of <code>siunitx</code> (align with decimal), please click <a href="v3/index.html">here</a>. As with any preview release, you may encounter some issues. 
+						<span class="glyphicon glyphicon-info-sign"></span> <strong>Alpha release.</strong> You are using a preview release of this editor. Please be aware that you may encounter some issues.
 					</div>
 				<div class="caption-container">
 					<div class="input-group" style="max-width:400px">
@@ -284,6 +285,7 @@
 					</table>
 				</div>
 				<div>
+
 					<div class="alert alert-info" role="alert" style="display:none;" id="border-editor-info">
 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<span class="glyphicon glyphicon-info-sign"></span> You are now using the border editor. You can drag your cursor to draw multiple borders at once or click on any border to activate or deactivate it. You can change the border style in the toolbar.
@@ -292,6 +294,7 @@
 				<hr>
 
 				<div id="tooltip-helper">Hey</div>
+<div style="margin:0 20%;background:whitesmoke;padding:1em;border-radius:1em;">
 				<center>
 					<div class="btn-group" role="group" style="margin-bottom:25px">
 						<button onclick="table.generate()" class="btn btn-primary" data-toggle="tooltip" title="Generate code" id="generate-button">Generate</button>
@@ -323,8 +326,22 @@
 						</div>
 						<button title="Settings" class="btn btn-default" data-target="#format-settings" data-toggle-second="tooltip" data-toggle="modal"><span class="glyphicon glyphicon-cog"></span></button>
 					</div>
-
 				</center>
+<div id="latex-opt-shortcuts"><div style="text-decoration:underline">Options (<a href="#" data-target="#format-settings" data-toggle="modal">+more</a>)</div>
+<div><input type="checkbox" id="copt-break"> Allow table to break across pages</div>
+<div><input type="checkbox" id="copt-shrink"> Shrink columns automatically</div>
+<div><input type="checkbox" id="copt-ltx-com"> Ignore LaTeX commands in text</div>
+<div>
+						<div class="btn-group dropdown">
+							<button title="Output environment" type="button" id="env-button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Auto <span class="caret"></span></button>
+							<ul class="dropdown-menu" id="env-button-drop" style="max-height:200px;overflow-y:auto;">
+								<li data-value="auto"><a href="#">Auto</a></li>
+								<li data-value="tabular"><a href="#">Tabular</a></li>
+								<li data-value="tabularray"><a href="#">Tabularray</a></li>
+								<li data-value="tabu"><a href="#">Tabu</a></li>
+							</ul>
+						</div> LaTeX environment</div>
+</div></div>
 <div style="margin:20px;">
 <div><span style="color:#555">Advertisement</span></div>
 <!-- Before-Generate -->
@@ -1326,6 +1343,8 @@ and \(...\)" data-toggle="tooltip">
 	<script type="text/javascript" src="toWML.js">
 	</script>
 	<script type="text/javascript" src="latex-import.js">
+	</script>
+	<script type="text/javascript" src="v3/toTabularray.js">
 	</script>
 	<script type="text/javascript" src="ntc.js">
 	</script>
