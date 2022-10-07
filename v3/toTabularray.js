@@ -111,6 +111,15 @@
 		if(isS && obj.align == "d" && !noS){
 			removeTag(frag, "span.latex-equation");
 		}
+		else if(!noS && obj.align == "d"){
+			removeTag(frag, "span.latex-equation");
+			o.code = "\\tablenum[table-format="+
+				table.formatDecimalCharacters(obj.globalDecimals)
+				+"]"
+				+"{"+cell.innerText.replace(/\n/g,"")+"}";
+			console.dir(obj);
+			return o;
+		}
 		var code = "";
 		if(frag.childNodes.length > 1){
 			if(frag.childNodes[2]){
@@ -149,7 +158,7 @@
 			table.packages["rotating"] = true;
 		}
 		if(isS){
-			if(obj.align != "d" || noS){
+			if(obj.align != "d" || noS || !table.isANumber(cell)){
 				code = "{{{"+code+"}}}";
 			}
 		}
@@ -674,7 +683,7 @@
 				if(cell.getHeader){
 					cell.getHeader("#000000", true);
 				}
-				if(cell.decimalChars){
+				if(cell.decimalChars && cell.cell && cell.cell.colSpan == 1){
 					hasSiUnitX = true
 					decCols[cell.x+1] = table.formatDecimalCharacters(cell.globalDecimals);
 				}
@@ -686,7 +695,7 @@
 				if(decCols[i+1]){
 					colspec+= "S[table-format="+decCols[i+1];
 					if(widthArray){
-						colspec += ",table-column-width="+widthArray[i]+"\\linewidth,"+widthArray[i]*1000;
+						colspec += ",table-column-width="+widthArray[i]+"\\linewidth";
 					}
 					colspec+= "]"
 				}

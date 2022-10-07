@@ -114,7 +114,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "3.0a";
+			this.version = "3.0b";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -3090,8 +3090,10 @@ console.log(size.height);
 						var text2 = "\\tablenum"
 						var sioptions = [];
 						if(o.decimalChars){
-							sioptions.push("table-format="+o.decimalChars[0]+"."
-									  +o.decimalChars[1]);
+							if(!o.globalDecimals){
+								this.globalDecimals(o);
+							}
+							sioptions.push("table-format="+this.formatDecimalCharacters(o.globalDecimals));
 						}
 						if(shrinkRatio || o.shrinkRatio){
 							sioptions.push("table-column-width="+(shrinkRatio||o.shrinkRatio)+"\\linewidth");
@@ -3282,7 +3284,7 @@ console.log(size.height);
 				}
 				return text;
 			}
-			this.calculateDecimalCharacters = function(cell, separator){
+			this.calculateDecimalCharacters = function(cell, separator, falseIfError){
 				separator = separator || ".";
 				var text = cell.innerText || cell.textContent || cell;
 				text = text.split(/\n+/g)[0];
@@ -3372,8 +3374,14 @@ console.log(size.height);
 						o[8] = c;
 						numberPart = 9;
 					}
+					else if(falseIfError && (c != " " && c !="~" && c != "\\,")){
+						return false;
+					}
 				}
 				return o;
+			}
+			this.isANumber = function(cell){
+				return this.calculateDecimalCharacters(cell, false, true);
 			}
 			this.createCellO = function(o, row){
 				var before = null,
@@ -3397,7 +3405,8 @@ console.log(size.height);
 				o.align = cell.getAttribute("data-align") || "l";
 				o.valign = cell.getAttribute("data-vertical-align") || "m";
 				if(o.align == "d"){
-					o.decimalChars = this.calculateDecimalCharacters(cell);
+					o.decimalChars = this.calculateDecimalCharacters(cell,".", true);
+					if(!o.decimalChars){o.align = "l"}
 				}
 				// calculate if you need vcell
 				if(!this.blacklistPackages["vcell"]){
@@ -3839,6 +3848,28 @@ console.log(size.height);
 				}
 				element.value = src;
 			}
+			this.globalDecimals = function(o, matrix){
+				matrix = matrix || o.matrix();
+				var gd = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+				for(var i=0;i<matrix.length;i++){
+					var traveledCell = matrix[i][(o.refCell||o).x];
+					traveledCell = traveledCell.refCell||traveledCell;
+					if(traveledCell.x == (o.refCell||o).x && traveledCell.cell.colSpan == (o.refCell||o).cell.colSpan){
+						if(traveledCell.align == "d"){
+							var dec = traveledCell.decimalChars;
+							for(var j=0;j<dec.length;j++){
+								if(j != 8){
+									gd[j] = Math.max(gd[j], dec[j]);
+								}
+								else{
+									gd[j] = dec[j]
+								}
+							}
+						}
+					}
+				}
+				o.globalDecimals = gd;	
+			}
 			this.comparableHeader = function(before, middle, after) {
 				if (before) {
 					before = before.cell || before.refCell.cell;
@@ -3942,27 +3973,7 @@ console.log(size.height);
 					var before = "";
 					if(align2 == "d"){
 						if(!o.globalDecimals){
-							// Let's travel the matrix !
-							var matrix = o.matrix();
-							var gd = [0,0,0,0,0,0,0,0,0,0,0,0,0]
-							for(var i=0;i<matrix.length;i++){
-								var traveledCell = matrix[i][(o.refCell||o).x];
-								traveledCell = traveledCell.refCell||traveledCell;
-								if(traveledCell.x == (o.refCell||o).x && traveledCell.cell.colSpan == middle.colSpan){
-									if(traveledCell.align == "d"){
-										var dec = traveledCell.decimalChars;
-										for(var j=0;j<dec.length;j++){
-											if(j != 8){
-												gd[j] = Math.max(gd[j], dec[j]);
-											}
-											else{
-												gd[j] = dec[j]
-											}
-										}
-									}
-								}
-							}
-							o.globalDecimals = gd;							
+							_this.globalDecimals(o);						
 						}
 						if(o.span){
 							if(shrinkRatio){
