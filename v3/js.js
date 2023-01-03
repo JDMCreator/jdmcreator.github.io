@@ -10,6 +10,16 @@ function $id(id) {
 	           r2.bottom < r1.top);
 	   }
 
+	var removeTag = function(node, selector){
+		var nodes = Array.from(node.querySelectorAll(selector));
+		for(var i=0;i<nodes.length;i++){
+			var frag = document.createDocumentFragment();
+			while(nodes[i].firstChild){
+				frag.appendChild(nodes[i].firstChild);
+			}
+			nodes[i].parentNode.replaceChild(frag,nodes[i]);
+		}
+	}
 
 	/* ==== START CAMPAIGN INFO ==== */
 	window.sendGAEvent = function(category, action, label){
@@ -114,7 +124,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "3.0b";
+			this.version = "3.0c";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -991,6 +1001,96 @@ this.getHTML = (function(){
 		return html;
 	}
 })();
+			this.getHTMLPerLine = function(cell, n, extractColor){
+				var html = this.getHTML(cell, n);
+				var color = extractColor ? false : null;
+				var lines = [];
+				var li = 0,
+				newItem = false,
+				addLi = 0;
+				var actualLine = document.createDocumentFragment();
+				var fromDiv = document.createElement("div"),
+				actualElement = actualLine;
+				fromDiv.innerHTML = html;
+				if(extractColor){
+					var treeWalker = document.createTreeWalker(fromDiv, NodeFilter.SHOW_TEXT);
+ 					treeWalker.nextNode();
+ 					var currentNode = treeWalker.currentNode;
+ 					treeWalkerLoop: while (currentNode) {
+						if(/\S/.test(currentNode.nodeValue)){
+							var parent = currentNode;
+							lookForParent:while(parent = parent.parentElement){
+								if(parent.tagName == "FONT"){
+									if(color && color != parent.color){
+										break treeWalkerLoop;
+									}
+									color = parent.color
+									currentNode = treeWalker.nextNode()
+									continue treeWalkerLoop;
+								}
+							}
+							break treeWalkerLoop;	
+						}
+						currentNode = treeWalker.nextNode()
+					}
+					if(!currentNode && color){
+						// Remove font tags
+						removeTag(fromDiv, "FONT");
+						color = toRGBA(color);
+					}
+				}
+				function pushLine(tag){
+					if(actualLine.childNodes.length>0){
+						var div = document.createElement("div");
+						var o = {
+							fragment: actualLine.cloneNode(true),
+							item: newItem,
+							level:li,
+							index:lines.length
+						}
+						newItem = false;
+						div.appendChild(actualLine);
+						o.html = div.innerHTML;
+						lines.push(o);
+						actualLine = actualElement = document.createDocumentFragment();
+					}
+					else{
+						actualElement = actualLine;
+					}
+				}
+				function treatTag(node, stopRemove){
+					if(!stopRemove && node.tagName != "LI" && node.tagName != "BR" && node.tagName != "UL"){
+						actualElement.appendChild(node);
+					}
+					if(node.tagName){
+						if(node.tagName == "UL"){addLi++}
+						if(node.tagName == "LI" || node.tagName == "BR"){
+							pushLine(node.tagName)
+							if(addLi>0){li+=addLi;addLi = 0}
+						}
+						if(node.tagName == "LI"){
+							newItem = true;
+						}
+						else if(node.childNodes.length>0 && !stopRemove){
+							actualElement = node;
+						}
+						var children = Array.from(node.childNodes);
+						for(var i=0;i<children.length;i++){
+							treatTag(children[i]);
+						}
+						if(node.tagName == "UL"){
+							pushLine();
+							if(!addLi){
+								li--;
+							}
+							addLi = 0;
+						}
+					}
+				}
+				treatTag(fromDiv, true);
+				pushLine();
+				return {lines:lines, color:color};
+			}
 			this.setHTML = function(cell, HTML) {
 				cell.querySelector("div[contenteditable]")
 					.innerHTML = HTML;
@@ -2038,6 +2138,149 @@ this.getHTML = (function(){
 				}
 				return false;
 			}
+			this.transpose = function(){
+				this.statesManager.registerState();
+				var matrix = this.Table.matrix();
+				var frag = document.createDocumentFragment();
+				var l = matrix.length;
+				for(var i=0;i<matrix[0].length;i++){
+					var tr = document.createElement("tr");
+					frag.appendChild(tr);
+					for(var j=0;j<matrix.length;j++){
+						var cell = matrix[j][i];
+						if(cell.cell){
+							var colspan = cell.cell.colSpan;
+							tr.appendChild(cell.cell);
+							cell.cell.colSpan = cell.cell.rowSpan;
+							cell.cell.rowSpan = colspan;
+						}
+					}
+				}
+				var cells = this.element.rows[0].cells;
+				for(var i=0;i<Math.max(cells.length,l);i++){
+					if(i>=l){
+						this.element.rows[0].removeChild(cells[cells.length-1]);
+					}
+					else if(!cells[i]){
+						this.element.rows[0].appendChild(document.createElement("td"));
+					}
+				}
+				while(this.element.rows[1]){
+					this.element.rows[1].parentElement.removeChild(this.element.rows[1]);
+				}
+				this.element.rows[0].parentElement.appendChild(frag);
+			}
+			this.moveRow = function(beforeIndex, afterIndex){
+				this.statesManager.registerState();
+				var cells = [];
+				// First we split all needed cells
+				var modified = false;
+				var matrix = this.Table.matrix();
+				for(var j=0;j<2;j++){
+					var index = j == 0 ? beforeIndex : afterIndex;
+					for(var i=0;i<matrix[0].length;i++){
+						if(!matrix[index]){continue;}
+						var cell = (matrix[index][i].refCell||matrix[index][i]);
+						if(cell.cell.rowSpan>1){
+							if(Math.min(beforeIndex, afterIndex)<cell.y
+							   || Math.max(beforeIndex, afterIndex)>cell.y+cell.cell.rowSpan){
+								modified = true;
+								this.Table.split(cell.cell, function(cell) {
+									this.applyToCell(cell)
+								}.bind(this));
+							}
+						}
+					}
+					if(modified){
+						modified = false;
+						matrix = this.Table.matrix();
+					}
+				}
+				table.Table.insertRow(afterIndex, function(cell){
+					cells.push(cell);
+				}.bind(this), function(cell){cell.rowSpan -= 1});
+				var colSpan = 0;
+				for(var i=0;i<cells.length;i++){
+					var cell = cells[i];
+					if(cell.colSpan > 1){
+						var index = i+1;
+						this.Table.split(cell, function(cell) {
+							cells.splice(index,0,cell);
+							index++;
+						}.bind(this));
+					}
+					if(colSpan>0){
+						cell.parentElement.removeChild(cell);
+						colSpan--;
+						continue;
+					}
+					var x = table.Table.position(cell).x;
+					var before = matrix[beforeIndex][x];
+					before = (before.refCell||before).cell;
+					colSpan = before.colSpan-1;
+					var td = document.createElement("td");
+					td.colSpan = before.colSpan;
+					before.parentElement.insertBefore(td, before);
+					cell.parentElement.replaceChild(before,cell);
+				}
+				table.Table.removeRow(beforeIndex>afterIndex?beforeIndex+1:beforeIndex);
+			}
+			this.moveCol = function(beforeIndex, afterIndex){
+				this.statesManager.registerState();
+				// First we split all needed cells
+				var modified = false;
+				var matrix = this.Table.matrix();
+				var cellsCol = [];
+				outside:for(var j=0;j<2;j++){
+					var index = j == 0 ? beforeIndex : afterIndex;
+					for(var i=0;i<matrix.length;i++){
+						if(!matrix[i][index]){continue outside;}
+						var cell = (matrix[i][index].refCell||matrix[i][index]);
+						if(cell.cell.colSpan>1){
+							if(Math.min(beforeIndex, afterIndex)<cell.x
+							   || Math.max(beforeIndex, afterIndex)>cell.x+cell.cell.colSpan){
+								modified = true;
+								this.Table.split(cell.cell, function(cell) {
+									this.applyToCell(cell)
+								}.bind(this));
+							}
+						}
+					}
+					if(modified){
+						modified = false;
+						matrix = this.Table.matrix();
+					}
+				}
+				var cells = [];
+				table.Table.insertCol(afterIndex, function(cell){
+					cells.push(cell);
+				}.bind(this), function(cell){cell.colSpan -= 1});
+				var rowSpan = 0;
+				for(var i=0;i<cells.length;i++){
+					var cell = cells[i];
+					if(cell.rowSpan > 1){
+						var index = i+1;
+						this.Table.split(cell, function(cell) {
+							cells.splice(index,0,cell);
+							index++;
+						}.bind(this));
+					}
+					if(rowSpan>0){
+						cell.parentElement.removeChild(cell);
+						rowSpan--;
+						continue;
+					}
+					var y = cell.parentElement.rowIndex-1;
+					var before = matrix[y][beforeIndex]
+					before = (before.refCell||before).cell;
+					rowSpan = before.rowSpan-1;
+					var td = document.createElement("td");
+					td.rowSpan = before.rowSpan;
+					cell.parentElement.insertBefore(td, before);
+					cell.parentElement.replaceChild(before,cell);
+				}
+				table.Table.removeCol(beforeIndex>afterIndex?beforeIndex+1:beforeIndex);
+			}
 			this.loadAllFootnotes = function(){
 				document.getElementById("footnotes-txt").innerHTML = "";
 				var footnotes = this.element.querySelectorAll(".tb-footnote"),
@@ -2078,7 +2321,59 @@ this.getHTML = (function(){
 					document.getElementById("panel-footnotes").style.display = "none";
 					document.getElementById("group-footnotes").style.display = "none";
 				}
-				table.addEventListener("click", function(e){
+				table.addEventListener("mousedown", function(e){
+					if(!document.body.hasAttribute("data-border-editor")){
+						var target = e.target || e.srcElement;
+						if((target.tagName == "TD" && target.parentElement.rowIndex === 0) || target.tagName == "TR"){
+							document.getElementById("overlay").style.display = "block";
+							var removeOverlay = function(){
+								document.getElementById("overlay").style.display = "none";
+								window.removeEventListener("mouseup", removeOverlay);
+								window.removeEventListener("mousemove", findTarget);
+								if(target.tagName == "TR"){
+									var actualTarget = document.querySelector(".moveTargetY");
+									if(actualTarget){
+										actualTarget.classList.remove("moveTargetY");
+										_this.moveRow(target.rowIndex-1,actualTarget.rowIndex);
+									}
+								}
+								else{
+									var actualTarget = document.querySelector(".moveTargetX");
+									if(actualTarget){
+										actualTarget.classList.remove("moveTargetX");
+										var index = "cellIndex" in actualTarget?actualTarget.cellIndex+1:0;
+										_this.moveCol(target.cellIndex, index);
+									}
+								}
+							}
+							var findTarget = function(e2){
+								if(target.tagName == "TR"){
+									var element = document.elementsFromPoint(e.clientX, e2.clientY)[1];
+									var actualTarget = document.querySelector(".moveTargetY");
+									if(actualTarget && element != actualTarget){
+										actualTarget.classList.remove("moveTargetY");
+									}
+									if(element != target){
+										element.classList.add("moveTargetY");
+									}
+								}
+								else{
+									var element = document.elementsFromPoint(e2.clientX, e.clientY)[1];
+									var actualTarget = document.querySelector(".moveTargetX");
+									if(actualTarget && element != actualTarget){
+										actualTarget.classList.remove("moveTargetX");
+									}
+									if(element != target){
+										element.classList.add("moveTargetX");
+									}
+								}
+							}
+							window.addEventListener("mouseup", removeOverlay);
+							window.addEventListener("mousemove", findTarget);
+						}
+					}
+				});
+				table.addEventListener("mousedown", function(e){
 					if(!document.body.hasAttribute("data-border-editor")){
 						var target = e.target || e.srcElement;
 						target = target.nodeType == 3 ? target.parentElement : target;
@@ -2777,6 +3072,72 @@ console.log(size.height);
 					})
 				}
 				return [content,after, index-1]
+			}
+			this.generateFromHTMLPerLine = function(lines, params){
+				params = params || {}
+				// List of params
+				// - align : the alignment of any tabular environment
+				// - ignoreMultiline : Surround by a tabular environment if multiline
+				// - numberColumn : Is it a "S" column ? aka the default is number
+				// - number : Is the cell alignment a number? If so, we detect numbers and apply tablenum for multilines
+				// - tablenum : If the cell is a number, we always apply tablenum
+				// - siunitx : Options for tablenum
+				// - nonNumberFormat : Template for non-number, where `@` is the HTML (e.g. `{@}` to surround by braces)
+				
+				var str = "";
+				for(var i=0;i<lines.length;i++){
+					if(i>0){str+="\\\\"}
+					var lineCode = "",
+					isANumber = false;
+					if(params.numberColumn || params.number){
+						var div = document.createElement("div");
+						div.innerHTML = lines[i].html;
+						var nb = this.isANumber(div.textContent || div.innerText, true);
+						if(nb){
+console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
+
+							if(params.tablenum || ((params.siunitx || params.siunitx === "") && lines.length>1)){
+								lineCode+="\\tablenum";
+								if(params.siunitx){
+									lineCode+="["+params.siunitx+"]";
+								}
+								lineCode+="{"+(div.textContent || div.innerText)+"}";
+							}
+							isANumber = true;
+						}
+					}
+					if(!lineCode){
+						lineCode = this.generateFromHTML(lines[i].html, params.ignoreMultiline, params.align);
+					}
+					if(!lineCode.trim() && lines.length>1){
+						str += "~"
+					}
+					else{
+						if(lines[i].level>0){
+							if(lines[i].level > 1){
+								str+="\\hspace";
+								if(params.ignoreMultiline){str+="*"}
+								str+="{"+(lines[i].level-1)/2+"\\leftmargin}"
+							}
+							if(!lines[i].item){
+								str+="\\phantom{";
+							}
+							str += "\\labelitem"+["i","ii","iii","iv"][lines[i].level-1];
+							if(!lines[i].item){
+								str+="}";
+							}
+							str += "\\hspace{\\dimexpr\\labelsep+0.5\\tabcolsep}";
+						}
+						str += lineCode;
+					}
+				}
+				if(!params.ignoreMultiline && lines.length>1){
+					str = "\\begin{tabular}{@{}"+(params.align||"l")+"@{}}"+str+"\\end{tabular}";
+				}
+				if((params.nonNumberFormat || params.nonNumberFormat === "") && (!isANumber || lines.length>1)){
+					str = params.nonNumberFormat.replace(/@/g,str);
+				}
+				return str;
 			}
 			this.generateFromHTML = function(html, ignoreMultiline, align, oldEq) {
 				align = align || "l";
@@ -3519,6 +3880,9 @@ console.log(size.height);
 							_this.packages["colortbl"] = true;
 							content="{\\cellcolor"+getColor(o.background)+"}"+content;
 						}
+						if(o.align == "d" && content.indexOf("\\\\")>-1){
+							content = "{" + content + "}";
+						}
 						var ratio = o.switch ? -1 : 1;
 						if(_this.shrink){
 							content = _this.multirow(ratio*cell.rowSpan, "\\hspace{0pt}"+content, o.shrinkRatio+"\\linewidth");
@@ -3534,6 +3898,9 @@ console.log(size.height);
 						if(o.background){
 							_this.packages["colortbl"] = true;
 							content="{\\cellcolor"+getColor(o.background)+"}"+content;
+						}
+						if(o.align == "d" && content.indexOf("\\\\")>-1){
+							content = "{" + content + "}";
 						}
 					}
 					if(cell.colSpan != 1 || forceMulti || !o.isInPreambule){
@@ -3850,11 +4217,13 @@ console.log(size.height);
 			}
 			this.globalDecimals = function(o, matrix){
 				matrix = matrix || o.matrix();
-				var gd = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+				var gd = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+				var cells = [];
 				for(var i=0;i<matrix.length;i++){
 					var traveledCell = matrix[i][(o.refCell||o).x];
 					traveledCell = traveledCell.refCell||traveledCell;
 					if(traveledCell.x == (o.refCell||o).x && traveledCell.cell.colSpan == (o.refCell||o).cell.colSpan){
+						cells.push(traveledCell);
 						if(traveledCell.align == "d"){
 							var dec = traveledCell.decimalChars;
 							for(var j=0;j<dec.length;j++){
@@ -3868,7 +4237,10 @@ console.log(size.height);
 						}
 					}
 				}
-				o.globalDecimals = gd;	
+				o.globalDecimals = gd;
+				for(var i=0;i<cells.length;i++){
+					cells[i].columnDecimals = gd;
+				}	
 			}
 			this.comparableHeader = function(before, middle, after) {
 				if (before) {

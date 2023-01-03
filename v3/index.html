@@ -30,6 +30,7 @@
 </head>
 
 <body>
+	<div id="overlay"></div>
 	<div id="font-backdrop"></div>
 	<div class="border-line" id="line"></div>
 	<div class="container-fluid">
@@ -88,7 +89,8 @@
 									</a>
 									<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu3" id="dropdownMenu4">
 
-										<li><a href="#" onclick="table.deleteContent()">Delete content</a></li>
+<li><a href="#" onclick="table.deleteContent();return false;">Delete content</a></li>
+										<li><a href="#" onclick="table.transpose();return false;">Transpose</a></li>
 									</ul>
 								</span>
 								<span>
@@ -267,7 +269,7 @@
 				</nav>
 					<div class="alert alert-info" role="alert" style="margin-top:10px;">
 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<span class="glyphicon glyphicon-info-sign"></span> <strong>Alpha release (v3.0b).</strong> You are using a preview release of this editor. Please be aware that you may encounter some issues.
+						<span class="glyphicon glyphicon-info-sign"></span> <strong>Alpha release (v3.0c).</strong> You are using a preview release of this editor. Please be aware that you may encounter some issues.
 					</div>
 				<div class="caption-container">
 					<div class="input-group" style="max-width:400px">

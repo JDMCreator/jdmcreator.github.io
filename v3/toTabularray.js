@@ -62,15 +62,16 @@
 		return str;
 	}
 	var generateCode = function(cell, obj,isS, width){
-		var html = table.getHTML(cell);
-		var div = document.createElement("div");
-		div.innerHTML = html;
-		var frag = document.createDocumentFragment();
-		frag.appendChild(div);
-		var noS = false;
+		var o = {}
+		var code = "";
 		if(cell.hasAttribute("data-two-diagonals") || cell.hasAttribute("data-diagonal")){
+			var html = table.getHTML(cell);
+			var div = document.createElement("div");
+			div.innerHTML = html;
+			var frag = document.createDocumentFragment();
+			frag.appendChild(div);
+
 			var html = table.getHTML(cell, 1);
-			noS = true;
 			var div = document.createElement("div");
 			div.innerHTML = html;
 			frag.appendChild(div);
@@ -80,48 +81,34 @@
 				div.innerHTML = html;
 				frag.appendChild(div);
 			}
-		}
-		var treeWalker = document.createTreeWalker(frag, NodeFilter.SHOW_TEXT);
- 		treeWalker.nextNode();
- 		var currentNode = treeWalker.currentNode;
-		var color = null;
- 		treeWalkerLoop: while (currentNode) {
-			if(/\S/.test(currentNode.nodeValue)){
-				var parent = currentNode;
-				lookForParent:while(parent = parent.parentElement){
-					if(parent.tagName == "FONT"){
-						if(color && color != parent.color){
-							break treeWalkerLoop;
+
+			var treeWalker = document.createTreeWalker(frag, NodeFilter.SHOW_TEXT);
+	 		treeWalker.nextNode();
+	 		var currentNode = treeWalker.currentNode;
+			var color = null;
+	 		treeWalkerLoop: while (currentNode) {
+				if(/\S/.test(currentNode.nodeValue)){
+					var parent = currentNode;
+					lookForParent:while(parent = parent.parentElement){
+						if(parent.tagName == "FONT"){
+							if(color && color != parent.color){
+								break treeWalkerLoop;
+							}
+							color = parent.color
+							currentNode = treeWalker.nextNode()
+							continue treeWalkerLoop;
 						}
-						color = parent.color
-						currentNode = treeWalker.nextNode()
-						continue treeWalkerLoop;
 					}
+					break treeWalkerLoop;	
 				}
-				break treeWalkerLoop;	
+				currentNode = treeWalker.nextNode()
 			}
-			currentNode = treeWalker.nextNode()
-		}
-		var o = {}
-		if(!currentNode && color){
-			// Remove font tags
-			removeTag(frag, "FONT");
-			o.color = toRGBA(color);
-		}
-		if(isS && obj.align == "d" && !noS){
-			removeTag(frag, "span.latex-equation");
-		}
-		else if(!noS && obj.align == "d"){
-			removeTag(frag, "span.latex-equation");
-			o.code = "\\tablenum[table-format="+
-				table.formatDecimalCharacters(obj.globalDecimals)
-				+"]"
-				+"{"+cell.innerText.replace(/\n/g,"")+"}";
-			console.dir(obj);
-			return o;
-		}
-		var code = "";
-		if(frag.childNodes.length > 1){
+			if(!currentNode && color){
+				// Remove font tags
+				removeTag(frag, "FONT");
+				o.color = toRGBA(color);
+			}
+			// Generate code
 			if(frag.childNodes[2]){
 				code = "\\diagboxthree";
 			}
@@ -140,31 +127,83 @@
 			if(optarg){
 				code+="["+optarg+"]";
 			}
-		}
-		if(frag.childNodes[2]){
-			code += "{"+table.generateFromHTML(frag.childNodes[2].innerHTML, true, "l")+
-			  "}{"+table.generateFromHTML(frag.childNodes[0].innerHTML, true, "l")+"}{"+
-			  table.generateFromHTML(frag.childNodes[1].innerHTML, true, "l")+"}";
-		}
-		else if(frag.childNodes[1]){
-			code += "{"+table.generateFromHTML(frag.childNodes[0].innerHTML, true, "l")+
-			  "}{"+ table.generateFromHTML(frag.childNodes[0].innerHTML, true, "l") + "}";
+			if(frag.childNodes[2]){
+				code += "{"+table.generateFromHTML(frag.childNodes[2].innerHTML, true, "l")+
+				  "}{"+table.generateFromHTML(frag.childNodes[0].innerHTML, true, "l")+"}{"+
+				  table.generateFromHTML(frag.childNodes[1].innerHTML, true, "l")+"}";
+			}
+			else if(frag.childNodes[1]){
+				code += "{"+table.generateFromHTML(frag.childNodes[0].innerHTML, true, "l")+
+				  "}{"+ table.generateFromHTML(frag.childNodes[0].innerHTML, true, "l") + "}";
+			}
 		}
 		else{
-			code = table.generateFromHTML(frag.childNodes[0].innerHTML, true, "l");
+			var html = table.getHTMLPerLine(cell, 0,true);
+			var options = {
+				ignoreMultiline:true,
+				numberColumn:isS,
+				tablenum: cell.colSpan>1,
+				number: obj.align == "d",
+				nonNumberFormat: isS ? "{{{@}}}" : false
+			};
+			if(obj.align == "d"){
+				options.siunitx = "table-format="+table.formatDecimalCharacters(obj.globalDecimals || obj.columnDecimals);
+			}
+			code = table.generateFromHTMLPerLine(html.lines,options);
+			if(!isS && html.lines.length>1){
+				code = "{" + code + "}";
+			}
+console.log(code);
+			o.color = html.color;
 		}
+/*
+		if(!noS && obj.align == "d"){
+			var lines = cell.innerText.replace(/\u200b/g,"").trim().split(/\n/g);
+			o.code = "";
+			for(var i=0;i<lines.length;i++){
+				var code = lines[i];
+				if(i>0){o.code+="\\\\"}
+				if(div.getElementsByTagName("U").length>0){
+					table.packages["ulem"] = true;
+					code = "\\uline{"+code+"}";
+				}
+				if(div.getElementsByTagName("B").length>0){
+					o.useBold = true;
+					if(div.getElementsByTagName("I").length>0){
+						o.useItalic = true;
+						code = "\\bfseries\\itshape "+code;
+					}
+					else{
+						code = "\\bfseries "+code;
+					}
+				}
+				else if(div.getElementsByTagName("I").length>0){
+					o.useItalic = true;
+					code = "\\itshape "+code;
+				}
+				if((!isS || lines.length>1) && table.isANumber(lines[i])){
+					code = "\\tablenum[table-format="+
+					table.formatDecimalCharacters(obj.globalDecimals)
+					+"]{"+code+"}";
+				}
+				o.code += code;
+			}
+			if(lines.length>1){o.code = "{{{"+o.code+"}}}";}
+			return o;
+		}
+*/
 		if(cell.hasAttribute("data-rotated")){
 			code = "\\begin{sideways}"+code+"\\end{sideways}";
 			table.packages["rotating"] = true;
 		}
+/*
 		if(isS){
 			if(obj.align != "d" || noS || !table.isANumber(cell)){
 				code = "{{{"+code+"}}}";
 			}
 		}
-		else if(code.indexOf("\\\\")>=0){
-			code = "{"+code+"}";
-		}
+*/
+
 		o.code = code;
 		return o;
 	}
@@ -663,8 +702,12 @@
 		var rg = table.matrix();
 		var str = "";
 		var rows = [];
+		var longtableBefore = "";
 		var decCols = [];
 		var hasSiUnitX = false;
+		var siBold = false,
+		siItalic = false,
+		siArgs = [];
 		var fit = $id("opt-fit-table").value,
 		scale = fit.indexOf("sc") >= 0,
 		shrink = fit.indexOf("sh") >= 0;
@@ -773,6 +816,12 @@
 						right.fg = table.tabuColor(props.color)
 					}
 					keys.cell(cell.x+1,cell.y+1,right,left);
+					if(props.useBold){
+						siBold = true;
+					}
+					if(props.useItalic){
+						siItalic = true;
+					}
 					o.text = props.code;
 				}
 				row2.push(o);
@@ -787,10 +836,33 @@
 			str += sp + "colspec = {"+colspec+"},\n";
 		}
 		var hasAllHBorders = true;
+		var booktabs = this.element.hasAttribute("data-booktabs")
 		for(var i=0;i<rg.length+1;i++){
 			table.actualColor = [0,0,0]
 			this.HBorder(i, function(o){
 				var borders = o.borders;
+				if(i == 0 && booktabs){
+					// toprule
+					for(var j=0;j<o.borders.length;j++){
+						o.borders[j] = {
+							cellIndex:j,
+							color: "rgb(0, 0, 0)",
+							sameAsBefore: true,
+							type: "toprule"
+						}
+					}
+				}
+				if(i == rg.length && booktabs){
+					// bottomrule
+					for(var j=0;j<o.borders.length;j++){
+						o.borders[j] = {
+							cellIndex:j,
+							color: "rgb(0, 0, 0)",
+							sameAsBefore: true,
+							type: "bottomrule"
+						}
+					}
+				}
 				for(var j=0;j<o.borders.length;j++){
 					var border = o.borders[j]
 					if(!border){hasAllHBorders = false;continue;}
@@ -863,6 +935,9 @@
 		if(table.packages["color"]){
 			firstPart += "% \\usepackage{color}\n";
 		}
+		if(table.packages["ulem"]){
+			firstPart += "% \\usepackage[normalem]{ulem}\n"
+		}
 		if(table.packages["rotating"]){
 			firstPart += "% \\usepackage{rotating}\n";
 		}
@@ -887,7 +962,14 @@
 
 		var caption = table.caption();
 		if(useLongtable){
+			if(siBold){
+				longtableBefore += "\\sisetup{reset-text-series=false,text-series-to-math=true}\n";
+			}
 			str += "\\end{longtblr}";
+			if(longtableBefore){
+				firstPart += "{\n"+longtableBefore;
+				str += "\n}";
+			}
 			firstPart += "\\begin{longtblr}";
 			var optStr = "";
 			if(caption.caption){
@@ -919,6 +1001,9 @@
 			}
 			if(this._id("table-opt-center").checked){
 				firstPart += "\\centering\n"
+			}
+			if(siBold){
+				firstPart += "\\sisetup{reset-text-series=false,text-series-to-math=true}\n";
 			}
 			if (caption.caption) {
 				if(caption.numbered){

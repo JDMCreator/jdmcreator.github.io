@@ -7,6 +7,16 @@
 				white-space: nowrap !important;
 			}
 		}
+		#overlay{
+			display:none;
+			position:fixed;
+			left:0;
+			right:0;
+			top:0;
+			bottom:0;
+			z-index:999999;
+			cursor:grabbing;
+		}
 		#table-div-container{
 			width:100%;
 			overflow-x:auto;
@@ -1009,10 +1019,14 @@ border:none;
 text-align:center;
 background:whitesmoke;
 vertical-align:middle;
+cursor:grab;
 }
 #table tr:first-child td::before{
 content:counter(table-col, upper-alpha);
 counter-increment:table-col;
+}
+#table tr:first-child td.moveTargetX{
+	border-right:2px solid red;
 }
 body[data-view-editor] tr:first-child{
 	display:none;
@@ -1026,6 +1040,12 @@ body:not([data-view-editor]) #table tr:not(:empty)::before{
 	display:table-cell;
 	border-bottom:2px solid transparent !important;
 	vertical-align:middle;
+}
+body:not([data-view-editor]) #table tr.moveTargetY:not(:empty)::before{
+	border-bottom:2px solid red !important;
+}
+body:not([data-view-editor]) #table tr.moveTargetX:not(:empty):first-child::before{
+	border-right:2px solid red;
 }
 body:not([data-view-editor]) #table tr:not(:empty):first-child::before{
 	color:transparent;
