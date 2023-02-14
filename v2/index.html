@@ -29,7 +29,6 @@
 </head>
 
 <body>
-	<div id="overlay"></div>
 	<div id="font-backdrop"></div>
 	<div class="border-line" id="line"></div>
 	<div class="container-fluid">
@@ -56,7 +55,6 @@
 								<span data-toggle="tooltip" title="Undo (CTRL+Z)" class="top-menu-btn" onclick="table.statesManager.undo()"><img src="icons/arrow-counterclockwise.svg"></span>
 								<!--<span data-toggle="tooltip" title="Redo" class="top-menu-btn" onclick="table.statesManager.undo()"><img src="icons/arrow-clockwise.svg"></span>-->
 								<span data-toggle="tooltip" title="Generate" class="top-menu-btn" onclick="table.generate();"><img src="icons/play-fill.svg"></span>
-						<div class="dropdown" style="display:inline-block">
 								<a class="dropdown-toggle" type="button" id="dropdownMenu1" role="button" data-target="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 									File <span class="caret"></span>
 								</a>
@@ -78,23 +76,21 @@
 									</li>
 									<li class="dropdown-submenu">
 										<a tabindex="-1" href="#">Export File</a>
-										<ul class="dropdown-menu" style="list-style-type:none;">
+										<ul class="dropdown-menu">
 											<li><a href="#" onclick="table.prepareDownload()">LaTeX</a></li>
 										</ul>
 									</li>
 								</ul>
-								</div>
-								<div class="dropdown" style="display:inline-block">
+								<span>
 									<a class="dropdown-toggle" type="button" id="dropdownMenu3" role="button" data-target="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 										Table <span class="caret"></span>
 									</a>
 									<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu3" id="dropdownMenu4">
 
-<li><a href="#" onclick="table.deleteContent();return false;">Delete content</a></li>
-										<li><a href="#" onclick="table.transpose();return false;">Transpose</a></li>
+										<li><a href="#" onclick="table.deleteContent()">Delete content</a></li>
 									</ul>
-								</div>
-								<div class="dropdown" style="display:inline-block">
+								</span>
+								<span>
 									<a class="dropdown-toggle" type="button" id="dropdownMenu5" role="button" data-target="dropdownMenu6" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 										Output <span class="caret"></span>
 									</a>
@@ -105,20 +101,10 @@
 										<li class="divider"></li>
 										<li><a href="#" data-target="#format-settings" data-toggle="modal">Settings</a></li>
 									</ul>
-								</div>
+								</span>
 							</div>
 						</div>
-						<div style="float:right;" class="top-dropdown-menu-element"><a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">Comments/Requests/Issues</a> | 
-								<div class="dropdown" style="display:inline-block">
-									<a class="dropdown-toggle" type="button" id="dropdownMenu3" role="button" data-target="dropdownMenu7" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-										v3.0 <span class="caret"></span>
-									</a>
-									<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu3" id="dropdownMenu7">
-
-										<li><a href="v2/index.html">v2.3.3</a></li>
-										<li><a href="v1/index.html">v1.9.1</a></li>
-									</ul>
-								</div> | <a href="#" data-target="#help-modal" data-toggle="modal">Help</a>
+						<div style="float:right;" class="top-dropdown-menu-element"><a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">Comments/Requests/Issues</a> | <a href="../v1/index.html">Switch to old interface</a> | <a href="#" data-target="#help-modal" data-toggle="modal">Help</a>
 						</div>
 					</div>
 					<div class="toolbar-group-container" tabindex="0" role="toolbar">
@@ -278,6 +264,7 @@
 					</div>
 					<hr style="margin:0;margin-bottom:2px;">
 				</nav>
+
 				<div class="caption-container">
 					<div class="input-group" style="max-width:400px">
 						<div class="input-group-addon">
@@ -294,7 +281,6 @@
 					</table>
 				</div>
 				<div>
-
 					<div class="alert alert-info" role="alert" style="display:none;" id="border-editor-info">
 						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<span class="glyphicon glyphicon-info-sign"></span> You are now using the border editor. You can drag your cursor to draw multiple borders at once or click on any border to activate or deactivate it. You can change the border style in the toolbar.
@@ -303,7 +289,6 @@
 				<hr>
 
 				<div id="tooltip-helper">Hey</div>
-<div style="margin:0 20%;background:whitesmoke;padding:1em;border-radius:1em;">
 				<center>
 					<div class="btn-group" role="group" style="margin-bottom:25px">
 						<button onclick="table.generate()" class="btn btn-primary" data-toggle="tooltip" title="Generate code" id="generate-button">Generate</button>
@@ -335,22 +320,8 @@
 						</div>
 						<button title="Settings" class="btn btn-default" data-target="#format-settings" data-toggle-second="tooltip" data-toggle="modal"><span class="glyphicon glyphicon-cog"></span></button>
 					</div>
+
 				</center>
-<div id="latex-opt-shortcuts"><div style="text-decoration:underline">Options (<a href="#" data-target="#format-settings" data-toggle="modal">+more</a>)</div>
-<div><input type="checkbox" id="copt-break"> Allow table to break across pages</div>
-<div><input type="checkbox" id="copt-shrink"> Shrink columns automatically</div>
-<div><input type="checkbox" id="copt-ltx-com"> Ignore LaTeX commands in text</div>
-<div>
-						<div class="btn-group dropdown">
-							<button title="Output environment" type="button" id="env-button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Auto <span class="caret"></span></button>
-							<ul class="dropdown-menu" id="env-button-drop" style="max-height:200px;overflow-y:auto;">
-								<li data-value="auto"><a href="#">Auto</a></li>
-								<li data-value="tabular"><a href="#">Tabular</a></li>
-								<li data-value="tabularray"><a href="#">Tabularray</a></li>
-								<li data-value="tabu"><a href="#">Tabu</a></li>
-							</ul>
-						</div> LaTeX environment</div>
-</div></div>
 <div style="margin:20px;">
 <div><span style="color:#555">Advertisement</span></div>
 <!-- Before-Generate -->
@@ -1352,8 +1323,6 @@ and \(...\)" data-toggle="tooltip">
 	<script type="text/javascript" src="toWML.js">
 	</script>
 	<script type="text/javascript" src="latex-import.js">
-	</script>
-	<script type="text/javascript" src="toTabularray.js">
 	</script>
 	<script type="text/javascript" src="ntc.js">
 	</script>

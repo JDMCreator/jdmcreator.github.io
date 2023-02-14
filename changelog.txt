@@ -6,6 +6,28 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 3.0
+==========
+
+| Note on this release:
+|     Generate tabularray tables, better UI, move columns and rows
+
+CORE
+
+[+] Possible to move columns and rows by grabing the header
+[+] Better rotated texts and easier to edit
+[+] Most important settings are now next to "Generate" button
+[+] Transpose table menu option (#71)
+[#] Fixed issue with dropdown menus
+[#] Tables with diagonal lines or two diagonal lines were not saved
+
+LATEX EXPORT
+
+[+] Generate Tabularray tables with `tblr` and `longtblr` environments
+[+] "Auto" setting generate tabularray/tabular tables depending on the complexity of the table
+[+] Improved support for numbers with `Siunitx`
+
+#71, #70
 
 Version 2.3.3 (2022/07/18)
 ==========
