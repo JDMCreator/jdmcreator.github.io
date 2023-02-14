@@ -4588,7 +4588,7 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 				} else {
 					this.interpret(format);
 				}
-				sendGAEvent("Code", "generate2", format)
+				sendGAEvent("Code", "generate3", format)
 				this.message("Generated in " + ((+new Date()) - start) + "ms");
 				$id("log")
 					.innerHTML = "<strong>Log</strong> (" + ((new Date())
