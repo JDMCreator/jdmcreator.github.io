@@ -124,7 +124,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "3.0";
+			this.version = "3.0.1";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -4598,7 +4598,12 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 					campaignUsed = true;
 				}
 				var c = $id("generate-button");
-				scrollTo(0, (c.getBoundingClientRect().top - document.body.getBoundingClientRect().top) - $id("nav-latex").offsetHeight - 15);
+				if(c.scrollIntoView){
+					c.scrollIntoView({behavior: "smooth", block: "center"});
+				}
+				else{
+					scrollTo(0, (c.getBoundingClientRect().top - document.body.getBoundingClientRect().top) - $id("nav-latex").offsetHeight - 15);
+				}
 			}
 			this.campaignClicked = function(){
 				campaignUsed = true;

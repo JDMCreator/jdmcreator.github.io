@@ -6,7 +6,17 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
-Version 3.0
+Version 3.0.1 (2023/02/19)
+==========
+
+| Note on this release:
+|     Improved scrolling
+
+CORE
+
+[+] Possible to move columns and rows by grabing the header
+
+Version 3.0 (2023/02/13)
 ==========
 
 | Note on this release:
