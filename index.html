@@ -370,6 +370,7 @@
 					<div class="col-md-9">
 						<textarea id="c" class="form-control">
                         </textarea>
+						<a href="javascript:;" onclick="navigator.clipboard.writeText(document.getElementById('c').value)">Copy to Clipboard</a> | 
 						<a href="javascript:;" onclick="table.toMWE();">Convert to Minimal Working Example (MWE)</a>
 					</div>
 					<div class="col-md-3">
@@ -620,6 +621,7 @@
 						<textarea class="form-control textarea-wrap" id="import_value" style="min-height:200px;" placeholder="Content of your file to import"></textarea>
 					</div>
 					<div id="latex-import-error" style="display:none;color:red;">Your LaTeX table could not be loaded. Help us and <a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">send us the code of your table</a> so we can see what happened.</div>
+<div style="padding-bottom:5px;"><label><input type="checkbox" id="opt-imp-unknown"> Preserve unknown LaTeX commands</label></div>
 					<div class="text-center">
 						<button type="button" class="btn btn-primary" onclick="table.importData();">Import the content of a file</button>
 					</div>
@@ -731,6 +733,10 @@
 
 					<h5>Default Colors</h5>
 					<div id="colorpicker-default-scheme" class="color-scheme">
+
+					</div>
+					<h5>Saved Colors</h5>
+					<div id="colorpicker-saved-scheme" class="color-scheme">
 
 					</div>
 					<div style="text-align:center;">

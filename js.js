@@ -124,7 +124,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "3.0.1";
+			this.version = "3.1";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -1052,20 +1052,20 @@ this.getHTML = (function(){
 						div.appendChild(actualLine);
 						o.html = div.innerHTML;
 						lines.push(o);
-						actualLine = actualElement = document.createDocumentFragment();
 					}
 					else{
-						actualElement = actualLine;
+						//actualElement = actualLine;
 					}
 				}
-				function treatTag(node, stopRemove){
+				function treatTag(node, stopRemove, actualElement){
 					if(!stopRemove && node.tagName != "LI" && node.tagName != "BR" && node.tagName != "UL"){
 						actualElement.appendChild(node);
 					}
 					if(node.tagName){
 						if(node.tagName == "UL"){addLi++}
 						if(node.tagName == "LI" || node.tagName == "BR"){
-							pushLine(node.tagName)
+							pushLine(node.tagName);
+							actualLine = actualElement = document.createDocumentFragment();
 							if(addLi>0){li+=addLi;addLi = 0}
 						}
 						if(node.tagName == "LI"){
@@ -1076,10 +1076,15 @@ this.getHTML = (function(){
 						}
 						var children = Array.from(node.childNodes);
 						for(var i=0;i<children.length;i++){
-							treatTag(children[i]);
+							if(actualLine.childNodes.length == 0){
+								// We changed line, therefore we change element
+								actualElement = actualLine;
+							}
+							treatTag(children[i], false, actualElement);
 						}
 						if(node.tagName == "UL"){
 							pushLine();
+							actualLine = actualElement = document.createDocumentFragment();
 							if(!addLi){
 								li--;
 							}
@@ -1087,7 +1092,7 @@ this.getHTML = (function(){
 						}
 					}
 				}
-				treatTag(fromDiv, true);
+				treatTag(fromDiv, true, actualElement);
 				pushLine();
 				return {lines:lines, color:color};
 			}
@@ -4523,7 +4528,7 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 				rightBorder = o[rightBorder || ""] || "";
 				return leftBorder + align + rightBorder;
 			}
-			this.autoLaTeXFormat = function(){debugger;
+			this.autoLaTeXFormat = function(){
 				var format = "tabular";
 				if($id("opt-latex-tabu").checked){
 					return "tabu";
@@ -4688,8 +4693,10 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 						}
 					}
 					var max = 0, value = "l";
+					var hasHeader = false; // There can be no header if all cells span columns
 					for (var k in headernow) {
 						if (headernow.hasOwnProperty(k)){
+							hasHeader = true;
 							if(headernow[k] > max) {
 								max = headernow[k];
 								value = k;
@@ -4699,12 +4706,14 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 							}
 						}
 					}
-					var cellsArray = cellsArrays[value];
-					for(var k=0;k<cellsArray.length;k++){
-						cellsArray[k].isInPreambule = true;
+					if(hasHeader){
+						var cellsArray = cellsArrays[value];
+						for(var k=0;k<cellsArray.length;k++){
+							cellsArray[k].isInPreambule = true;
+						}
+						this.actualColor = colorArr[value]
 					}
 					colHeaders.push(value);
-					this.actualColor = colorArr[value]
 				}
 				return colHeaders;
 			}

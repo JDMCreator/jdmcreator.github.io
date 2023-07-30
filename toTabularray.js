@@ -153,7 +153,6 @@
 			if(!isS && html.lines.length>1){
 				code = "{" + code + "}";
 			}
-console.log(code);
 			o.color = html.color;
 		}
 /*

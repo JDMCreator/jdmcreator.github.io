@@ -622,6 +622,32 @@
 			height:30px;
 			border:2px solid black;
 		}
+		.colorpicker-save-color{
+			display:flex;
+			flex-direction:column;
+		}
+		.colorpicker-save-color > span{
+			font-weight:bold;
+			font-size:130%;
+			text-align:center;
+		}
+		.colorpicker-saved-color{
+			position:relative;
+		}
+		.colorpicker-saved-color > div{
+			position:absolute;
+			top:-5px;
+			right:-5px;
+			background:#d00000;
+			width:10px;
+			color:#fff;
+			height:10px;
+			border-radius:50%;
+			font-size:90%;
+			text-align:center;
+			line-height:10px;
+			font-weight:bold;
+		}
 		.color-scheme > div:hover{
 			border-color:gray;
 		}
