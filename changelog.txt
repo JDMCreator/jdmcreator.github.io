@@ -6,6 +6,27 @@ Legend
 [#] Fixed
 Dates use a YYYY/MM/DD format.
 
+Version 3.2 (2025/01/14)
+==========
+
+| Note on this release:
+|     Bug Fixes
+
+CORE
+
+[+] Quick access to insert new rows
+[+] URL params "format" for default format
+[/] Some scripts are now loaded async and only when needed, for faster loading
+[#] Undo when removing columns and rows should be better handled
+
+LATEX IMPORT
+
+[+] Support for environment `xltabular` (#100)
+
+TYPST EXPORT
+
+[+] New export module
+
 Version 3.1.1 (2024/02/17)
 ==========
 
@@ -1143,7 +1164,7 @@ Version 0.6 BETA (2017/10/23)
 
 CORE
 
-[+] New package option for "colortbl"¸
+[+] New package option for "colortbl" 
 [+] Informations about LaTeX packages are now shown
 [#] Support for pasting data
 [#] Bold and italic elements that follows each other are now merged
@@ -1277,7 +1298,7 @@ LATEX IMPORT MODULE
 
 [+] Support for \multirowcell and \multirowthead from "makecell" package
 [+] Support for "table*" environment
-[+] Support for \P command (gives ¶)
+[+] Support for \P command (gives  )
 [#] Now support short forms of "multirow" and "multicolumn" (ex: \multirow3*{My Text})
 [#] \cmidrule(){} are not ignored anymore
 [#] \taburulecolor is now ignored

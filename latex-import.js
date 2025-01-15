@@ -807,12 +807,12 @@ tblrkeyval = function(str){
 		}
 	}
 },
-importTable = function(code){
-
+importTable = async function(code){
+await requireScript("xcolor.js");
 xcolor.erase();
 xcolor.extract(code);
-var tabularReg = /^[^\%]*?(?:(?:\\(ctable)[\[\{])|(?:\\begin\s*{((?:long|)tabu\*?|sidewaystable|(?:long|tall|)tblr|NiceTabular[\*X]?|wraptable|table\*?|xtabular\*?|tabularht\*?|tabularhtx|tabularkv|longtable|(?:mp|)supertabular\*?|tabularew|mpxtabular\*?|tabular[xy]?\*?)}))/gm;
-var tabularRegCommand = /(?:(?:\\(ctable)[\[\{])|(?:\\begin\s*{((?:long|)tabu\*?|sidewaystable|(?:long|tall|)tblr|NiceTabular[\*X]?|wraptable|table\*?|xtabular\*?|tabularht\*?|tabularhtx|tabularkv|longtable|(?:mp|)supertabular\*?|tabularew|mpxtabular\*?|tabular[xy]?\*?)}))/g;
+var tabularReg = /^[^\%]*?(?:(?:\\(ctable)[\[\{])|(?:\\begin\s*{((?:long|)tabu\*?|sidewaystable|(?:long|tall|)tblr|NiceTabular[\*X]?|wraptable|table\*?|xltabular\*?|xtabular\*?|tabularht\*?|tabularhtx|tabularkv|longtable|(?:mp|)supertabular\*?|tabularew|mpxtabular\*?|tabular[xy]?\*?)}))/gm;
+var tabularRegCommand = /(?:(?:\\(ctable)[\[\{])|(?:\\begin\s*{((?:long|)tabu\*?|sidewaystable|(?:long|tall|)tblr|NiceTabular[\*X]?|wraptable|table\*?|xltabular\*?|xtabular\*?|tabularht\*?|tabularhtx|tabularkv|longtable|(?:mp|)supertabular\*?|tabularew|mpxtabular\*?|tabular[xy]?\*?)}))/g;
 var tabular = tabularReg.exec(code);
 	tabularReg.lastIndex = 0;
 	tabularRegCommand.lastIndex = 0;
@@ -922,7 +922,7 @@ var tabular = tabularReg.exec(code);
 		var initEnv = envirn(code2);
 		code = initEnv.content;
 		if(type == "table" || type == "table*" || type == "sidewaystable" || type == "wraptable"){
-			if(/^[^%]*?(?:\\begin\s*{((?:long|)tabu\*?|xtabular\*?|tabularht\*?|(?:mp|)supertabular\*?|tabularew|tabularhtx|(?:long|tall|)tblr|NiceTabular[*X]?|tabularkv|longtable|mpxtabular\*?|tabular[xy]?\*?|)})/m.test(code)){
+			if(/^[^%]*?(?:\\begin\s*{((?:long|)tabu\*?|xtabular\*?|tabularht\*?|(?:mp|)supertabular\*?|tabularew|tabularhtx|(?:long|tall|)tblr|NiceTabular[*X]?|tabularkv|xltabular\*?|longtable|mpxtabular\*?|tabular[xy]?\*?|)})/m.test(code)){
 				var caption = code.indexOf("\\caption");
 				if(caption >=0){
 					caption = command(code.substring(caption));
@@ -936,11 +936,11 @@ var tabular = tabularReg.exec(code);
 					if(!obj.caption){ obj.caption = {} }
 					obj.caption.label = label.args[0];
 				}
-				tabular = /^[^%]*?(?:\\begin\s*{((?:long|)tabu\*?|xtabular\*?|(?:mp|)supertabular\*?|tabularht\*?|tabularhtx|tblr|NiceTabular[*X]?|tabularkv|longtable|mpxtabular\*?|tabular[xy]?\*?)})/gm.exec(code2);
+				tabular = /^[^%]*?(?:\\begin\s*{((?:long|)tabu\*?|xltabular\*?|xtabular\*?|(?:mp|)supertabular\*?|tabularht\*?|tabularhtx|tblr|NiceTabular[*X]?|tabularkv|longtable|mpxtabular\*?|tabular[xy]?\*?)})/gm.exec(code2);
 				if(!tabular){
 					return false; // Should not happen
 				}
-				tabularCommand = /(?:\\begin\s*{((?:long|)tabu\*?|xtabular\*?|(?:mp|)supertabular\*?|tabularht\*?|tabularhtx|tblr|NiceTabular[*X]?|tabularkv|longtable|mpxtabular\*?|tabular[xy]?\*?)})/g.exec(tabular[0]);
+				tabularCommand = /(?:\\begin\s*{((?:long|)tabu\*?|xtabular\*?|(?:mp|)supertabular\*?|tabularht\*?|tabularhtx|tblr|NiceTabular[*X]?|tabularkv|xltabular\*?|longtable|mpxtabular\*?|tabular[xy]?\*?)})/g.exec(tabular[0]);
 				if(!tabularCommand){
 					return false;
 				}
@@ -954,7 +954,7 @@ var tabular = tabularReg.exec(code);
 			}
 		}
 		code = initEnv.content;
-		if(type == "longtable" || type=="longtabu"){
+		if(type == "longtable" || type=="longtabu" || type=="xltabular"){
 			var label = code.indexOf("\\label");
 			if(label >= 0){
 				label = command(code.substring(label));
@@ -995,7 +995,7 @@ var tabular = tabularReg.exec(code);
 		if(type == "tabular" || type == "xtabular" || type == "mpxtabular" || type == "longtable" || type == "NiceTabular" || type == "supertabular" || type == "mpsupertabular" || type == "tabularew"){
 			head = header(initEnv.command.args[1]);
 		}
-		else if(type == "tabular*" || type == "tabularx" || type == "tabulary" || type == "tabularht" || type == "tabularkv" || type == "NiceTabularX" || type == "NiceTabular*" || type == "supertabular*" || type == "mpsupertabular*" || type == "xtabular*" || type == "mpxtabular*"){
+		else if(type == "tabular*" || type == "tabularx" || type == "tabulary" || type == "tabularht" || type == "tabularkv" || type == "NiceTabularX" || type == "NiceTabular*" || type == "supertabular*" || type == "mpsupertabular*" || type == "xtabular*" || type == "mpxtabular*" || type == "xltabular"){
 			head = header(initEnv.command.args[2]);
 		}
 		else if(type == "tabularht*" || type == "tabularhtx"){

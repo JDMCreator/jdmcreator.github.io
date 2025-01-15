@@ -12,6 +12,8 @@
 	<link href="css/bootstrap.min.css" rel="stylesheet">
 	<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+	<script type="text/javascript" src="init.js">
+	</script>
 	<script type="text/javascript" src="js/jquery.min.js">
 	</script>
 	<script type="text/javascript" src="js/bootstrap.min.js">
@@ -19,8 +21,6 @@
 	<script type="text/javascript" src="table.js">
 	</script>
 	<script type="text/javascript" src="color.js">
-	</script>
-	<script type="text/javascript" src="tableDecimal.js">
 	</script>
 	<script type="text/javascript" src="js.js"></script>
 	<script type="text/javascript">
@@ -117,7 +117,7 @@
 						<div style="float:right;" class="top-dropdown-menu-element"><a href="https://github.com/JDMCreator/LaTeXTableEditor/issues" target="_blank">Comments/Requests/Issues</a> | 
 								<div class="dropdown" style="display:inline-block">
 									<a class="dropdown-toggle" type="button" id="dropdownMenu3" role="button" data-target="dropdownMenu7" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-										v3.0 <span class="caret"></span>
+										v3.2 <span class="caret"></span>
 									</a>
 									<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu3" id="dropdownMenu7">
 
@@ -298,6 +298,7 @@
 				<div id="table-div-container">
 					<table id="table">
 					</table>
+					<div id="plus-row-button" title="Insert a row here"><div>+</div><div></div></div>
 				</div>
 				<div>
 
@@ -325,7 +326,7 @@
 								<li role="separator" class="divider"></li>
 								<li class="dropdown-header">Markup</li>
 								<li data-value="md"><a href="#">Markdown</a></li>
-								<li data-value="textile"><a href="#">Textile</a></li>
+								<li data-value="textile"><a href="#">Textile</a></li>									<li data-value="typst"><a href="#">Typst</a></li>
 								<li role="separator" class="divider"></li>
 								<li class="dropdown-header">Web</li>
 								<li data-value="html"><a href="#">HTML</a></li>
@@ -999,7 +1000,7 @@
 						<option value="csv">CSV</option>
 						<option value="eplain">Eplain</option>
 						<option value="pretext">PreTeXt</option>
-						<option value="textile">Textile</option>
+						<option value="textile">Textile</option>										<option value="typst">Typst</option>
 						<option value="wml">WML</option>
 					</select>
 					<div class="form-group" data-option-group="latex">
@@ -1229,6 +1230,10 @@ and \(...\)" data-toggle="tooltip">
 							<option value="four" selected>Four spaces</option>
 						</select>
 					</div>
+
+					<div class="form-group" data-option-group="typst" style="display:none;">
+						<h4>Typst options</h4>
+					</div>
 					<div class="form-group" data-option-group="textile" style="display:none;">
 						<h4>Textile options</h4>
 					</div>
@@ -1238,16 +1243,6 @@ and \(...\)" data-toggle="tooltip">
 	</div>
 
 	<script type="text/javascript">
-		tableDecimal("#table", {
-			attributeChar: "data-align",
-			attributeCharValue: "d",
-			char: ".",
-			observe: true,
-			paddingElement: "div[contenteditable]",
-			observeFilter: function() {
-				return document.getElementById("table").querySelector('td[data-align="d"');
-			}
-		});
 		$(function() {
 			var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 			var isEdge = !isIE && !!window.StyleMedia;
@@ -1278,8 +1273,14 @@ and \(...\)" data-toggle="tooltip">
 				table.create(4, 4);
 			}
 			var format = localStorage.getItem("table_format")
-			if (format) {
+			var urlParams = new URLSearchParams(window.location.search);
+			if (format && !(urlParams.has("force") && urlParams.has("format"))) {
 				table.selectFormat(format);
+			}
+			else{
+				if(urlParams.has("format")){
+					table.selectFormat(urlParams.get("format"));
+				}
 			}
 
 			function createTableCreater() {
@@ -1346,38 +1347,23 @@ and \(...\)" data-toggle="tooltip">
 			ga('create', 'UA-102898458-1', 'auto');
 			ga('send', 'pageview');
 		}
+		;(async function(){
+			await requireScript("tableDecimal.js");
+			tableDecimal("#table", {
+				attributeChar: "data-align",
+				attributeCharValue: "d",
+				char: ".",
+				observe: true,
+				paddingElement: "div[contenteditable]",
+				observeFilter: function() {
+					return document.getElementById("table").querySelector('td[data-align="d"');
+				}
+			});
+		})();
 	</script>
-	<script type="text/javascript" src="toMarkdown.js">
+	<script type="text/javascript" defer src="ntc.js">
 	</script>
-	<script type="text/javascript" src="toTeX.js">
-	</script>
-	<script type="text/javascript" src="toHTML.js">
-	</script>
-	<script type="text/javascript" src="toCSV.js">
-	</script>
-	<script type="text/javascript" src="toBBCode.js">
-	</script>
-	<script type="text/javascript" src="toEplain.js">
-	</script>
-	<script type="text/javascript" src="toPreTeXt.js">
-	</script>
-	<script type="text/javascript" src="toWML.js">
-	</script>
-	<script type="text/javascript" src="latex-import.js">
-	</script>
-	<script type="text/javascript" src="toTabularray.js">
-	</script>
-	<script type="text/javascript" src="ntc.js">
-	</script>
-	<script type="text/javascript" src="colorPicker.js">
-	</script>
-	<script type="text/javascript" src="xcolor.js">
-	</script>
-	<script type="text/javascript" src="toConteXt.js">
-	</script>
-	<script type="text/javascript" src="toWikicode.js">
-	</script>
-	<script type="text/javascript" src="toTextile.js">
+	<script type="text/javascript" defer src="colorPicker.js">
 	</script>
 </body>
 

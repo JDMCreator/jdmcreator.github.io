@@ -265,6 +265,28 @@
 			position:relative;
 			top:-1.7ex;
 		}
+		#plus-row-button{
+			position:absolute;
+			height:10px;
+			display:none;
+			cursor:pointer;
+		}
+		#plus-row-button > div:first-child{
+			font-size:10px;
+			background:#F0F0F4;
+			border:2px solid gray;
+			padding:5px;
+			border-radius:100%;
+			transform:translateX(-50%) translateY(-1px);
+			height:12px;
+			width:12px;
+			text-align:center;
+			cursor:pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+		}
 		#extract-div{
 			height:auto;
 			min-height:200px;
@@ -1069,6 +1091,9 @@ body:not([data-view-editor]) #table tr:not(:empty)::before{
 }
 body:not([data-view-editor]) #table tr.moveTargetY:not(:empty)::before{
 	border-bottom:2px solid red !important;
+}
+body:not([data-view-editor]) #table tr.moveTargetY.moveAddY:not(:empty)::before{
+	border-bottom:2px solid gray !important;
 }
 body:not([data-view-editor]) #table tr.moveTargetX:not(:empty):first-child::before{
 	border-right:2px solid red;

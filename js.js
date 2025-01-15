@@ -124,7 +124,7 @@ function $id(id) {
 			return "[rgb]{"+sep+"}";
 		},
 		table = new(function() {
-			this.version = "3.1.1";
+			this.version = "3.2";
 			this.create = function(cols, rows) {
 				rows = parseInt(rows, 10);
 				cols = parseInt(cols, 10);
@@ -137,14 +137,15 @@ function $id(id) {
 				this.Table.update();
 				this.loadAllFootnotes();
 			};
-			this.importData = function(content, format){
+			this.importData = async function(content, format){
 				content = content || $id("import_value").value;
 				format = (format || $id("import_format").value).toLowerCase();
 				if(format == "auto"){
 					var json;
 					if(/(\\begin{|\\halign|\\valign|\\ctable({|\[))/.test(content)){
 						try{
-							this.importFromJSON(this.latex.importTable(content));
+							await requireScript("latex-import.js");
+							this.importFromJSON(await this.latex.importTable(content));
 						}
 						catch(e){
 							try{
@@ -194,14 +195,16 @@ function $id(id) {
 					}
 				}
 				else if(format == "latex"){
+					await requireScript("latex-import.js");
 					if(!window.isProduction){
-							this.importFromJSON(table.latex.importTable(content));
+debugger;
+							this.importFromJSON(await table.latex.importTable(content));
 							$('#importModal').modal('hide');
 							sendGAEvent("Code", "import", "latex");
 					}
 					else{
 						try{
-							this.importFromJSON(table.latex.importTable(content));
+							this.importFromJSON(await table.latex.importTable(content));
 							$('#importModal').modal('hide');
 							sendGAEvent("Code", "import", "latex");
 						}
@@ -307,9 +310,28 @@ function $id(id) {
 			this.createInterpreter = function(format, fn) {
 				this.interpreters[format] = fn;
 			}
-			this.interpret = function(format) {
+			this.getInterpreted = async function(format){
+				var scriptMap = {
+					"bbcode" : "toBBCode.js",
+					"context" : "toConteXt.js",
+					"csv" : "toCSV.js",
+					"eplain" : "toEplain.js",
+					"html" : "toHTML.js",
+					"md" : "toMarkdown.js",
+					"plain" : "toTeX.js",
+					"pretext" : "toPreTeXt.js",
+					"textile": "toTextile.js",
+					"typst": "toTypst.js",
+					"wikicode" : "toWikicode.js",
+					"wml" : "toWML.js"
+				}
+				if(!scriptMap[format]){return "";}
+				await requireScript(scriptMap[format]);
+				return this.interpreters[format].call(this);
+			}
+			this.interpret = async function(format) {
 				document.getElementById('c')
-					.value = this.interpreters[format].call(this);
+					.value = await this.getInterpreted(format);
 			}
 			this.deleteContent = function(force){
 				force = force || confirm("Are you sure you want to delete the content of your table ?");
@@ -2380,6 +2402,59 @@ this.getHTML = (function(){
 						}
 					}
 				});
+				(function(){
+				var throttleMM = 0;
+				table.addEventListener("mousemove", function(e){
+					var target = e.target || e.srcElement;
+					if(Date.now()<throttleMM){return;}
+					var ignore = false;
+					throttleMM = Date.now() + 25;
+					var btn = document.querySelector("#plus-row-button");
+					if(e.target.tagName == "TR" && !document.body.hasAttribute("data-border-editor") && e.target.rowIndex > 0){
+						var bound = e.target.getBoundingClientRect();
+						if(e.clientY-bound.top<5 || bound.top+bound.height-e.clientY<5){
+							ignore = true;
+							btn.style.display = "block";
+							btn.style.left = (bound.left + scrollX) + "px";
+							var st = document.querySelector(".moveTargetY");
+							if(st){st.classList.remove("moveTargetY");}
+							var row = e.target;
+							if(e.clientY-bound.top<5){
+								btn.style.top = (bound.top + scrollY - 5)+"px";
+								row = row.closest("table").rows[row.rowIndex-1];
+							}
+							else{
+								btn.style.top = (bound.top + scrollY +bound.height - 5)+"px";
+							}
+							btn.onclick = (function(index){
+								var matrix = this.matrix();
+								var cell = null;
+								var row = matrix[Math.max(0,index-1)];
+								for(var i=0;i<row.length;i++){
+									if(!row[i].refCell){cell = row[i]}
+								}
+								if(cell){
+									if(index === 0){
+										this.insertRowOver(cell.cell);
+									}
+									else{
+										this.insertRowUnder(cell.cell);
+									}
+								}
+							}).bind(window.table, row.rowIndex);
+							row.classList.add("moveTargetY");											row.classList.add("moveAddY");
+						}
+					}
+					if(!ignore){
+						if(btn.style.display == "block"){
+							var st = document.querySelector(".moveTargetY");
+							if(st){st.classList.remove("moveTargetY");
+							st.classList.remove("moveAddY");}
+							btn.style.display = "none";
+						}
+					}
+				});
+				})();
 				table.addEventListener("mousedown", function(e){
 					if(!document.body.hasAttribute("data-border-editor")){
 						var target = e.target || e.srcElement;
@@ -2796,7 +2871,7 @@ this.getHTML = (function(){
 					mergePicker.style.display = "none";
 				}
 			}
-			this.toggleFontColorPicker = function(el){
+			this.toggleFontColorPicker = async function(el){
 				var fontPicker = document.getElementById("font-color-picker");
 				if(el.getAttribute("aria-expanded") == "false"){
 
@@ -4055,7 +4130,7 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 			}
 			this.removeRow = function() {
 				this.statesManager.registerState();
-				var cell = this.selectedCell;
+				var cell = this.element.querySelector("td[data-selected]");
 				do{				
 					if (cell) {
 						if(cell.closest && cell.closest("table").rows.length <= 2){
@@ -4071,7 +4146,7 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 			}
 			this.removeCol = function() {
 				this.statesManager.registerState();
-				var cell = this.selectedCell;
+				var cell = this.element.querySelector("td[data-selected]");
 				do{
 					if (cell) {
 						if(cell.closest("table").rows[0].childNodes.length <= 1){
@@ -4570,7 +4645,7 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 				}
 				return format;
 			}
-			this.generate = function() {
+			this.generate = async function() {
 				var start = +new Date()
 				table.useTabularray = false;
 				this.buildBlacklist();
@@ -4585,6 +4660,7 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 						env = this.autoLaTeXFormat();
 					}
 					if(env == "tabularray"){
+						await requireScript("toTabularray.js");
 						$id("c").value = this.generateTabularray();
 					}
 					else{
@@ -5716,13 +5792,13 @@ console.log(params.siunitx+"|"+lines.length+"|"+div.innerHTML);
 				$id("link-download")
 					.href = "";
 			}
-			this.prepareEmail = function(){
+			this.prepareEmail = async function(){
 				var format = $id("format-in").value,
 				result = "";
 				if (format == "latex") {
 					result = this.generateLaTeX();
 				} else {
-					result = this.interpreters[format].call(this)
+					result = await this.getInterpreted(format);
 				}
 				this._id("link-email").href = "mailto:?subject=Table&body=" + encodeURIComponent(result);
 				$('#email').modal('show');
